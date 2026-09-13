@@ -1,0 +1,61 @@
+
+> shipbrief@0.1.0 dev
+> next dev --hostname 127.0.0.1 --port 3000
+
+▲ Next.js 16.3.4 (Turbopack)
+- Local:         http://127.0.0.1:3000
+- Network:       http://127.0.0.1:3000
+✓ Ready in 8.5s
+✓ Running next.config.ts took 628ms
+Creating turbopack project { dir: 'C:\\Users\\HP\\shipbrief', testMode: true }
+
+○ Compiling / ...
+ GET /?verify=v3 200 in 15.9s (next.js: 12.2s, application-code: 3.7s)
+ GET /login?verify=v3 200 in 643ms (next.js: 117ms, application-code: 526ms)
+ GET /?visual=v3 200 in 680ms (next.js: 81ms, application-code: 599ms)
+ GET /?visual=v3 200 in 469ms (next.js: 144ms, application-code: 325ms)
+ GET /?visual=v3 200 in 364ms (next.js: 110ms, application-code: 254ms)
+ GET /?visual=v4 200 in 561ms (next.js: 37ms, application-code: 524ms)
+ GET /?mobile=v4 200 in 652ms (next.js: 37ms, application-code: 615ms)
+ GET /?mobile=v5 200 in 727ms (next.js: 30ms, application-code: 697ms)
+ GET /?postbuild=v4 200 in 481ms (next.js: 37ms, application-code: 444ms)
+ GET /?finalcheck=1 200 in 424ms (next.js: 33ms, application-code: 391ms)
+ GET /?finalcheck=mobile 200 in 522ms (next.js: 40ms, application-code: 483ms)
+ GET /login?finalcheck=mobile 200 in 312ms (next.js: 83ms, application-code: 229ms)
+ GET / 200 in 860ms (next.js: 105ms, application-code: 756ms)
+ GET /login?finalcheck=mobile 200 in 490ms (next.js: 138ms, application-code: 352ms)
+✓ Compiled in 1612ms
+ GET /login?finalcheck=mobile 200 in 467ms (next.js: 133ms, application-code: 334ms)
+✓ Compiled in 2.8s
+ GET /login?finalcheck=mobile 200 in 500ms (next.js: 110ms, application-code: 390ms)
+ GET / 200 in 1016ms (next.js: 384ms, application-code: 632ms)
+ GET / 200 in 607ms (next.js: 32ms, application-code: 575ms)
+ GET / 200 in 368ms (next.js: 32ms, application-code: 336ms)
+ GET / 200 in 1512ms (next.js: 101ms, application-code: 1411ms)
+ GET / 200 in 444ms (next.js: 30ms, application-code: 414ms)
+ GET / 200 in 521ms (next.js: 37ms, application-code: 484ms)
+ GET / 200 in 555ms (next.js: 29ms, application-code: 526ms)
+ GET / 200 in 343ms (next.js: 25ms, application-code: 318ms)
+ GET / 200 in 441ms (next.js: 27ms, application-code: 414ms)
+ GET / 200 in 564ms (next.js: 280ms, application-code: 285ms)
+ GET / 200 in 324ms (next.js: 43ms, application-code: 281ms)
+✓ Compiled in 4s
+ GET / 200 in 636ms (next.js: 85ms, application-code: 551ms)
+ GET / 200 in 498ms (next.js: 133ms, application-code: 365ms)
+ GET / 200 in 547ms (next.js: 40ms, application-code: 507ms)
+ GET / 200 in 254ms (next.js: 33ms, application-code: 221ms)
+ GET / 200 in 371ms (next.js: 61ms, application-code: 310ms)
+ GET / 200 in 300ms (next.js: 37ms, application-code: 264ms)
+✓ Compiled in 2.5s
+ GET / 200 in 443ms (next.js: 68ms, application-code: 376ms)
+ GET / 200 in 357ms (next.js: 37ms, application-code: 320ms)
+ GET / 200 in 479ms (next.js: 56ms, application-code: 423ms)
+ GET / 200 in 292ms (next.js: 30ms, application-code: 262ms)
+✓ Compiled in 1405ms
+ GET / 200 in 894ms (next.js: 135ms, application-code: 758ms)
+ GET / 200 in 442ms (next.js: 51ms, application-code: 391ms)
+ GET / 200 in 491ms (next.js: 43ms, application-code: 448ms)
+ GET / 200 in 499ms (next.js: 77ms, application-code: 422ms)
+ GET / 200 in 627ms (next.js: 36ms, application-code: 591ms)
+ GET /login 200 in 796ms (next.js: 223ms, application-code: 573ms)
+[?25h

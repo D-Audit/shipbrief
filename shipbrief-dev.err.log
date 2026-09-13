@@ -1,0 +1,993 @@
+⨯ ./src/components/public/public-update.tsx:12:1
+Error: Module not found: Can't resolve './public-engagement'
+  [90m10 |[0m [36mimport[0m [36mtype[0m { [33mRelease[0m, [33mWorkspaceBranding[0m } [36mfrom[0m [32m"@/types"[0m;
+  [90m11 |[0m [36mimport[0m { [33mPublicHeader[0m } [36mfrom[0m [32m"./public-header"[0m;
+[31m[1m>[0m [90m12 |[0m [36mimport[0m { [33mPublicEngagement[0m } [36mfrom[0m [32m"./public-engagement"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m13 |[0m
+  [90m14 |[0m [36mexport[0m [36mfunction[0m [33mPublicUpdatePage[0m({ workspace, slug }: { workspace: string; slug: string }) {
+  [90m15 |[0m   [36mconst[0m [release, setRelease] = useState<[33mRelease[0m | [36mnull[0m>([36mnull[0m);
+
+
+
+Import trace:
+  Server Component:
+    ./src/components/public/public-update.tsx
+    ./src/app/c/[workspace]/[slug]/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/public/public-update.tsx:12:1
+Error: Module not found: Can't resolve './public-engagement'
+  [90m10 |[0m [36mimport[0m [36mtype[0m { [33mRelease[0m, [33mWorkspaceBranding[0m } [36mfrom[0m [32m"@/types"[0m;
+  [90m11 |[0m [36mimport[0m { [33mPublicHeader[0m } [36mfrom[0m [32m"./public-header"[0m;
+[31m[1m>[0m [90m12 |[0m [36mimport[0m { [33mPublicEngagement[0m } [36mfrom[0m [32m"./public-engagement"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m13 |[0m
+  [90m14 |[0m [36mexport[0m [36mfunction[0m [33mPublicUpdatePage[0m({ workspace, slug }: { workspace: string; slug: string }) {
+  [90m15 |[0m   [36mconst[0m [release, setRelease] = useState<[33mRelease[0m | [36mnull[0m>([36mnull[0m);
+
+
+
+Import trace:
+  Server Component:
+    ./src/components/public/public-update.tsx
+    ./src/app/c/[workspace]/[slug]/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/public/public-update.tsx:12:1
+Error: Module not found: Can't resolve './public-engagement'
+  [90m10 |[0m [36mimport[0m [36mtype[0m { [33mRelease[0m, [33mWorkspaceBranding[0m } [36mfrom[0m [32m"@/types"[0m;
+  [90m11 |[0m [36mimport[0m { [33mPublicHeader[0m } [36mfrom[0m [32m"./public-header"[0m;
+[31m[1m>[0m [90m12 |[0m [36mimport[0m { [33mPublicEngagement[0m } [36mfrom[0m [32m"./public-engagement"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m13 |[0m
+  [90m14 |[0m [36mexport[0m [36mfunction[0m [33mPublicUpdatePage[0m({ workspace, slug }: { workspace: string; slug: string }) {
+  [90m15 |[0m   [36mconst[0m [release, setRelease] = useState<[33mRelease[0m | [36mnull[0m>([36mnull[0m);
+
+
+
+Import trace:
+  Server Component:
+    ./src/components/public/public-update.tsx
+    ./src/app/c/[workspace]/[slug]/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/public/public-update.tsx:12:1
+Error: Module not found: Can't resolve './public-engagement'
+  [90m10 |[0m [36mimport[0m [36mtype[0m { [33mRelease[0m, [33mWorkspaceBranding[0m } [36mfrom[0m [32m"@/types"[0m;
+  [90m11 |[0m [36mimport[0m { [33mPublicHeader[0m } [36mfrom[0m [32m"./public-header"[0m;
+[31m[1m>[0m [90m12 |[0m [36mimport[0m { [33mPublicEngagement[0m } [36mfrom[0m [32m"./public-engagement"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m13 |[0m
+  [90m14 |[0m [36mexport[0m [36mfunction[0m [33mPublicUpdatePage[0m({ workspace, slug }: { workspace: string; slug: string }) {
+  [90m15 |[0m   [36mconst[0m [release, setRelease] = useState<[33mRelease[0m | [36mnull[0m>([36mnull[0m);
+
+
+
+Import trace:
+  Server Component:
+    ./src/components/public/public-update.tsx
+    ./src/app/c/[workspace]/[slug]/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/public/public-update.tsx:12:1
+Error: Module not found: Can't resolve './public-engagement'
+  [90m10 |[0m [36mimport[0m [36mtype[0m { [33mRelease[0m, [33mWorkspaceBranding[0m } [36mfrom[0m [32m"@/types"[0m;
+  [90m11 |[0m [36mimport[0m { [33mPublicHeader[0m } [36mfrom[0m [32m"./public-header"[0m;
+[31m[1m>[0m [90m12 |[0m [36mimport[0m { [33mPublicEngagement[0m } [36mfrom[0m [32m"./public-engagement"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m13 |[0m
+  [90m14 |[0m [36mexport[0m [36mfunction[0m [33mPublicUpdatePage[0m({ workspace, slug }: { workspace: string; slug: string }) {
+  [90m15 |[0m   [36mconst[0m [release, setRelease] = useState<[33mRelease[0m | [36mnull[0m>([36mnull[0m);
+
+
+
+Import trace:
+  Server Component:
+    ./src/components/public/public-update.tsx
+    ./src/app/c/[workspace]/[slug]/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/public/public-update.tsx:12:1
+Error: Module not found: Can't resolve './public-engagement'
+  [90m10 |[0m [36mimport[0m [36mtype[0m { [33mRelease[0m, [33mWorkspaceBranding[0m } [36mfrom[0m [32m"@/types"[0m;
+  [90m11 |[0m [36mimport[0m { [33mPublicHeader[0m } [36mfrom[0m [32m"./public-header"[0m;
+[31m[1m>[0m [90m12 |[0m [36mimport[0m { [33mPublicEngagement[0m } [36mfrom[0m [32m"./public-engagement"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m13 |[0m
+  [90m14 |[0m [36mexport[0m [36mfunction[0m [33mPublicUpdatePage[0m({ workspace, slug }: { workspace: string; slug: string }) {
+  [90m15 |[0m   [36mconst[0m [release, setRelease] = useState<[33mRelease[0m | [36mnull[0m>([36mnull[0m);
+
+
+
+Import trace:
+  Server Component:
+    ./src/components/public/public-update.tsx
+    ./src/app/c/[workspace]/[slug]/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/public/public-update.tsx:12:1
+Error: Module not found: Can't resolve './public-engagement'
+  [90m10 |[0m [36mimport[0m [36mtype[0m { [33mRelease[0m, [33mWorkspaceBranding[0m } [36mfrom[0m [32m"@/types"[0m;
+  [90m11 |[0m [36mimport[0m { [33mPublicHeader[0m } [36mfrom[0m [32m"./public-header"[0m;
+[31m[1m>[0m [90m12 |[0m [36mimport[0m { [33mPublicEngagement[0m } [36mfrom[0m [32m"./public-engagement"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m13 |[0m
+  [90m14 |[0m [36mexport[0m [36mfunction[0m [33mPublicUpdatePage[0m({ workspace, slug }: { workspace: string; slug: string }) {
+  [90m15 |[0m   [36mconst[0m [release, setRelease] = useState<[33mRelease[0m | [36mnull[0m>([36mnull[0m);
+
+
+
+Import trace:
+  Server Component:
+    ./src/components/public/public-update.tsx
+    ./src/app/c/[workspace]/[slug]/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/public/public-update.tsx:12:1
+Error: Module not found: Can't resolve './public-engagement'
+  [90m10 |[0m [36mimport[0m [36mtype[0m { [33mRelease[0m, [33mWorkspaceBranding[0m } [36mfrom[0m [32m"@/types"[0m;
+  [90m11 |[0m [36mimport[0m { [33mPublicHeader[0m } [36mfrom[0m [32m"./public-header"[0m;
+[31m[1m>[0m [90m12 |[0m [36mimport[0m { [33mPublicEngagement[0m } [36mfrom[0m [32m"./public-engagement"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m13 |[0m
+  [90m14 |[0m [36mexport[0m [36mfunction[0m [33mPublicUpdatePage[0m({ workspace, slug }: { workspace: string; slug: string }) {
+  [90m15 |[0m   [36mconst[0m [release, setRelease] = useState<[33mRelease[0m | [36mnull[0m>([36mnull[0m);
+
+
+
+Import trace:
+  Server Component:
+    ./src/components/public/public-update.tsx
+    ./src/app/c/[workspace]/[slug]/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/public/public-update.tsx:12:1
+Error: Module not found: Can't resolve './public-engagement'
+  [90m10 |[0m [36mimport[0m [36mtype[0m { [33mRelease[0m, [33mWorkspaceBranding[0m } [36mfrom[0m [32m"@/types"[0m;
+  [90m11 |[0m [36mimport[0m { [33mPublicHeader[0m } [36mfrom[0m [32m"./public-header"[0m;
+[31m[1m>[0m [90m12 |[0m [36mimport[0m { [33mPublicEngagement[0m } [36mfrom[0m [32m"./public-engagement"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m13 |[0m
+  [90m14 |[0m [36mexport[0m [36mfunction[0m [33mPublicUpdatePage[0m({ workspace, slug }: { workspace: string; slug: string }) {
+  [90m15 |[0m   [36mconst[0m [release, setRelease] = useState<[33mRelease[0m | [36mnull[0m>([36mnull[0m);
+
+
+
+Import trace:
+  Server Component:
+    ./src/components/public/public-update.tsx
+    ./src/app/c/[workspace]/[slug]/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/public/public-update.tsx:12:1
+Error: Module not found: Can't resolve './public-engagement'
+  [90m10 |[0m [36mimport[0m [36mtype[0m { [33mRelease[0m, [33mWorkspaceBranding[0m } [36mfrom[0m [32m"@/types"[0m;
+  [90m11 |[0m [36mimport[0m { [33mPublicHeader[0m } [36mfrom[0m [32m"./public-header"[0m;
+[31m[1m>[0m [90m12 |[0m [36mimport[0m { [33mPublicEngagement[0m } [36mfrom[0m [32m"./public-engagement"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m13 |[0m
+  [90m14 |[0m [36mexport[0m [36mfunction[0m [33mPublicUpdatePage[0m({ workspace, slug }: { workspace: string; slug: string }) {
+  [90m15 |[0m   [36mconst[0m [release, setRelease] = useState<[33mRelease[0m | [36mnull[0m>([36mnull[0m);
+
+
+
+Import trace:
+  Server Component:
+    ./src/components/public/public-update.tsx
+    ./src/app/c/[workspace]/[slug]/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/public/public-update.tsx:12:1
+Error: Module not found: Can't resolve './public-engagement'
+  [90m10 |[0m [36mimport[0m [36mtype[0m { [33mRelease[0m, [33mWorkspaceBranding[0m } [36mfrom[0m [32m"@/types"[0m;
+  [90m11 |[0m [36mimport[0m { [33mPublicHeader[0m } [36mfrom[0m [32m"./public-header"[0m;
+[31m[1m>[0m [90m12 |[0m [36mimport[0m { [33mPublicEngagement[0m } [36mfrom[0m [32m"./public-engagement"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m13 |[0m
+  [90m14 |[0m [36mexport[0m [36mfunction[0m [33mPublicUpdatePage[0m({ workspace, slug }: { workspace: string; slug: string }) {
+  [90m15 |[0m   [36mconst[0m [release, setRelease] = useState<[33mRelease[0m | [36mnull[0m>([36mnull[0m);
+
+
+
+Import trace:
+  Server Component:
+    ./src/components/public/public-update.tsx
+    ./src/app/c/[workspace]/[slug]/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/public/public-update.tsx:12:1
+Error: Module not found: Can't resolve './public-engagement'
+  [90m10 |[0m [36mimport[0m [36mtype[0m { [33mRelease[0m, [33mWorkspaceBranding[0m } [36mfrom[0m [32m"@/types"[0m;
+  [90m11 |[0m [36mimport[0m { [33mPublicHeader[0m } [36mfrom[0m [32m"./public-header"[0m;
+[31m[1m>[0m [90m12 |[0m [36mimport[0m { [33mPublicEngagement[0m } [36mfrom[0m [32m"./public-engagement"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m13 |[0m
+  [90m14 |[0m [36mexport[0m [36mfunction[0m [33mPublicUpdatePage[0m({ workspace, slug }: { workspace: string; slug: string }) {
+  [90m15 |[0m   [36mconst[0m [release, setRelease] = useState<[33mRelease[0m | [36mnull[0m>([36mnull[0m);
+
+
+
+Import trace:
+  Server Component:
+    ./src/components/public/public-update.tsx
+    ./src/app/c/[workspace]/[slug]/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[browser] ./src/components/public/public-update.tsx:12:1
+Error: Module not found: Can't resolve './public-engagement'
+  10 | import type { Release, WorkspaceBranding } from "@/types";
+  11 | import { PublicHeader } from "./public-header";
+> 12 | import { PublicEngagement } from "./public-engagement";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  13 |
+  14 | export function PublicUpdatePage({ workspace, slug }: { workspace: string; slug: string }) {
+  15 |   const [release, setRelease] = useState<Release | null>(null);
+
+Import trace:
+  Server Component:
+    ./src/components/public/public-update.tsx
+    ./src/app/c/[workspace]/[slug]/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found 
+[browser] ./src/components/public/public-update.tsx:12:1
+Error: Module not found: Can't resolve './public-engagement'
+  10 | import type { Release, WorkspaceBranding } from "@/types";
+  11 | import { PublicHeader } from "./public-header";
+> 12 | import { PublicEngagement } from "./public-engagement";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  13 |
+  14 | export function PublicUpdatePage({ workspace, slug }: { workspace: string; slug: string }) {
+  15 |   const [release, setRelease] = useState<Release | null>(null);
+
+Import trace:
+  Server Component:
+    ./src/components/public/public-update.tsx
+    ./src/app/c/[workspace]/[slug]/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found 
+⨯ ./src/components/public/public-update.tsx:12:1
+Error: Module not found: Can't resolve './public-engagement'
+  [90m10 |[0m [36mimport[0m [36mtype[0m { [33mRelease[0m, [33mWorkspaceBranding[0m } [36mfrom[0m [32m"@/types"[0m;
+  [90m11 |[0m [36mimport[0m { [33mPublicHeader[0m } [36mfrom[0m [32m"./public-header"[0m;
+[31m[1m>[0m [90m12 |[0m [36mimport[0m { [33mPublicEngagement[0m } [36mfrom[0m [32m"./public-engagement"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m13 |[0m
+  [90m14 |[0m [36mexport[0m [36mfunction[0m [33mPublicUpdatePage[0m({ workspace, slug }: { workspace: string; slug: string }) {
+  [90m15 |[0m   [36mconst[0m [release, setRelease] = useState<[33mRelease[0m | [36mnull[0m>([36mnull[0m);
+
+
+
+Import trace:
+  Server Component:
+    ./src/components/public/public-update.tsx
+    ./src/app/c/[workspace]/[slug]/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/public/public-update.tsx:12:1
+Error: Module not found: Can't resolve './public-engagement'
+  [90m10 |[0m [36mimport[0m [36mtype[0m { [33mRelease[0m, [33mWorkspaceBranding[0m } [36mfrom[0m [32m"@/types"[0m;
+  [90m11 |[0m [36mimport[0m { [33mPublicHeader[0m } [36mfrom[0m [32m"./public-header"[0m;
+[31m[1m>[0m [90m12 |[0m [36mimport[0m { [33mPublicEngagement[0m } [36mfrom[0m [32m"./public-engagement"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m13 |[0m
+  [90m14 |[0m [36mexport[0m [36mfunction[0m [33mPublicUpdatePage[0m({ workspace, slug }: { workspace: string; slug: string }) {
+  [90m15 |[0m   [36mconst[0m [release, setRelease] = useState<[33mRelease[0m | [36mnull[0m>([36mnull[0m);
+
+
+
+Import trace:
+  Server Component:
+    ./src/components/public/public-update.tsx
+    ./src/app/c/[workspace]/[slug]/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/public/public-update.tsx:12:1
+Error: Module not found: Can't resolve './public-engagement'
+  [90m10 |[0m [36mimport[0m [36mtype[0m { [33mRelease[0m, [33mWorkspaceBranding[0m } [36mfrom[0m [32m"@/types"[0m;
+  [90m11 |[0m [36mimport[0m { [33mPublicHeader[0m } [36mfrom[0m [32m"./public-header"[0m;
+[31m[1m>[0m [90m12 |[0m [36mimport[0m { [33mPublicEngagement[0m } [36mfrom[0m [32m"./public-engagement"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m13 |[0m
+  [90m14 |[0m [36mexport[0m [36mfunction[0m [33mPublicUpdatePage[0m({ workspace, slug }: { workspace: string; slug: string }) {
+  [90m15 |[0m   [36mconst[0m [release, setRelease] = useState<[33mRelease[0m | [36mnull[0m>([36mnull[0m);
+
+
+
+Import trace:
+  Server Component:
+    ./src/components/public/public-update.tsx
+    ./src/app/c/[workspace]/[slug]/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/public/public-update.tsx:12:1
+Error: Module not found: Can't resolve './public-engagement'
+  [90m10 |[0m [36mimport[0m [36mtype[0m { [33mRelease[0m, [33mWorkspaceBranding[0m } [36mfrom[0m [32m"@/types"[0m;
+  [90m11 |[0m [36mimport[0m { [33mPublicHeader[0m } [36mfrom[0m [32m"./public-header"[0m;
+[31m[1m>[0m [90m12 |[0m [36mimport[0m { [33mPublicEngagement[0m } [36mfrom[0m [32m"./public-engagement"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m13 |[0m
+  [90m14 |[0m [36mexport[0m [36mfunction[0m [33mPublicUpdatePage[0m({ workspace, slug }: { workspace: string; slug: string }) {
+  [90m15 |[0m   [36mconst[0m [release, setRelease] = useState<[33mRelease[0m | [36mnull[0m>([36mnull[0m);
+
+
+
+Import trace:
+  Server Component:
+    ./src/components/public/public-update.tsx
+    ./src/app/c/[workspace]/[slug]/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/public/public-update.tsx:12:1
+Error: Module not found: Can't resolve './public-engagement'
+  [90m10 |[0m [36mimport[0m [36mtype[0m { [33mRelease[0m, [33mWorkspaceBranding[0m } [36mfrom[0m [32m"@/types"[0m;
+  [90m11 |[0m [36mimport[0m { [33mPublicHeader[0m } [36mfrom[0m [32m"./public-header"[0m;
+[31m[1m>[0m [90m12 |[0m [36mimport[0m { [33mPublicEngagement[0m } [36mfrom[0m [32m"./public-engagement"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m13 |[0m
+  [90m14 |[0m [36mexport[0m [36mfunction[0m [33mPublicUpdatePage[0m({ workspace, slug }: { workspace: string; slug: string }) {
+  [90m15 |[0m   [36mconst[0m [release, setRelease] = useState<[33mRelease[0m | [36mnull[0m>([36mnull[0m);
+
+
+
+Import trace:
+  Server Component:
+    ./src/components/public/public-update.tsx
+    ./src/app/c/[workspace]/[slug]/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/public/public-update.tsx:12:1
+Error: Module not found: Can't resolve './public-engagement'
+  [90m10 |[0m [36mimport[0m [36mtype[0m { [33mRelease[0m, [33mWorkspaceBranding[0m } [36mfrom[0m [32m"@/types"[0m;
+  [90m11 |[0m [36mimport[0m { [33mPublicHeader[0m } [36mfrom[0m [32m"./public-header"[0m;
+[31m[1m>[0m [90m12 |[0m [36mimport[0m { [33mPublicEngagement[0m } [36mfrom[0m [32m"./public-engagement"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m13 |[0m
+  [90m14 |[0m [36mexport[0m [36mfunction[0m [33mPublicUpdatePage[0m({ workspace, slug }: { workspace: string; slug: string }) {
+  [90m15 |[0m   [36mconst[0m [release, setRelease] = useState<[33mRelease[0m | [36mnull[0m>([36mnull[0m);
+
+
+
+Import trace:
+  Server Component:
+    ./src/components/public/public-update.tsx
+    ./src/app/c/[workspace]/[slug]/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/public/public-update.tsx:12:1
+Error: Module not found: Can't resolve './public-engagement'
+  [90m10 |[0m [36mimport[0m [36mtype[0m { [33mRelease[0m, [33mWorkspaceBranding[0m } [36mfrom[0m [32m"@/types"[0m;
+  [90m11 |[0m [36mimport[0m { [33mPublicHeader[0m } [36mfrom[0m [32m"./public-header"[0m;
+[31m[1m>[0m [90m12 |[0m [36mimport[0m { [33mPublicEngagement[0m } [36mfrom[0m [32m"./public-engagement"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m13 |[0m
+  [90m14 |[0m [36mexport[0m [36mfunction[0m [33mPublicUpdatePage[0m({ workspace, slug }: { workspace: string; slug: string }) {
+  [90m15 |[0m   [36mconst[0m [release, setRelease] = useState<[33mRelease[0m | [36mnull[0m>([36mnull[0m);
+
+
+
+Import trace:
+  Server Component:
+    ./src/components/public/public-update.tsx
+    ./src/app/c/[workspace]/[slug]/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/public/public-update.tsx:12:1
+Error: Module not found: Can't resolve './public-engagement'
+  [90m10 |[0m [36mimport[0m [36mtype[0m { [33mRelease[0m, [33mWorkspaceBranding[0m } [36mfrom[0m [32m"@/types"[0m;
+  [90m11 |[0m [36mimport[0m { [33mPublicHeader[0m } [36mfrom[0m [32m"./public-header"[0m;
+[31m[1m>[0m [90m12 |[0m [36mimport[0m { [33mPublicEngagement[0m } [36mfrom[0m [32m"./public-engagement"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m13 |[0m
+  [90m14 |[0m [36mexport[0m [36mfunction[0m [33mPublicUpdatePage[0m({ workspace, slug }: { workspace: string; slug: string }) {
+  [90m15 |[0m   [36mconst[0m [release, setRelease] = useState<[33mRelease[0m | [36mnull[0m>([36mnull[0m);
+
+
+
+Import trace:
+  Server Component:
+    ./src/components/public/public-update.tsx
+    ./src/app/c/[workspace]/[slug]/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[browser] ./src/components/public/public-update.tsx:12:1
+Error: Module not found: Can't resolve './public-engagement'
+  10 | import type { Release, WorkspaceBranding } from "@/types";
+  11 | import { PublicHeader } from "./public-header";
+> 12 | import { PublicEngagement } from "./public-engagement";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  13 |
+  14 | export function PublicUpdatePage({ workspace, slug }: { workspace: string; slug: string }) {
+  15 |   const [release, setRelease] = useState<Release | null>(null);
+
+Import trace:
+  Server Component:
+    ./src/components/public/public-update.tsx
+    ./src/app/c/[workspace]/[slug]/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found 
+⨯ ./src/components/public/public-update.tsx:12:1
+Error: Module not found: Can't resolve './public-engagement'
+  [90m10 |[0m [36mimport[0m [36mtype[0m { [33mRelease[0m, [33mWorkspaceBranding[0m } [36mfrom[0m [32m"@/types"[0m;
+  [90m11 |[0m [36mimport[0m { [33mPublicHeader[0m } [36mfrom[0m [32m"./public-header"[0m;
+[31m[1m>[0m [90m12 |[0m [36mimport[0m { [33mPublicEngagement[0m } [36mfrom[0m [32m"./public-engagement"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m13 |[0m
+  [90m14 |[0m [36mexport[0m [36mfunction[0m [33mPublicUpdatePage[0m({ workspace, slug }: { workspace: string; slug: string }) {
+  [90m15 |[0m   [36mconst[0m [release, setRelease] = useState<[33mRelease[0m | [36mnull[0m>([36mnull[0m);
+
+
+
+Import trace:
+  Server Component:
+    ./src/components/public/public-update.tsx
+    ./src/app/c/[workspace]/[slug]/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/public/public-update.tsx:12:1
+Error: Module not found: Can't resolve './public-engagement'
+  [90m10 |[0m [36mimport[0m [36mtype[0m { [33mRelease[0m, [33mWorkspaceBranding[0m } [36mfrom[0m [32m"@/types"[0m;
+  [90m11 |[0m [36mimport[0m { [33mPublicHeader[0m } [36mfrom[0m [32m"./public-header"[0m;
+[31m[1m>[0m [90m12 |[0m [36mimport[0m { [33mPublicEngagement[0m } [36mfrom[0m [32m"./public-engagement"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m13 |[0m
+  [90m14 |[0m [36mexport[0m [36mfunction[0m [33mPublicUpdatePage[0m({ workspace, slug }: { workspace: string; slug: string }) {
+  [90m15 |[0m   [36mconst[0m [release, setRelease] = useState<[33mRelease[0m | [36mnull[0m>([36mnull[0m);
+
+
+
+Import trace:
+  Server Component:
+    ./src/components/public/public-update.tsx
+    ./src/app/c/[workspace]/[slug]/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/public/public-update.tsx:12:1
+Error: Module not found: Can't resolve './public-engagement'
+  [90m10 |[0m [36mimport[0m [36mtype[0m { [33mRelease[0m, [33mWorkspaceBranding[0m } [36mfrom[0m [32m"@/types"[0m;
+  [90m11 |[0m [36mimport[0m { [33mPublicHeader[0m } [36mfrom[0m [32m"./public-header"[0m;
+[31m[1m>[0m [90m12 |[0m [36mimport[0m { [33mPublicEngagement[0m } [36mfrom[0m [32m"./public-engagement"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m13 |[0m
+  [90m14 |[0m [36mexport[0m [36mfunction[0m [33mPublicUpdatePage[0m({ workspace, slug }: { workspace: string; slug: string }) {
+  [90m15 |[0m   [36mconst[0m [release, setRelease] = useState<[33mRelease[0m | [36mnull[0m>([36mnull[0m);
+
+
+
+Import trace:
+  Server Component:
+    ./src/components/public/public-update.tsx
+    ./src/app/c/[workspace]/[slug]/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/public/public-update.tsx:12:1
+Error: Module not found: Can't resolve './public-engagement'
+  [90m10 |[0m [36mimport[0m [36mtype[0m { [33mRelease[0m, [33mWorkspaceBranding[0m } [36mfrom[0m [32m"@/types"[0m;
+  [90m11 |[0m [36mimport[0m { [33mPublicHeader[0m } [36mfrom[0m [32m"./public-header"[0m;
+[31m[1m>[0m [90m12 |[0m [36mimport[0m { [33mPublicEngagement[0m } [36mfrom[0m [32m"./public-engagement"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m13 |[0m
+  [90m14 |[0m [36mexport[0m [36mfunction[0m [33mPublicUpdatePage[0m({ workspace, slug }: { workspace: string; slug: string }) {
+  [90m15 |[0m   [36mconst[0m [release, setRelease] = useState<[33mRelease[0m | [36mnull[0m>([36mnull[0m);
+
+
+
+Import trace:
+  Server Component:
+    ./src/components/public/public-update.tsx
+    ./src/app/c/[workspace]/[slug]/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/public/public-update.tsx:12:1
+Error: Module not found: Can't resolve './public-engagement'
+  [90m10 |[0m [36mimport[0m [36mtype[0m { [33mRelease[0m, [33mWorkspaceBranding[0m } [36mfrom[0m [32m"@/types"[0m;
+  [90m11 |[0m [36mimport[0m { [33mPublicHeader[0m } [36mfrom[0m [32m"./public-header"[0m;
+[31m[1m>[0m [90m12 |[0m [36mimport[0m { [33mPublicEngagement[0m } [36mfrom[0m [32m"./public-engagement"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m13 |[0m
+  [90m14 |[0m [36mexport[0m [36mfunction[0m [33mPublicUpdatePage[0m({ workspace, slug }: { workspace: string; slug: string }) {
+  [90m15 |[0m   [36mconst[0m [release, setRelease] = useState<[33mRelease[0m | [36mnull[0m>([36mnull[0m);
+
+
+
+Import trace:
+  Server Component:
+    ./src/components/public/public-update.tsx
+    ./src/app/c/[workspace]/[slug]/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/public/public-update.tsx:12:1
+Error: Module not found: Can't resolve './public-engagement'
+  [90m10 |[0m [36mimport[0m [36mtype[0m { [33mRelease[0m, [33mWorkspaceBranding[0m } [36mfrom[0m [32m"@/types"[0m;
+  [90m11 |[0m [36mimport[0m { [33mPublicHeader[0m } [36mfrom[0m [32m"./public-header"[0m;
+[31m[1m>[0m [90m12 |[0m [36mimport[0m { [33mPublicEngagement[0m } [36mfrom[0m [32m"./public-engagement"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m13 |[0m
+  [90m14 |[0m [36mexport[0m [36mfunction[0m [33mPublicUpdatePage[0m({ workspace, slug }: { workspace: string; slug: string }) {
+  [90m15 |[0m   [36mconst[0m [release, setRelease] = useState<[33mRelease[0m | [36mnull[0m>([36mnull[0m);
+
+
+
+Import trace:
+  Server Component:
+    ./src/components/public/public-update.tsx
+    ./src/app/c/[workspace]/[slug]/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/public/public-update.tsx:12:1
+Error: Module not found: Can't resolve './public-engagement'
+  [90m10 |[0m [36mimport[0m [36mtype[0m { [33mRelease[0m, [33mWorkspaceBranding[0m } [36mfrom[0m [32m"@/types"[0m;
+  [90m11 |[0m [36mimport[0m { [33mPublicHeader[0m } [36mfrom[0m [32m"./public-header"[0m;
+[31m[1m>[0m [90m12 |[0m [36mimport[0m { [33mPublicEngagement[0m } [36mfrom[0m [32m"./public-engagement"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m13 |[0m
+  [90m14 |[0m [36mexport[0m [36mfunction[0m [33mPublicUpdatePage[0m({ workspace, slug }: { workspace: string; slug: string }) {
+  [90m15 |[0m   [36mconst[0m [release, setRelease] = useState<[33mRelease[0m | [36mnull[0m>([36mnull[0m);
+
+
+
+Import trace:
+  Server Component:
+    ./src/components/public/public-update.tsx
+    ./src/app/c/[workspace]/[slug]/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/public/public-update.tsx:12:1
+Error: Module not found: Can't resolve './public-engagement'
+  [90m10 |[0m [36mimport[0m [36mtype[0m { [33mRelease[0m, [33mWorkspaceBranding[0m } [36mfrom[0m [32m"@/types"[0m;
+  [90m11 |[0m [36mimport[0m { [33mPublicHeader[0m } [36mfrom[0m [32m"./public-header"[0m;
+[31m[1m>[0m [90m12 |[0m [36mimport[0m { [33mPublicEngagement[0m } [36mfrom[0m [32m"./public-engagement"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m13 |[0m
+  [90m14 |[0m [36mexport[0m [36mfunction[0m [33mPublicUpdatePage[0m({ workspace, slug }: { workspace: string; slug: string }) {
+  [90m15 |[0m   [36mconst[0m [release, setRelease] = useState<[33mRelease[0m | [36mnull[0m>([36mnull[0m);
+
+
+
+Import trace:
+  Server Component:
+    ./src/components/public/public-update.tsx
+    ./src/app/c/[workspace]/[slug]/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[browser] ./src/components/public/public-update.tsx:12:1
+Error: Module not found: Can't resolve './public-engagement'
+  10 | import type { Release, WorkspaceBranding } from "@/types";
+  11 | import { PublicHeader } from "./public-header";
+> 12 | import { PublicEngagement } from "./public-engagement";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  13 |
+  14 | export function PublicUpdatePage({ workspace, slug }: { workspace: string; slug: string }) {
+  15 |   const [release, setRelease] = useState<Release | null>(null);
+
+Import trace:
+  Server Component:
+    ./src/components/public/public-update.tsx
+    ./src/app/c/[workspace]/[slug]/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found 
+[browser] ./src/components/public/public-update.tsx:12:1
+Error: Module not found: Can't resolve './public-engagement'
+  10 | import type { Release, WorkspaceBranding } from "@/types";
+  11 | import { PublicHeader } from "./public-header";
+> 12 | import { PublicEngagement } from "./public-engagement";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  13 |
+  14 | export function PublicUpdatePage({ workspace, slug }: { workspace: string; slug: string }) {
+  15 |   const [release, setRelease] = useState<Release | null>(null);
+
+Import trace:
+  Server Component:
+    ./src/components/public/public-update.tsx
+    ./src/app/c/[workspace]/[slug]/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found 
+⨯ ./src/components/channels/index.ts:4:1
+Error: Module not found: Can't resolve './in-app-preview'
+  [90m2 |[0m [36mexport[0m { [33mChangelogPreview[0m } [36mfrom[0m [32m"./changelog-preview"[0m;
+  [90m3 |[0m [36mexport[0m { [33mEmailPreview[0m } [36mfrom[0m [32m"./email-preview"[0m;
+[31m[1m>[0m [90m4 |[0m [36mexport[0m { [33mInAppPreview[0m } [36mfrom[0m [32m"./in-app-preview"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m5 |[0m [36mexport[0m { [33mCampaignComposer[0m } [36mfrom[0m [32m"./campaign-composer"[0m;
+  [90m6 |[0m
+
+
+
+Import traces:
+  Client Component Browser:
+    ./src/components/channels/index.ts [Client Component Browser]
+    ./src/components/ai/release-canvas.tsx [Client Component Browser]
+    ./src/components/pages/ai-studio-page.tsx [Client Component Browser]
+    ./src/components/pages/ai-studio-page.tsx [Server Component]
+    ./src/app/app/ai-studio/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/channels/index.ts [Client Component SSR]
+    ./src/components/ai/release-canvas.tsx [Client Component SSR]
+    ./src/components/pages/ai-studio-page.tsx [Client Component SSR]
+    ./src/components/pages/ai-studio-page.tsx [Server Component]
+    ./src/app/app/ai-studio/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/channels/index.ts:4:1
+Error: Module not found: Can't resolve './in-app-preview'
+  [90m2 |[0m [36mexport[0m { [33mChangelogPreview[0m } [36mfrom[0m [32m"./changelog-preview"[0m;
+  [90m3 |[0m [36mexport[0m { [33mEmailPreview[0m } [36mfrom[0m [32m"./email-preview"[0m;
+[31m[1m>[0m [90m4 |[0m [36mexport[0m { [33mInAppPreview[0m } [36mfrom[0m [32m"./in-app-preview"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m5 |[0m [36mexport[0m { [33mCampaignComposer[0m } [36mfrom[0m [32m"./campaign-composer"[0m;
+  [90m6 |[0m
+
+
+
+Import traces:
+  Client Component Browser:
+    ./src/components/channels/index.ts [Client Component Browser]
+    ./src/components/ai/release-canvas.tsx [Client Component Browser]
+    ./src/components/pages/ai-studio-page.tsx [Client Component Browser]
+    ./src/components/pages/ai-studio-page.tsx [Server Component]
+    ./src/app/app/ai-studio/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/channels/index.ts [Client Component SSR]
+    ./src/components/ai/release-canvas.tsx [Client Component SSR]
+    ./src/components/pages/ai-studio-page.tsx [Client Component SSR]
+    ./src/components/pages/ai-studio-page.tsx [Server Component]
+    ./src/app/app/ai-studio/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/channels/index.ts:4:1
+Error: Module not found: Can't resolve './in-app-preview'
+  [90m2 |[0m [36mexport[0m { [33mChangelogPreview[0m } [36mfrom[0m [32m"./changelog-preview"[0m;
+  [90m3 |[0m [36mexport[0m { [33mEmailPreview[0m } [36mfrom[0m [32m"./email-preview"[0m;
+[31m[1m>[0m [90m4 |[0m [36mexport[0m { [33mInAppPreview[0m } [36mfrom[0m [32m"./in-app-preview"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m5 |[0m [36mexport[0m { [33mCampaignComposer[0m } [36mfrom[0m [32m"./campaign-composer"[0m;
+  [90m6 |[0m
+
+
+
+Import traces:
+  Client Component Browser:
+    ./src/components/channels/index.ts [Client Component Browser]
+    ./src/components/ai/release-canvas.tsx [Client Component Browser]
+    ./src/components/pages/ai-studio-page.tsx [Client Component Browser]
+    ./src/components/pages/ai-studio-page.tsx [Server Component]
+    ./src/app/app/ai-studio/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/channels/index.ts [Client Component SSR]
+    ./src/components/ai/release-canvas.tsx [Client Component SSR]
+    ./src/components/pages/ai-studio-page.tsx [Client Component SSR]
+    ./src/components/pages/ai-studio-page.tsx [Server Component]
+    ./src/app/app/ai-studio/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/channels/index.ts:4:1
+Error: Module not found: Can't resolve './in-app-preview'
+  [90m2 |[0m [36mexport[0m { [33mChangelogPreview[0m } [36mfrom[0m [32m"./changelog-preview"[0m;
+  [90m3 |[0m [36mexport[0m { [33mEmailPreview[0m } [36mfrom[0m [32m"./email-preview"[0m;
+[31m[1m>[0m [90m4 |[0m [36mexport[0m { [33mInAppPreview[0m } [36mfrom[0m [32m"./in-app-preview"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m5 |[0m [36mexport[0m { [33mCampaignComposer[0m } [36mfrom[0m [32m"./campaign-composer"[0m;
+  [90m6 |[0m
+
+
+
+Import traces:
+  Client Component Browser:
+    ./src/components/channels/index.ts [Client Component Browser]
+    ./src/components/ai/release-canvas.tsx [Client Component Browser]
+    ./src/components/pages/ai-studio-page.tsx [Client Component Browser]
+    ./src/components/pages/ai-studio-page.tsx [Server Component]
+    ./src/app/app/ai-studio/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/channels/index.ts [Client Component SSR]
+    ./src/components/ai/release-canvas.tsx [Client Component SSR]
+    ./src/components/pages/ai-studio-page.tsx [Client Component SSR]
+    ./src/components/pages/ai-studio-page.tsx [Server Component]
+    ./src/app/app/ai-studio/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/channels/index.ts:4:1
+Error: Module not found: Can't resolve './in-app-preview'
+  [90m2 |[0m [36mexport[0m { [33mChangelogPreview[0m } [36mfrom[0m [32m"./changelog-preview"[0m;
+  [90m3 |[0m [36mexport[0m { [33mEmailPreview[0m } [36mfrom[0m [32m"./email-preview"[0m;
+[31m[1m>[0m [90m4 |[0m [36mexport[0m { [33mInAppPreview[0m } [36mfrom[0m [32m"./in-app-preview"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m5 |[0m [36mexport[0m { [33mCampaignComposer[0m } [36mfrom[0m [32m"./campaign-composer"[0m;
+  [90m6 |[0m
+
+
+
+Import traces:
+  Client Component Browser:
+    ./src/components/channels/index.ts [Client Component Browser]
+    ./src/components/pages/campaigns-page.tsx [Client Component Browser]
+    ./src/components/pages/campaigns-page.tsx [Server Component]
+    ./src/app/app/campaigns/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/channels/index.ts [Client Component SSR]
+    ./src/components/pages/campaigns-page.tsx [Client Component SSR]
+    ./src/components/pages/campaigns-page.tsx [Server Component]
+    ./src/app/app/campaigns/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/channels/index.ts:4:1
+Error: Module not found: Can't resolve './in-app-preview'
+  [90m2 |[0m [36mexport[0m { [33mChangelogPreview[0m } [36mfrom[0m [32m"./changelog-preview"[0m;
+  [90m3 |[0m [36mexport[0m { [33mEmailPreview[0m } [36mfrom[0m [32m"./email-preview"[0m;
+[31m[1m>[0m [90m4 |[0m [36mexport[0m { [33mInAppPreview[0m } [36mfrom[0m [32m"./in-app-preview"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m5 |[0m [36mexport[0m { [33mCampaignComposer[0m } [36mfrom[0m [32m"./campaign-composer"[0m;
+  [90m6 |[0m
+
+
+
+Import traces:
+  Client Component Browser:
+    ./src/components/channels/index.ts [Client Component Browser]
+    ./src/components/pages/campaigns-page.tsx [Client Component Browser]
+    ./src/components/pages/campaigns-page.tsx [Server Component]
+    ./src/app/app/campaigns/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/channels/index.ts [Client Component SSR]
+    ./src/components/pages/campaigns-page.tsx [Client Component SSR]
+    ./src/components/pages/campaigns-page.tsx [Server Component]
+    ./src/app/app/campaigns/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/channels/index.ts:4:1
+Error: Module not found: Can't resolve './in-app-preview'
+  [90m2 |[0m [36mexport[0m { [33mChangelogPreview[0m } [36mfrom[0m [32m"./changelog-preview"[0m;
+  [90m3 |[0m [36mexport[0m { [33mEmailPreview[0m } [36mfrom[0m [32m"./email-preview"[0m;
+[31m[1m>[0m [90m4 |[0m [36mexport[0m { [33mInAppPreview[0m } [36mfrom[0m [32m"./in-app-preview"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m5 |[0m [36mexport[0m { [33mCampaignComposer[0m } [36mfrom[0m [32m"./campaign-composer"[0m;
+  [90m6 |[0m
+
+
+
+Import traces:
+  Client Component Browser:
+    ./src/components/channels/index.ts [Client Component Browser]
+    ./src/components/pages/campaigns-page.tsx [Client Component Browser]
+    ./src/components/pages/campaigns-page.tsx [Server Component]
+    ./src/app/app/campaigns/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/channels/index.ts [Client Component SSR]
+    ./src/components/pages/campaigns-page.tsx [Client Component SSR]
+    ./src/components/pages/campaigns-page.tsx [Server Component]
+    ./src/app/app/campaigns/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/channels/index.ts:4:1
+Error: Module not found: Can't resolve './in-app-preview'
+  [90m2 |[0m [36mexport[0m { [33mChangelogPreview[0m } [36mfrom[0m [32m"./changelog-preview"[0m;
+  [90m3 |[0m [36mexport[0m { [33mEmailPreview[0m } [36mfrom[0m [32m"./email-preview"[0m;
+[31m[1m>[0m [90m4 |[0m [36mexport[0m { [33mInAppPreview[0m } [36mfrom[0m [32m"./in-app-preview"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m5 |[0m [36mexport[0m { [33mCampaignComposer[0m } [36mfrom[0m [32m"./campaign-composer"[0m;
+  [90m6 |[0m
+
+
+
+Import traces:
+  Client Component Browser:
+    ./src/components/channels/index.ts [Client Component Browser]
+    ./src/components/pages/campaigns-page.tsx [Client Component Browser]
+    ./src/components/pages/campaigns-page.tsx [Server Component]
+    ./src/app/app/campaigns/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/channels/index.ts [Client Component SSR]
+    ./src/components/pages/campaigns-page.tsx [Client Component SSR]
+    ./src/components/pages/campaigns-page.tsx [Server Component]
+    ./src/app/app/campaigns/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/channels/index.ts:4:1
+Error: Module not found: Can't resolve './in-app-preview'
+  [90m2 |[0m [36mexport[0m { [33mChangelogPreview[0m } [36mfrom[0m [32m"./changelog-preview"[0m;
+  [90m3 |[0m [36mexport[0m { [33mEmailPreview[0m } [36mfrom[0m [32m"./email-preview"[0m;
+[31m[1m>[0m [90m4 |[0m [36mexport[0m { [33mInAppPreview[0m } [36mfrom[0m [32m"./in-app-preview"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m5 |[0m [36mexport[0m { [33mCampaignComposer[0m } [36mfrom[0m [32m"./campaign-composer"[0m;
+  [90m6 |[0m
+
+
+
+Import traces:
+  Client Component Browser:
+    ./src/components/channels/index.ts [Client Component Browser]
+    ./src/components/pages/campaigns-page.tsx [Client Component Browser]
+    ./src/components/pages/campaigns-page.tsx [Server Component]
+    ./src/app/app/campaigns/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/channels/index.ts [Client Component SSR]
+    ./src/components/pages/campaigns-page.tsx [Client Component SSR]
+    ./src/components/pages/campaigns-page.tsx [Server Component]
+    ./src/app/app/campaigns/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/channels/index.ts:4:1
+Error: Module not found: Can't resolve './in-app-preview'
+  [90m2 |[0m [36mexport[0m { [33mChangelogPreview[0m } [36mfrom[0m [32m"./changelog-preview"[0m;
+  [90m3 |[0m [36mexport[0m { [33mEmailPreview[0m } [36mfrom[0m [32m"./email-preview"[0m;
+[31m[1m>[0m [90m4 |[0m [36mexport[0m { [33mInAppPreview[0m } [36mfrom[0m [32m"./in-app-preview"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m5 |[0m [36mexport[0m { [33mCampaignComposer[0m } [36mfrom[0m [32m"./campaign-composer"[0m;
+  [90m6 |[0m
+
+
+
+Import traces:
+  Client Component Browser:
+    ./src/components/channels/index.ts [Client Component Browser]
+    ./src/components/pages/campaigns-page.tsx [Client Component Browser]
+    ./src/components/pages/campaigns-page.tsx [Server Component]
+    ./src/app/app/campaigns/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/channels/index.ts [Client Component SSR]
+    ./src/components/pages/campaigns-page.tsx [Client Component SSR]
+    ./src/components/pages/campaigns-page.tsx [Server Component]
+    ./src/app/app/campaigns/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[browser] ./src/components/channels/index.ts:4:1
+Error: Module not found: Can't resolve './in-app-preview'
+  2 | export { ChangelogPreview } from "./changelog-preview";
+  3 | export { EmailPreview } from "./email-preview";
+> 4 | export { InAppPreview } from "./in-app-preview";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  5 | export { CampaignComposer } from "./campaign-composer";
+  6 |
+
+Import traces:
+  Client Component Browser:
+    ./src/components/channels/index.ts [Client Component Browser]
+    ./src/components/ai/release-canvas.tsx [Client Component Browser]
+    ./src/components/pages/ai-studio-page.tsx [Client Component Browser]
+    ./src/components/pages/ai-studio-page.tsx [Server Component]
+    ./src/app/app/ai-studio/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/channels/index.ts [Client Component SSR]
+    ./src/components/ai/release-canvas.tsx [Client Component SSR]
+    ./src/components/pages/ai-studio-page.tsx [Client Component SSR]
+    ./src/components/pages/ai-studio-page.tsx [Server Component]
+    ./src/app/app/ai-studio/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found 
+[browser] ./src/components/channels/index.ts:4:1
+Error: Module not found: Can't resolve './in-app-preview'
+  2 | export { ChangelogPreview } from "./changelog-preview";
+  3 | export { EmailPreview } from "./email-preview";
+> 4 | export { InAppPreview } from "./in-app-preview";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  5 | export { CampaignComposer } from "./campaign-composer";
+  6 |
+
+Import traces:
+  Client Component Browser:
+    ./src/components/channels/index.ts [Client Component Browser]
+    ./src/components/ai/release-canvas.tsx [Client Component Browser]
+    ./src/components/pages/ai-studio-page.tsx [Client Component Browser]
+    ./src/components/pages/ai-studio-page.tsx [Server Component]
+    ./src/app/app/ai-studio/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/channels/index.ts [Client Component SSR]
+    ./src/components/ai/release-canvas.tsx [Client Component SSR]
+    ./src/components/pages/ai-studio-page.tsx [Client Component SSR]
+    ./src/components/pages/ai-studio-page.tsx [Server Component]
+    ./src/app/app/ai-studio/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found 
+[browser] ./src/components/channels/index.ts:4:1
+Error: Module not found: Can't resolve './in-app-preview'
+  2 | export { ChangelogPreview } from "./changelog-preview";
+  3 | export { EmailPreview } from "./email-preview";
+> 4 | export { InAppPreview } from "./in-app-preview";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  5 | export { CampaignComposer } from "./campaign-composer";
+  6 |
+
+Import traces:
+  Client Component Browser:
+    ./src/components/channels/index.ts [Client Component Browser]
+    ./src/components/ai/release-canvas.tsx [Client Component Browser]
+    ./src/components/pages/ai-studio-page.tsx [Client Component Browser]
+    ./src/components/pages/ai-studio-page.tsx [Server Component]
+    ./src/app/app/ai-studio/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/channels/index.ts [Client Component SSR]
+    ./src/components/ai/release-canvas.tsx [Client Component SSR]
+    ./src/components/pages/ai-studio-page.tsx [Client Component SSR]
+    ./src/components/pages/ai-studio-page.tsx [Server Component]
+    ./src/app/app/ai-studio/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found 

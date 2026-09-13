@@ -1,0 +1,62 @@
+import type { ReleaseVersion } from "@/types";
+
+export const mockReleaseVersions: Record<string, ReleaseVersion[]> = {
+  rel_1: [
+    {
+      id: "ver_1_3",
+      releaseId: "rel_1",
+      version: 3,
+      title: "Dark Mode",
+      summary: "A more comfortable way to use Acme at night and in low-light environments.",
+      body: "<p>Theme switching with system preference support.</p>",
+      changedBy: "Alex Chen",
+      changedAt: "2026-09-06T14:00:00Z",
+      changeNote: "Approved for publish",
+    },
+    {
+      id: "ver_1_2",
+      releaseId: "rel_1",
+      version: 2,
+      title: "Dark Mode",
+      summary: "Switch between light and dark themes in Acme.",
+      body: "<p>Initial draft with theme options.</p>",
+      changedBy: "Don Jesus",
+      changedAt: "2026-09-05T10:00:00Z",
+      changeNote: "AI rewrite applied",
+    },
+    {
+      id: "ver_1_1",
+      releaseId: "rel_1",
+      version: 1,
+      title: "Dark Mode",
+      summary: "Add dark theme support.",
+      body: "<p>Implement dark mode UI.</p>",
+      changedBy: "Don Jesus",
+      changedAt: "2026-09-05T08:00:00Z",
+      changeNote: "Created from GitHub detection",
+    },
+  ],
+  rel_3: [
+    {
+      id: "ver_3_2",
+      releaseId: "rel_3",
+      version: 2,
+      title: "Team Permissions",
+      summary: "Granular roles so the right people can review and publish updates.",
+      body: "<p>Assign roles with approval workflows.</p>",
+      changedBy: "Alex Chen",
+      changedAt: "2026-09-06T16:00:00Z",
+      changeNote: "Scheduled for Sep 9",
+    },
+    {
+      id: "ver_3_1",
+      releaseId: "rel_3",
+      version: 1,
+      title: "Team Permissions",
+      summary: "Role-based access for team members.",
+      body: "<p>Initial draft.</p>",
+      changedBy: "Don Jesus",
+      changedAt: "2026-09-01T11:00:00Z",
+    },
+  ],
+};

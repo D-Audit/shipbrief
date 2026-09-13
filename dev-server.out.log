@@ -1,0 +1,66 @@
+
+> shipbrief@0.1.0 dev
+> next dev --hostname 127.0.0.1 --port 3000
+
+▲ Next.js 16.3.4 (Turbopack)
+- Local:         http://127.0.0.1:3000
+- Network:       http://127.0.0.1:3000
+✓ Ready in 2.2s
+✓ Running next.config.ts took 134ms
+Creating turbopack project { dir: 'C:\\Users\\HP\\shipbrief', testMode: true }
+
+ GET / 200 in 2.9s (next.js: 1196ms, application-code: 1727ms)
+ GET /login 200 in 1294ms (next.js: 280ms, application-code: 1015ms)
+ GET / 200 in 638ms (next.js: 40ms, application-code: 597ms)
+ GET / 200 in 435ms (next.js: 31ms, application-code: 404ms)
+ GET / 200 in 72ms (next.js: 27ms, application-code: 45ms)
+ GET / 200 in 237ms (next.js: 25ms, application-code: 212ms)
+ GET /login 200 in 206ms (next.js: 72ms, application-code: 134ms)
+ GET /app/overview 200 in 348ms (next.js: 206ms, application-code: 142ms)
+ GET /signup 200 in 428ms (next.js: 235ms, application-code: 192ms)
+ GET /login 200 in 154ms (next.js: 36ms, application-code: 118ms)
+ GET / 200 in 288ms (next.js: 33ms, application-code: 255ms)
+ GET /app/feedback 200 in 190ms (next.js: 116ms, application-code: 74ms)
+ GET /app/overview 200 in 78ms (next.js: 17ms, application-code: 61ms)
+ GET /app/changelog 200 in 174ms (next.js: 106ms, application-code: 68ms)
+ GET /app/analytics 200 in 177ms (next.js: 115ms, application-code: 62ms)
+ GET /app/overview 200 in 77ms (next.js: 20ms, application-code: 57ms)
+ GET /app/activity 200 in 170ms (next.js: 110ms, application-code: 60ms)
+ GET /app/billing 200 in 177ms (next.js: 114ms, application-code: 64ms)
+ GET /app/settings 200 in 165ms (next.js: 108ms, application-code: 57ms)
+ GET /app/releases 200 in 149ms (next.js: 93ms, application-code: 57ms)
+ GET /app/feedback 200 in 70ms (next.js: 17ms, application-code: 52ms)
+ GET /app/billing 200 in 70ms (next.js: 20ms, application-code: 50ms)
+ GET /app/overview 200 in 110ms (next.js: 30ms, application-code: 80ms)
+ GET /app/releases 200 in 76ms (next.js: 18ms, application-code: 57ms)
+ GET /app/changelog 200 in 66ms (next.js: 15ms, application-code: 52ms)
+ GET /app/widget 200 in 164ms (next.js: 101ms, application-code: 63ms)
+ GET /app/campaigns 200 in 180ms (next.js: 124ms, application-code: 56ms)
+ GET /app/feedback 200 in 73ms (next.js: 18ms, application-code: 54ms)
+ GET /app/roadmap 200 in 166ms (next.js: 109ms, application-code: 58ms)
+ GET /app/analytics 200 in 74ms (next.js: 18ms, application-code: 56ms)
+ GET /app/ai-studio 200 in 177ms (next.js: 113ms, application-code: 64ms)
+ GET /app/integrations 200 in 204ms (next.js: 132ms, application-code: 73ms)
+ GET /app/integrations 200 in 75ms (next.js: 24ms, application-code: 51ms)
+ GET /app/team 200 in 162ms (next.js: 104ms, application-code: 58ms)
+ GET /app/branding 200 in 166ms (next.js: 97ms, application-code: 69ms)
+ GET /app/billing 200 in 62ms (next.js: 13ms, application-code: 50ms)
+ GET /app/api 200 in 159ms (next.js: 104ms, application-code: 55ms)
+ GET /app/activity 200 in 65ms (next.js: 18ms, application-code: 47ms)
+ GET /app/settings 200 in 64ms (next.js: 15ms, application-code: 49ms)
+ GET /app/releases 200 in 68ms (next.js: 18ms, application-code: 50ms)
+ GET / 200 in 303ms (next.js: 23ms, application-code: 280ms)
+✓ Compiled in 2.2s
+ GET /login 200 in 146ms (next.js: 40ms, application-code: 107ms)
+ GET / 200 in 310ms (next.js: 68ms, application-code: 241ms)
+ GET /login 200 in 326ms (next.js: 19ms, application-code: 307ms)
+ GET / 200 in 290ms (next.js: 49ms, application-code: 241ms)
+✓ Compiled in 2s
+ GET /login 200 in 160ms (next.js: 52ms, application-code: 108ms)
+ GET / 200 in 172ms (next.js: 61ms, application-code: 112ms)
+✓ Compiled in 475ms
+ GET /login 200 in 192ms (next.js: 42ms, application-code: 150ms)
+ GET / 200 in 132ms (next.js: 33ms, application-code: 99ms)
+ GET / 200 in 1314ms (next.js: 145ms, application-code: 1169ms)
+ GET / 200 in 935ms (next.js: 65ms, application-code: 870ms)
+[?25h

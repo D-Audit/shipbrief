@@ -1,0 +1,205 @@
+.scene {
+  position: relative;
+  display: none;
+  min-height: 100%;
+  overflow: hidden;
+  background: #18181a;
+  isolation: isolate;
+}
+
+@media (min-width: 1024px) {
+  .scene {
+    display: block;
+  }
+}
+
+.photo {
+  object-fit: cover;
+  object-position: 42% center;
+  filter: saturate(0.8) contrast(0.96);
+  transform: scale(1.025);
+}
+
+.colorWash {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgb(10 11 13 / 18%) 0%, rgb(10 11 13 / 4%) 38%, rgb(10 11 13 / 38%) 100%),
+    linear-gradient(132deg, rgb(200 92 111 / 23%) 0%, transparent 44%, rgb(252 221 170 / 11%) 100%);
+}
+
+.windLines {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.windLine {
+  fill: none;
+  stroke: rgb(255 243 229 / 42%);
+  stroke-width: 0.17;
+  stroke-linecap: round;
+  stroke-dasharray: 5 7;
+}
+
+.windLineDelayed {
+  opacity: 0.7;
+  stroke-dasharray: 3 9;
+}
+
+.windLineSoft {
+  opacity: 0.45;
+  stroke-dasharray: 2 11;
+}
+
+.rotor {
+  position: absolute;
+  z-index: 2;
+  top: 9.8%;
+  left: 19.8%;
+  width: 34%;
+  color: rgb(255 237 220 / 36%);
+  filter: blur(0.12px);
+  mix-blend-mode: screen;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.rotor circle {
+  fill: currentcolor;
+}
+
+.rotor path {
+  fill: currentcolor;
+}
+
+.grass {
+  position: absolute;
+  inset: auto 0 0;
+  z-index: 3;
+  height: 31%;
+  pointer-events: none;
+}
+
+.grassBlade {
+  position: absolute;
+  bottom: -12%;
+  width: clamp(1px, 0.33vw, 3px);
+  min-height: 5.5rem;
+  transform: rotate(var(--field-lean));
+  transform-origin: 50% 100%;
+  border-radius: 999px 999px 0 0;
+  background: linear-gradient(90deg, rgb(37 48 34 / 16%), rgb(75 95 56 / 68%) 55%, rgb(232 180 110 / 55%));
+}
+
+.far {
+  opacity: 0.45;
+  filter: blur(0.45px);
+}
+
+.mid {
+  opacity: 0.72;
+}
+
+.near {
+  width: clamp(2px, 0.46vw, 4px);
+  opacity: 0.88;
+  filter: blur(0.18px);
+}
+
+.lockup {
+  position: absolute;
+  z-index: 4;
+  top: 1.35rem;
+  left: 1.35rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: rgb(255 255 255 / 88%);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  text-shadow: 0 1px 16px rgb(13 14 17 / 40%);
+}
+
+.lockupMark {
+  width: 2rem;
+  height: 2rem;
+  object-fit: contain;
+  filter: drop-shadow(0 6px 9px rgb(13 14 17 / 25%));
+}
+
+.caption {
+  position: absolute;
+  z-index: 4;
+  right: 1.6rem;
+  bottom: 1.45rem;
+  max-width: 13rem;
+  color: rgb(255 252 246 / 84%);
+  font-size: 0.8rem;
+  line-height: 1.35;
+  text-align: right;
+  text-shadow: 0 1px 18px rgb(16 16 17 / 72%);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .photo {
+    animation: photo-drift 18s ease-in-out infinite alternate;
+  }
+
+  .rotor {
+    animation: rotor-spin 18s linear infinite;
+    will-change: transform;
+  }
+
+  .windLine {
+    animation: wind-flow 8.2s linear infinite;
+  }
+
+  .windLineDelayed {
+    animation-delay: -3.4s;
+  }
+
+  .windLineSoft {
+    animation-delay: -5.6s;
+  }
+
+  .grassBlade {
+    animation: grass-sway var(--field-duration) ease-in-out var(--field-delay) infinite alternate;
+  }
+}
+
+@keyframes rotor-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes wind-flow {
+  to {
+    stroke-dashoffset: -36;
+  }
+}
+
+@keyframes grass-sway {
+  from {
+    transform: rotate(calc(var(--field-lean) - 2deg));
+  }
+
+  to {
+    transform: rotate(calc(var(--field-lean) + 3deg));
+  }
+}
+
+@keyframes photo-drift {
+  from {
+    transform: scale(1.025) translate3d(-0.4%, 0, 0);
+  }
+
+  to {
+    transform: scale(1.06) translate3d(0.4%, -0.35%, 0);
+  }
+}

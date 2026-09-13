@@ -1,0 +1,254 @@
+
+> shipbrief@0.1.0 dev
+> next dev --hostname 127.0.0.1
+
+▲ Next.js 16.3.4 (Turbopack)
+- Local:         http://127.0.0.1:3000
+- Network:       http://127.0.0.1:3000
+✓ Ready in 11.0s
+✓ Running next.config.ts took 534ms
+Creating turbopack project { dir: 'C:\\Users\\HP\\shipbrief', testMode: true }
+
+ GET /app/releases/rel_5 200 in 4.7s (next.js: 3.3s, application-code: 1366ms)
+ GET /app/releases/rel_5 200 in 388ms (next.js: 92ms, application-code: 295ms)
+ GET /app/ai-studio?release=rel_5 200 in 527ms (next.js: 111ms, application-code: 416ms)
+ GET /app/releases/rel_5 200 in 274ms (next.js: 40ms, application-code: 235ms)
+✓ Compiled in 1327ms
+ GET /app/releases/rel_5 200 in 214ms (next.js: 88ms, application-code: 126ms)
+✓ Compiled in 956ms
+ GET /app/releases/rel_5 200 in 203ms (next.js: 88ms, application-code: 115ms)
+✓ Compiled in 746ms
+ GET /app/releases/rel_5 200 in 248ms (next.js: 48ms, application-code: 200ms)
+ GET /app/releases/rel_6 200 in 326ms (next.js: 52ms, application-code: 274ms)
+ GET /app/ai-studio?release=rel_6 200 in 189ms (next.js: 88ms, application-code: 101ms)
+ GET /app/releases/rel_6 200 in 165ms (next.js: 48ms, application-code: 117ms)
+ GET /app/releases/rel_6 200 in 295ms (next.js: 83ms, application-code: 211ms)
+ GET /app/releases/rel_6 200 in 304ms (next.js: 97ms, application-code: 207ms)
+ GET /app/releases/rel_6 200 in 269ms (next.js: 76ms, application-code: 193ms)
+ GET /app/releases/rel_6 200 in 578ms (next.js: 346ms, application-code: 232ms)
+✓ Compiled in 910ms
+ GET /app/releases/rel_6 200 in 223ms (next.js: 81ms, application-code: 142ms)
+ GET /app/releases/rel_6 200 in 147ms (next.js: 44ms, application-code: 103ms)
+ GET /c/acme 200 in 1819ms (next.js: 1296ms, application-code: 523ms)
+ GET /c/acme/dark-mode 200 in 1713ms (next.js: 1213ms, application-code: 500ms)
+ GET /c/acme 200 in 529ms (next.js: 36ms, application-code: 493ms)
+ GET /c/acme/dark-mode 200 in 530ms (next.js: 35ms, application-code: 496ms)
+✓ Compiled in 567ms
+ GET /c/acme/dark-mode 200 in 580ms (next.js: 79ms, application-code: 501ms)
+ GET /c/acme/dark-mode 200 in 562ms (next.js: 61ms, application-code: 500ms)
+✓ Compiled in 1928ms
+ GET /c/acme/dark-mode 200 in 555ms (next.js: 69ms, application-code: 485ms)
+✓ Compiled in 1309ms
+ GET /c/acme/dark-mode 200 in 565ms (next.js: 65ms, application-code: 500ms)
+✓ Compiled in 709ms
+✓ Compiled in 388ms
+✓ Compiled in 843ms
+ GET /c/acme/dark-mode 200 in 565ms (next.js: 69ms, application-code: 496ms)
+✓ Compiled in 911ms
+ GET /c/acme/dark-mode 200 in 568ms (next.js: 69ms, application-code: 500ms)
+ GET /c/acme/dark-mode 200 in 575ms (next.js: 62ms, application-code: 513ms)
+ GET /c/acme/dark-mode 200 in 547ms (next.js: 50ms, application-code: 497ms)
+✓ Compiled in 456ms
+✓ Compiled in 1563ms
+ GET /c/acme/dark-mode 200 in 643ms (next.js: 96ms, application-code: 547ms)
+ GET /c/acme/dark-mode 200 in 572ms (next.js: 37ms, application-code: 534ms)
+ GET /app/campaigns 200 in 491ms (next.js: 109ms, application-code: 381ms)
+✓ Compiled in 443ms
+ GET /c/acme/dark-mode 200 in 581ms (next.js: 86ms, application-code: 495ms)
+✓ Compiled in 353ms
+ GET /c/acme/dark-mode 200 in 534ms (next.js: 33ms, application-code: 501ms)
+✓ Compiled in 531ms
+ GET /c/acme/dark-mode 200 in 583ms (next.js: 82ms, application-code: 502ms)
+✓ Compiled in 943ms
+ GET /c/acme/dark-mode 200 in 677ms (next.js: 91ms, application-code: 587ms)
+✓ Compiled in 322ms
+ GET /c/acme/dark-mode 200 in 595ms (next.js: 80ms, application-code: 515ms)
+ GET /c/acme 200 in 554ms (next.js: 54ms, application-code: 499ms)
+ GET /c/acme/dark-mode 200 in 531ms (next.js: 38ms, application-code: 493ms)
+ GET /c/acme/dark-mode 200 in 518ms (next.js: 40ms, application-code: 478ms)
+ GET /c/acme/csv-export 200 in 518ms (next.js: 29ms, application-code: 489ms)
+ GET /c/acme 200 in 530ms (next.js: 35ms, application-code: 495ms)
+ GET /c/acme/dark-mode 200 in 547ms (next.js: 36ms, application-code: 511ms)
+ GET /c/acme/dark-mode 200 in 648ms (next.js: 35ms, application-code: 613ms)
+ GET /app/campaigns 200 in 248ms (next.js: 37ms, application-code: 212ms)
+✓ Compiled in 553ms
+ GET /app/campaigns 200 in 214ms (next.js: 111ms, application-code: 102ms)
+✓ Compiled in 984ms
+ GET /app/campaigns 200 in 139ms (next.js: 60ms, application-code: 79ms)
+✓ Compiled in 963ms
+ GET /app/campaigns 200 in 223ms (next.js: 70ms, application-code: 152ms)
+✓ Compiled in 1582ms
+ GET /app/campaigns 200 in 131ms (next.js: 39ms, application-code: 92ms)
+✓ Compiled in 880ms
+ GET /app/campaigns 200 in 120ms (next.js: 22ms, application-code: 98ms)
+✓ Compiled in 1013ms
+✓ Compiled in 1208ms
+ GET /app/campaigns 200 in 151ms (next.js: 27ms, application-code: 124ms)
+ GET /app/changelog 200 in 518ms (next.js: 105ms, application-code: 414ms)
+✓ Compiled in 1120ms
+ GET /c/acme/dark-mode 500 in 1061ms (next.js: 593ms, application-code: 468ms)
+ GET /app/campaigns 200 in 331ms (next.js: 172ms, application-code: 158ms)
+✓ Compiled in 483ms
+ GET /app/campaigns 200 in 143ms (next.js: 37ms, application-code: 106ms)
+ GET /c/acme/dark-mode 200 in 595ms (next.js: 59ms, application-code: 536ms)
+ GET /app/campaigns 200 in 129ms (next.js: 24ms, application-code: 105ms)
+ GET /app/campaigns 200 in 163ms (next.js: 30ms, application-code: 134ms)
+✓ Compiled in 1191ms
+ GET /app/campaigns 200 in 132ms (next.js: 37ms, application-code: 95ms)
+ GET /app/campaigns 200 in 100ms (next.js: 20ms, application-code: 79ms)
+ GET /app/campaigns 200 in 99ms (next.js: 17ms, application-code: 82ms)
+ GET /c/acme/dark-mode 200 in 584ms (next.js: 65ms, application-code: 520ms)
+ GET /c/acme/advanced-reporting 200 in 658ms (next.js: 36ms, application-code: 623ms)
+✓ Compiled in 673ms
+ GET /c/acme/advanced-reporting 200 in 604ms (next.js: 100ms, application-code: 504ms)
+ GET /c/acme/dark-mode 200 in 550ms (next.js: 45ms, application-code: 505ms)
+ GET /c/acme/advanced-reporting 200 in 545ms (next.js: 37ms, application-code: 507ms)
+ GET /app/ai-studio 200 in 362ms (next.js: 44ms, application-code: 319ms)
+ GET /embed/whats-new 200 in 344ms (next.js: 100ms, application-code: 244ms)
+✓ Compiled in 306ms
+ GET /c/acme/advanced-reporting 200 in 529ms (next.js: 52ms, application-code: 476ms)
+✓ Compiled in 524ms
+ GET /c/acme/advanced-reporting 200 in 738ms (next.js: 117ms, application-code: 621ms)
+ GET /app/ai-studio?release=rel_1 200 in 287ms (next.js: 49ms, application-code: 237ms)
+ GET /c/acme/dark-mode 200 in 532ms (next.js: 30ms, application-code: 502ms)
+ GET /app/ai-studio?release=rel_1 200 in 215ms (next.js: 14ms, application-code: 201ms)
+ GET /app/ai-studio?release=rel_1 200 in 230ms (next.js: 19ms, application-code: 212ms)
+ GET /embed/whats-new 200 in 158ms (next.js: 17ms, application-code: 141ms)
+ GET /c/acme/dark-mode 200 in 558ms (next.js: 47ms, application-code: 511ms)
+ GET /app/changelog 200 in 370ms (next.js: 69ms, application-code: 300ms)
+ GET /app/ai-studio?release=rel_1 200 in 226ms (next.js: 17ms, application-code: 209ms)
+ GET /c/acme/dark-mode 200 in 529ms (next.js: 39ms, application-code: 490ms)
+ GET /c/acme/dark-mode 200 in 619ms (next.js: 57ms, application-code: 563ms)
+ GET /c/acme/advanced-reporting 200 in 553ms (next.js: 47ms, application-code: 506ms)
+✓ Compiled in 1314ms
+ GET /c/acme/dark-mode 200 in 653ms (next.js: 89ms, application-code: 564ms)
+ GET /c/acme/advanced-reporting 200 in 505ms (next.js: 14ms, application-code: 491ms)
+ GET /c/acme/dark-mode 200 in 532ms (next.js: 53ms, application-code: 479ms)
+ GET /c/acme/advanced-reporting 200 in 503ms (next.js: 12ms, application-code: 491ms)
+ GET /app/campaigns 200 in 430ms (next.js: 41ms, application-code: 389ms)
+ GET /app/campaigns 200 in 199ms (next.js: 35ms, application-code: 165ms)
+✓ Compiled in 2.2s
+ GET /app/campaigns 200 in 200ms (next.js: 117ms, application-code: 83ms)
+ GET /c/acme/advanced-reporting 200 in 566ms (next.js: 61ms, application-code: 505ms)
+✓ Compiled in 858ms
+ GET /app/campaigns 200 in 141ms (next.js: 44ms, application-code: 97ms)
+ GET /c/acme/advanced-reporting 200 in 512ms (next.js: 31ms, application-code: 481ms)
+✓ Compiled in 989ms
+ GET /app/campaigns 200 in 162ms (next.js: 54ms, application-code: 108ms)
+ GET /c/acme/advanced-reporting 200 in 524ms (next.js: 54ms, application-code: 470ms)
+ GET /app/campaigns 200 in 102ms (next.js: 20ms, application-code: 82ms)
+ GET /c/acme/advanced-reporting 200 in 500ms (next.js: 31ms, application-code: 468ms)
+✓ Compiled in 1002ms
+ GET /app/campaigns 200 in 113ms (next.js: 37ms, application-code: 75ms)
+ GET /c/acme/advanced-reporting 200 in 553ms (next.js: 61ms, application-code: 492ms)
+ GET /app/campaigns 200 in 143ms (next.js: 37ms, application-code: 106ms)
+ GET /c/acme/advanced-reporting 200 in 522ms (next.js: 37ms, application-code: 485ms)
+ GET /app/campaigns 200 in 105ms (next.js: 20ms, application-code: 86ms)
+ GET /c/acme/advanced-reporting 200 in 534ms (next.js: 37ms, application-code: 496ms)
+✓ Compiled in 1081ms
+ GET /app/campaigns 200 in 216ms (next.js: 50ms, application-code: 167ms)
+ GET /c/acme/advanced-reporting 200 in 557ms (next.js: 60ms, application-code: 497ms)
+✓ Compiled in 1000ms
+ GET /app/campaigns 200 in 123ms (next.js: 44ms, application-code: 79ms)
+ GET /c/acme/advanced-reporting 200 in 553ms (next.js: 57ms, application-code: 496ms)
+✓ Compiled in 1098ms
+ GET /app/campaigns 200 in 195ms (next.js: 59ms, application-code: 137ms)
+ GET /c/acme/advanced-reporting 200 in 506ms (next.js: 35ms, application-code: 471ms)
+ GET /app/campaigns 200 in 132ms (next.js: 22ms, application-code: 110ms)
+ GET /c/acme/advanced-reporting 200 in 501ms (next.js: 32ms, application-code: 469ms)
+ GET /app/campaigns 200 in 115ms (next.js: 33ms, application-code: 81ms)
+ GET /c/acme/advanced-reporting 200 in 506ms (next.js: 33ms, application-code: 473ms)
+ GET /app/campaigns 200 in 96ms (next.js: 13ms, application-code: 83ms)
+ GET /c/acme/advanced-reporting 200 in 509ms (next.js: 31ms, application-code: 477ms)
+ GET /app/campaigns 200 in 91ms (next.js: 16ms, application-code: 75ms)
+ GET /c/acme/advanced-reporting 200 in 499ms (next.js: 29ms, application-code: 471ms)
+ GET /app/campaigns 200 in 92ms (next.js: 12ms, application-code: 81ms)
+ GET /c/acme/advanced-reporting 200 in 521ms (next.js: 33ms, application-code: 488ms)
+ GET /app/campaigns 200 in 493ms (next.js: 402ms, application-code: 91ms)
+ GET /app/campaigns 200 in 119ms (next.js: 27ms, application-code: 92ms)
+ GET /c/acme/advanced-reporting 200 in 579ms (next.js: 102ms, application-code: 478ms)
+ GET /c/acme/advanced-reporting 200 in 503ms (next.js: 13ms, application-code: 491ms)
+ GET /app/campaigns 200 in 144ms (next.js: 44ms, application-code: 100ms)
+ GET /c/acme/advanced-reporting 200 in 556ms (next.js: 40ms, application-code: 516ms)
+ GET /app/campaigns 200 in 123ms (next.js: 17ms, application-code: 106ms)
+ GET /c/acme/advanced-reporting 200 in 534ms (next.js: 39ms, application-code: 495ms)
+ GET /app/campaigns 200 in 108ms (next.js: 15ms, application-code: 94ms)
+ GET /c/acme/advanced-reporting 200 in 536ms (next.js: 54ms, application-code: 481ms)
+ GET /app/campaigns 200 in 121ms (next.js: 21ms, application-code: 100ms)
+ GET /c/acme/advanced-reporting 200 in 525ms (next.js: 35ms, application-code: 490ms)
+ GET /app/campaigns 200 in 155ms (next.js: 19ms, application-code: 136ms)
+ GET /c/acme/advanced-reporting 200 in 534ms (next.js: 50ms, application-code: 484ms)
+✓ Compiled in 992ms
+ GET /app/campaigns 200 in 113ms (next.js: 31ms, application-code: 82ms)
+ GET /c/acme/advanced-reporting 200 in 565ms (next.js: 89ms, application-code: 476ms)
+✓ Compiled in 1128ms
+ GET /app/campaigns 200 in 114ms (next.js: 35ms, application-code: 79ms)
+ GET /c/acme/advanced-reporting 200 in 541ms (next.js: 55ms, application-code: 486ms)
+ GET /app/campaigns 200 in 125ms (next.js: 28ms, application-code: 96ms)
+ GET /c/acme/advanced-reporting 200 in 533ms (next.js: 48ms, application-code: 484ms)
+ GET /app/campaigns 200 in 100ms (next.js: 17ms, application-code: 83ms)
+ GET /c/acme/advanced-reporting 200 in 502ms (next.js: 30ms, application-code: 472ms)
+ GET /app/roadmap 200 in 331ms (next.js: 92ms, application-code: 239ms)
+✓ Compiled in 1111ms
+ GET /app/campaigns 200 in 280ms (next.js: 58ms, application-code: 222ms)
+ GET /c/acme/advanced-reporting 200 in 526ms (next.js: 58ms, application-code: 467ms)
+ GET /app/ai-studio 200 in 267ms (next.js: 50ms, application-code: 217ms)
+ GET /app/roadmap 200 in 202ms (next.js: 42ms, application-code: 160ms)
+ GET /embed/whats-new 200 in 311ms (next.js: 40ms, application-code: 271ms)
+ GET /app/ai-studio?release=rel_1 200 in 179ms (next.js: 11ms, application-code: 168ms)
+ GET /app/ai-studio?release=rel_1 200 in 179ms (next.js: 13ms, application-code: 166ms)
+✓ Compiled in 988ms
+ GET /app/ai-studio?release=rel_1 200 in 129ms (next.js: 35ms, application-code: 93ms)
+ GET /c/acme/advanced-reporting 200 in 563ms (next.js: 65ms, application-code: 498ms)
+ GET /app/releases/rel_1 200 in 142ms (next.js: 76ms, application-code: 66ms)
+ GET /app/ai-studio 200 in 86ms (next.js: 21ms, application-code: 65ms)
+✓ Compiled in 786ms
+ GET /app/ai-studio 200 in 291ms (next.js: 35ms, application-code: 256ms)
+ GET /c/acme/advanced-reporting 200 in 564ms (next.js: 67ms, application-code: 497ms)
+ GET /embed/whats-new 200 in 139ms (next.js: 32ms, application-code: 107ms)
+ GET /app/roadmap 200 in 205ms (next.js: 32ms, application-code: 173ms)
+ GET /app/ai-studio?release=rel_1 200 in 218ms (next.js: 19ms, application-code: 199ms)
+ GET /app/ai-studio?release=rel_1 200 in 163ms (next.js: 9ms, application-code: 154ms)
+ GET /app/roadmap 200 in 190ms (next.js: 13ms, application-code: 177ms)
+ GET /embed/whats-new 200 in 111ms (next.js: 9ms, application-code: 102ms)
+✓ Compiled in 874ms
+ GET /app/ai-studio?release=rel_1 200 in 191ms (next.js: 108ms, application-code: 83ms)
+ GET /c/acme/advanced-reporting 200 in 532ms (next.js: 51ms, application-code: 481ms)
+✓ Compiled in 1022ms
+ GET /app/ai-studio?release=rel_1 200 in 474ms (next.js: 101ms, application-code: 373ms)
+ GET /c/acme/advanced-reporting 200 in 913ms (next.js: 227ms, application-code: 687ms)
+ GET /app/releases/new 200 in 524ms (next.js: 134ms, application-code: 390ms)
+ GET /app/ai-studio?release=rel_1 200 in 334ms (next.js: 17ms, application-code: 317ms)
+ GET /c/acme/advanced-reporting 200 in 597ms (next.js: 42ms, application-code: 554ms)
+ GET /app/ai-studio?release=rel_1 200 in 391ms (next.js: 57ms, application-code: 335ms)
+ GET /c/acme/advanced-reporting 200 in 600ms (next.js: 70ms, application-code: 530ms)
+ GET /app/ai-studio?release=rel_1 200 in 196ms (next.js: 22ms, application-code: 174ms)
+ GET /c/acme/advanced-reporting 200 in 648ms (next.js: 61ms, application-code: 587ms)
+✓ Compiled in 1404ms
+ GET /app/ai-studio?release=rel_1 200 in 613ms (next.js: 50ms, application-code: 563ms)
+ GET /c/acme/advanced-reporting 200 in 803ms (next.js: 175ms, application-code: 627ms)
+ GET /app/ai-studio?release=rel_1 200 in 447ms (next.js: 125ms, application-code: 322ms)
+✓ Compiled in 1270ms
+ GET /app/ai-studio?release=rel_1 200 in 249ms (next.js: 138ms, application-code: 111ms)
+ GET /c/acme/advanced-reporting 200 in 594ms (next.js: 46ms, application-code: 548ms)
+ GET /c/acme/advanced-reporting 200 in 581ms (next.js: 15ms, application-code: 566ms)
+ GET / 200 in 1267ms (next.js: 280ms, application-code: 987ms)
+ GET /login 200 in 316ms (next.js: 203ms, application-code: 113ms)
+✓ Compiled in 1198ms
+ GET /app/ai-studio?release=rel_1 200 in 950ms (next.js: 705ms, application-code: 245ms)
+ GET / 200 in 1108ms (next.js: 141ms, application-code: 967ms)
+ GET /c/acme/advanced-reporting 200 in 638ms (next.js: 85ms, application-code: 554ms)
+ GET /signup 200 in 287ms (next.js: 172ms, application-code: 115ms)
+ GET / 200 in 112ms (next.js: 55ms, application-code: 57ms)
+ GET / 200 in 256ms (next.js: 23ms, application-code: 233ms)
+✓ Compiled in 860ms
+ GET /app/ai-studio?release=rel_1 200 in 469ms (next.js: 287ms, application-code: 182ms)
+ GET / 200 in 707ms (next.js: 102ms, application-code: 606ms)
+ GET /c/acme/advanced-reporting 200 in 627ms (next.js: 68ms, application-code: 559ms)
+✓ Compiled in 566ms
+ GET /app/ai-studio?release=rel_1 200 in 346ms (next.js: 127ms, application-code: 219ms)
+ GET /c/acme/advanced-reporting 200 in 601ms (next.js: 51ms, application-code: 551ms)
+ GET / 200 in 449ms (next.js: 24ms, application-code: 425ms)
+ GET /app/ai-studio?release=rel_1 200 in 173ms (next.js: 29ms, application-code: 145ms)
+ GET /c/acme/advanced-reporting 200 in 752ms (next.js: 60ms, application-code: 692ms)
+ GET / 200 in 493ms (next.js: 17ms, application-code: 476ms)

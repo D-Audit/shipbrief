@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" role="img" aria-labelledby="title desc">
+  <title id="title">Acme workspace in dark mode</title>
+  <desc id="desc">A dark product dashboard with a sidebar, release metrics, and update cards.</desc>
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#111127"/>
+      <stop offset="1" stop-color="#25235a"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#9698ff"/>
+      <stop offset="1" stop-color="#6d6eea"/>
+    </linearGradient>
+  </defs>
+  <rect width="1280" height="720" fill="url(#background)"/>
+  <rect x="46" y="46" width="1188" height="628" rx="24" fill="#171725" stroke="#41415b" stroke-width="2"/>
+  <rect x="47" y="47" width="250" height="626" rx="23" fill="#202030"/>
+  <rect x="78" y="82" width="32" height="32" rx="10" fill="url(#accent)"/>
+  <path d="M89 91h10v14H89z" fill="#fff" opacity=".92"/>
+  <text x="122" y="105" fill="#fbfbff" font-family="Arial, sans-serif" font-size="24" font-weight="700">Acme</text>
+  <rect x="76" y="154" width="188" height="42" rx="10" fill="#2e2d4f"/>
+  <rect x="89" y="168" width="12" height="12" rx="3" fill="#a9abff"/>
+  <rect x="114" y="168" width="67" height="11" rx="5.5" fill="#f2f2ff" opacity=".9"/>
+  <rect x="89" y="224" width="12" height="12" rx="3" fill="#84849b"/>
+  <rect x="114" y="224" width="86" height="11" rx="5.5" fill="#a4a4b6"/>
+  <rect x="89" y="272" width="12" height="12" rx="3" fill="#84849b"/>
+  <rect x="114" y="272" width="71" height="11" rx="5.5" fill="#a4a4b6"/>
+  <rect x="89" y="320" width="12" height="12" rx="3" fill="#84849b"/>
+  <rect x="114" y="320" width="94" height="11" rx="5.5" fill="#a4a4b6"/>
+  <text x="344" y="110" fill="#f7f7ff" font-family="Arial, sans-serif" font-size="30" font-weight="700">Good evening, Don</text>
+  <text x="344" y="142" fill="#aaaac0" font-family="Arial, sans-serif" font-size="16">Here’s how your product updates are performing.</text>
+  <rect x="344" y="182" width="203" height="132" rx="16" fill="#222234" stroke="#424259"/>
+  <rect x="568" y="182" width="203" height="132" rx="16" fill="#222234" stroke="#424259"/>
+  <rect x="792" y="182" width="203" height="132" rx="16" fill="#222234" stroke="#424259"/>
+  <rect x="1016" y="182" width="172" height="132" rx="16" fill="#222234" stroke="#424259"/>
+  <text x="370" y="218" fill="#aaaac0" font-family="Arial, sans-serif" font-size="14">Published</text>
+  <text x="370" y="270" fill="#f7f7ff" font-family="Arial, sans-serif" font-size="36" font-weight="700">12</text>
+  <circle cx="507" cy="252" r="20" fill="#2d6149"/><path d="m498 252 7 7 13-15" fill="none" stroke="#8de1b2" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="594" y="218" fill="#aaaac0" font-family="Arial, sans-serif" font-size="14">Drafts</text>
+  <text x="594" y="270" fill="#f7f7ff" font-family="Arial, sans-serif" font-size="36" font-weight="700">4</text>
+  <rect x="695" y="239" width="48" height="23" rx="11.5" fill="#39365f"/><circle cx="728" cy="250.5" r="8" fill="#a9abff"/>
+  <text x="818" y="218" fill="#aaaac0" font-family="Arial, sans-serif" font-size="14">Views</text>
+  <text x="818" y="270" fill="#f7f7ff" font-family="Arial, sans-serif" font-size="36" font-weight="700">2.4k</text>
+  <path d="M947 271v-22l-22 22h11v12h22v-12z" fill="#8d8ff4"/>
+  <text x="1042" y="218" fill="#aaaac0" font-family="Arial, sans-serif" font-size="14">Engagement</text>
+  <text x="1042" y="270" fill="#f7f7ff" font-family="Arial, sans-serif" font-size="36" font-weight="700">38%</text>
+  <rect x="344" y="350" width="844" height="276" rx="16" fill="#202030" stroke="#424259"/>
+  <text x="372" y="392" fill="#f7f7ff" font-family="Arial, sans-serif" font-size="19" font-weight="700">Recent updates</text>
+  <rect x="372" y="422" width="788" height="1" fill="#44445c"/>
+  <rect x="372" y="452" width="44" height="44" rx="12" fill="#343364"/>
+  <circle cx="394" cy="474" r="10" fill="#a9abff"/>
+  <text x="436" y="470" fill="#f7f7ff" font-family="Arial, sans-serif" font-size="17" font-weight="700">Dark Mode</text>
+  <text x="436" y="493" fill="#aaaac0" font-family="Arial, sans-serif" font-size="14">A more comfortable way to work after dark.</text>
+  <rect x="1045" y="462" width="90" height="26" rx="13" fill="#2d6149"/>
+  <text x="1063" y="480" fill="#8de1b2" font-family="Arial, sans-serif" font-size="12" font-weight="700">Published</text>
+  <rect x="372" y="528" width="44" height="44" rx="12" fill="#303044"/>
+  <text x="436" y="546" fill="#f7f7ff" font-family="Arial, sans-serif" font-size="17" font-weight="700">Team Permissions</text>
+  <text x="436" y="569" fill="#aaaac0" font-family="Arial, sans-serif" font-size="14">Granular roles for every review workflow.</text>
+  <rect x="1045" y="538" width="90" height="26" rx="13" fill="#3b365d"/>
+  <text x="1067" y="556" fill="#c1c2ff" font-family="Arial, sans-serif" font-size="12" font-weight="700">Scheduled</text>
+</svg>
