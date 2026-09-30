@@ -92,7 +92,7 @@ export function PublicEngagement({ workspace, slug }: { workspace: string; slug:
 
       <section id="comments" aria-labelledby="comments-heading" className="space-y-4 scroll-mt-6">
         <div className="flex flex-wrap items-center gap-2">
-          <MessageCircle className="size-4 text-primary" />
+          <MessageCircle className="size-4 text-primary-strong" />
           <h3 id="comments-heading" className="text-base font-semibold">Comments</h3>
           {engagementState.status === "success" && (
             <span className="text-sm text-muted-foreground">{engagementState.data.comments} total</span>
@@ -157,7 +157,7 @@ export function PublicEngagement({ workspace, slug }: { workspace: string; slug:
               aria-describedby="public-comment-help"
               disabled={commentPending}
             />
-            <p id="public-comment-help" className="text-xs text-muted-foreground">Up to 1,000 characters. Your comment is posted as mock data in this frontend preview.</p>
+            <p id="public-comment-help" className="text-xs text-muted-foreground">Up to 1,000 characters. Comments are public.</p>
             {commentError && <p id="public-comment-error" role="alert" className="text-sm text-destructive">{commentError}</p>}
           </div>
           <div className="mt-4 flex flex-wrap items-center justify-between gap-3">

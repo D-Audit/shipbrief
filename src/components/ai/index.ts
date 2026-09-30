@@ -4,3 +4,4 @@ export { AIStudioInspector } from "./ai-studio-inspector";
 export { ReleaseCanvas } from "./release-canvas";
 export type { QualityState } from "./ai-quality-check";
 export type { AIGeneration, StudioDraft, StudioScope } from "./types";
+export { GenerationState } from "./generation-state";

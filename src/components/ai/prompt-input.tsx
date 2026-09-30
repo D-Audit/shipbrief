@@ -1,9 +1,10 @@
 "use client";
 
-import { ArrowUp, Sparkles } from "lucide-react";
+import { ArrowUp, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 
+/** The AI instruction box: a roomy field with the Generate action tucked in its corner. */
 export function PromptInput({
   value,
   onChange,
@@ -16,42 +17,35 @@ export function PromptInput({
   disabled?: boolean;
 }) {
   return (
-    <div className="rounded-xl border border-border bg-background p-2 shadow-sm">
+    <div className="rounded-[var(--radius-lg)] border border-input bg-surface transition-colors focus-within:border-ring focus-within:ring-3 focus-within:ring-ring/50">
       <label htmlFor="ai-studio-prompt" className="sr-only">
-        Ask ShipBrief AI
+        Tell AI what to change
       </label>
       <Textarea
         id="ai-studio-prompt"
         value={value}
         onChange={(event) => onChange(event.target.value)}
         onKeyDown={(event) => {
-          if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
+          if (event.key === "Enter" && !event.shiftKey) {
             event.preventDefault();
             onSubmit();
           }
         }}
         disabled={disabled}
-        rows={3}
-        className="min-h-20 resize-none border-0 bg-transparent px-1 py-1 shadow-none focus-visible:ring-0"
-        placeholder="Ask AI to rewrite, extract benefits, or create a channel version..."
+        rows={4}
+        aria-describedby="ai-studio-prompt-hint"
+        className="min-h-24 resize-none border-0 bg-transparent px-3.5 pt-3 text-[15px] leading-relaxed shadow-none focus-visible:ring-0 dark:bg-transparent"
+        placeholder="Describe the change you want — e.g. “Lead with the time customers save and keep it under 60 words.”"
       />
-      <div className="mt-1 flex items-center justify-between gap-2">
-        <span className="flex items-center gap-1 text-xs text-muted-foreground">
-          <Sparkles className="size-3 text-primary" />
-          Uses your release context and brand voice
+      <div className="flex items-center justify-between gap-3 px-3 pb-3">
+        <span id="ai-studio-prompt-hint" className="text-xs text-muted-foreground">
+          Press Enter to generate
         </span>
-        <Button
-          type="button"
-          size="sm"
-          onClick={onSubmit}
-          disabled={disabled || !value.trim()}
-          aria-label="Generate AI proposal"
-        >
-          <ArrowUp />
+        <Button type="button" size="sm" onClick={onSubmit} disabled={disabled || !value.trim()} aria-label="Generate AI proposal">
+          {disabled ? <Loader2 className="animate-spin" /> : <ArrowUp />}
           Generate
         </Button>
       </div>
-      <p className="mt-1 text-[11px] text-muted-foreground">Ctrl + Enter to generate</p>
     </div>
   );
 }

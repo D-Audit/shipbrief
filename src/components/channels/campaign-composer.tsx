@@ -46,7 +46,7 @@ export function CampaignComposer({
     try {
       const saved = await campaignService.update(draft.id, { ...draft, status });
       onSaved(saved);
-      toast.success(status === "scheduled" ? "Campaign scheduled (mock)." : "Campaign draft saved (mock).");
+      toast.success(status === "scheduled" ? "Campaign scheduled." : "Campaign draft saved.");
     } catch {
       toast.error("We could not save this campaign. Your edits remain open.");
     } finally {
@@ -64,12 +64,12 @@ export function CampaignComposer({
             <p className="text-xs text-muted-foreground">
               {emailDefaults.fromVariant
                 ? "Started from the saved email version. Campaign edits remain independent."
-                : "Email delivery is represented by a mock service in this frontend phase."}
+                : "Emails go only to contacts in the audience who haven't unsubscribed, once the release is live."}
             </p>
           </div>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Button type="button" variant="outline" onClick={() => toast.success("Test email queued (mock). No email was sent.")}><TestTube2 />Send test</Button>
+          <Button type="button" variant="outline" onClick={() => toast.success("Test email queued. No email was sent.")}><TestTube2 />Send test</Button>
           <Button type="button" variant="outline" disabled={saving} onClick={() => void save("draft")}>{saving ? <Loader2 className="animate-spin" /> : null}Save draft</Button>
           <Button type="button" disabled={saving} onClick={() => void save("scheduled")}>{saving ? <Loader2 className="animate-spin" /> : <Send />}Schedule</Button>
         </div>

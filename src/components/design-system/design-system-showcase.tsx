@@ -261,7 +261,7 @@ export function DesignSystemShowcase() {
             {spacing.map((value) => (
               <div key={value} className="flex flex-col items-center gap-2">
                 <div
-                  className="rounded-sm bg-primary/20"
+                  className="rounded-sm bg-accent"
                   style={{ width: value, height: value }}
                 />
                 <Typography variant="metadata">{value}px</Typography>

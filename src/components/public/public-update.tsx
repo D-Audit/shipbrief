@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { format } from "date-fns";
-import { brandingService, changelogService } from "@/lib/services";
+import { brandingService, changelogService, publicEngagementService } from "@/lib/services";
 import { ErrorState, LoadingState } from "@/components/shared/page-states";
 import { useAsyncData } from "@/hooks/use-async-data";
 import { cn } from "@/lib/utils";
@@ -14,13 +14,17 @@ import { ReleaseMediaGallery } from "./release-media-gallery";
 
 export function PublicUpdatePage({ workspace, slug }: { workspace: string; slug: string }) {
   const fetchUpdate = useCallback(async () => {
-    const [release, branding] = await Promise.all([
+    const [release, publicWorkspace] = await Promise.all([
       changelogService.getPublic(workspace, slug),
-      brandingService.get(),
+      brandingService.getPublic(workspace),
     ]);
-    return { release, branding };
+    return { release, branding: publicWorkspace.branding };
   }, [slug, workspace]);
   const { state, reload } = useAsyncData(fetchUpdate, [slug, workspace]);
+
+  useEffect(() => {
+    publicEngagementService.recordView(workspace, slug).catch(() => undefined);
+  }, [workspace, slug]);
 
   if (state.status === "idle" || state.status === "loading") return <div className="mx-auto max-w-2xl p-8"><LoadingState /></div>;
   if (state.status === "error") return <div className="mx-auto max-w-2xl p-8"><ErrorState message={state.error} title="Update not found" onRetry={() => void reload()} /></div>;
@@ -39,7 +43,7 @@ export function PublicUpdatePage({ workspace, slug }: { workspace: string; slug:
         <p className="mt-3 text-lg leading-relaxed text-muted-foreground">{release.summary}</p>
         <RichTextPreview html={release.body} className="mt-8" />
         <ReleaseMediaGallery media={release.media} />
-        {release.cta && <Link href={release.cta.url} className="mt-8 inline-flex h-8 items-center rounded-lg bg-primary px-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/80">{release.cta.label}</Link>}
+        {release.cta && <Link href={release.cta.url} onClick={() => publicEngagementService.recordClick(workspace, slug).catch(() => undefined)} className="mt-8 inline-flex h-8 items-center rounded-lg bg-primary px-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/80">{release.cta.label}</Link>}
         <div className="mt-10"><PublicEngagement workspace={workspace} slug={slug} /></div>
       </article>
     </div>

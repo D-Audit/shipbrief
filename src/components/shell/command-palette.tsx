@@ -12,8 +12,10 @@ import {
   CommandSeparator,
   CommandShortcut,
 } from "@/components/ui/command";
-import { commandActions, workspaceNav } from "@/lib/navigation";
-import { mockReleases } from "@/lib/mock-data";
+import { accountNav, commandActions, workspaceNav } from "@/lib/navigation";
+import { releaseService } from "@/lib/services";
+import { useAsyncData } from "@/hooks/use-async-data";
+import { StatusBadge } from "@/components/shared/page-states";
 
 interface CommandPaletteProps {
   open: boolean;
@@ -22,6 +24,8 @@ interface CommandPaletteProps {
 
 export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
   const router = useRouter();
+  const { state: releasesState } = useAsyncData(() => releaseService.list(), [open]);
+  const releases = releasesState.status === "success" ? releasesState.data.slice(0, 5) : [];
 
   const run = useCallback(
     (href: string) => {
@@ -54,15 +58,16 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
         </CommandGroup>
         <CommandSeparator />
         <CommandGroup heading="Recent releases">
-          {mockReleases.slice(0, 3).map((r) => (
-            <CommandItem key={r.id} onSelect={() => run(`/app/releases/${r.id}`)}>
-              {r.title}
+          {releases.map((r) => (
+            <CommandItem key={r.id} keywords={[r.status, r.category]} onSelect={() => run(`/app/releases/${r.id}`)}>
+              <span className="truncate">{r.title}</span>
+              <StatusBadge status={r.status} className="ml-auto" />
             </CommandItem>
           ))}
         </CommandGroup>
         <CommandSeparator />
         <CommandGroup heading="Navigation">
-          {workspaceNav.flatMap((s) =>
+          {[...workspaceNav, { items: accountNav }].flatMap((s) =>
             s.items.map((item) => (
               <CommandItem key={item.href} onSelect={() => run(item.href)}>
                 {item.title}
@@ -71,7 +76,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
           )}
         </CommandGroup>
       </CommandList>
-      <div className="border-t border-border px-3 py-2 text-[10px] text-muted-foreground">
+      <div className="border-t border-border px-3 py-2 text-[11px] text-muted-foreground">
         ↑↓ navigate · ↵ select · Esc close
       </div>
     </CommandDialog>

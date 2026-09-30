@@ -6,7 +6,6 @@ import {
   Info,
   Megaphone,
   MousePointer2,
-  Sparkles,
   X,
 } from "lucide-react";
 import { RichTextPreview } from "@/components/releases/rich-text-editor";
@@ -103,7 +102,7 @@ export function InAppAnnouncement({
   if (content.format === "banner") {
     return (
       <article
-        className={cn("relative flex flex-col gap-3 border-b border-primary/20 bg-primary/5 px-4 py-3 sm:flex-row sm:items-start", className)}
+        className={cn("relative flex flex-col gap-3 border-b border-border-strong bg-surface-subtle px-4 py-3 sm:flex-row sm:items-start", className)}
         data-in-app-format="banner"
         role="status"
         aria-label={`${formatLabel}: ${title}`}
@@ -112,7 +111,7 @@ export function InAppAnnouncement({
           <Megaphone className="size-3.5" aria-hidden="true" />
         </span>
         <div className="min-w-0 flex-1">
-          <p className="text-xs font-medium text-primary">New update</p>
+          <p className="text-xs font-medium text-primary-strong">New update</p>
           <h2 className="mt-0.5 text-sm font-semibold">{title}</h2>
           <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{summary}</p>
           <AnnouncementCta cta={cta} onRead={markRead} className="mt-3" />
@@ -130,18 +129,18 @@ export function InAppAnnouncement({
       >
         <div className="absolute inset-x-7 top-4 h-2 rounded-full bg-foreground/10" aria-hidden="true" />
         <article
-          className="relative mt-5 rounded-xl border border-border bg-background p-4 shadow-xl"
+          className="relative mt-5 rounded-xl border border-border bg-background p-4"
           role="dialog"
           aria-modal="false"
           aria-label={`${formatLabel}: ${title}`}
         >
           <div className="flex items-start justify-between gap-3">
-            <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+            <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-accent text-primary-strong">
               <BellRing className="size-4" aria-hidden="true" />
             </span>
             <AnnouncementDismissButton title={title} onDismiss={dismiss} />
           </div>
-          <p className="mt-4 text-xs font-medium text-primary">New update</p>
+          <p className="mt-4 text-xs font-medium text-primary-strong">New update</p>
           <h2 className="mt-1 text-lg font-semibold tracking-tight">{title}</h2>
           <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{summary}</p>
           <RichTextPreview html={content.body} className="mt-4 text-sm [&_p]:my-0" />
@@ -159,13 +158,13 @@ export function InAppAnnouncement({
       >
         <div className="absolute inset-x-6 top-4 h-1.5 rounded-full bg-foreground/10" aria-hidden="true" />
         <article
-          className="relative mt-6 rounded-xl border border-border bg-background p-3 shadow-lg"
+          className="relative mt-6 rounded-xl border border-border bg-background p-3"
           role="status"
           aria-label={`${formatLabel}: ${title}`}
         >
           <div className="flex items-start gap-3">
             <span className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
-              <Sparkles className="size-3.5" aria-hidden="true" />
+              <Megaphone className="size-3.5" aria-hidden="true" />
             </span>
             <div className="min-w-0 flex-1">
               <h2 className="truncate text-sm font-semibold">{title}</h2>
@@ -188,15 +187,15 @@ export function InAppAnnouncement({
         <div className="h-2 w-20 rounded-full bg-foreground/10" aria-hidden="true" />
         <div className="mt-2 h-6 w-2/3 rounded-md bg-muted" aria-hidden="true" />
         <article
-          className="relative mt-4 rounded-xl border border-primary/25 bg-background p-3 shadow-lg"
+          className="relative mt-4 rounded-xl border border-primary-strong/25 bg-background p-3"
           role="note"
           aria-label={`${formatLabel}: ${title}`}
         >
-          <span className="absolute -top-2 left-7 size-4 rotate-45 border-t border-l border-primary/25 bg-background" aria-hidden="true" />
+          <span className="absolute -top-2 left-7 size-4 rotate-45 border-t border-l border-primary-strong/25 bg-background" aria-hidden="true" />
           <div className="relative flex items-start gap-2">
-            <MousePointer2 className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden="true" />
+            <MousePointer2 className="mt-0.5 size-4 shrink-0 text-primary-strong" aria-hidden="true" />
             <div className="min-w-0 flex-1">
-              <p className="text-xs font-medium text-primary">Tip</p>
+              <p className="text-xs font-medium text-primary-strong">Tip</p>
               <h2 className="mt-0.5 text-sm font-semibold">{title}</h2>
               <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{summary}</p>
               <AnnouncementCta cta={cta} onRead={markRead} className="mt-3" />
@@ -215,11 +214,11 @@ export function InAppAnnouncement({
       aria-label={`${formatLabel}: ${title}`}
     >
       <div className="flex items-start gap-3">
-        <span className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+        <span className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-lg bg-accent text-primary-strong">
           <Info className="size-3.5" aria-hidden="true" />
         </span>
         <div className="min-w-0 flex-1">
-          <p className="text-xs font-medium text-primary">New update</p>
+          <p className="text-xs font-medium text-primary-strong">New update</p>
           <h2 className="mt-1 text-base font-semibold">{title}</h2>
           <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{summary}</p>
           <RichTextPreview html={content.body} className="mt-3 text-sm [&_p]:my-0" />

@@ -16,13 +16,15 @@ function workspaceName(workspace: string) {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { workspace } = await params;
-  const name = workspaceName(workspace) || "ShipBrief";
+  let name = workspaceName(workspace) || "ShipBrief";
 
   try {
-    const [branding, releases] = await Promise.all([
-      brandingService.get(),
+    const [publicWorkspace, releases] = await Promise.all([
+      brandingService.getPublic(workspace),
       changelogService.getPublicList(workspace),
     ]);
+    const branding = publicWorkspace.branding;
+    name = publicWorkspace.name;
     const title = `What’s new at ${name}`;
     const description =
       releases.length === 1

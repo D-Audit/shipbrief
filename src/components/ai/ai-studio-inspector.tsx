@@ -1,6 +1,5 @@
 "use client";
 
-import { History, Palette, ScanSearch, Users } from "lucide-react";
 import { ChannelSelector } from "@/components/releases/channel-selector";
 import { VersionHistory } from "@/components/releases/version-history";
 import { Input } from "@/components/ui/input";
@@ -41,18 +40,18 @@ export function AIStudioInspector({
   const selectedAudience = audiences.find((audience) => audience.id === release.audienceId);
 
   return (
-    <aside className="sb-panel min-w-0 p-4 xl:sticky xl:top-4 xl:max-h-[calc(100vh-7rem)] xl:overflow-y-auto">
+    <aside className="sb-panel min-w-0 p-4">
       <Tabs defaultValue="ai">
         <TabsList className="w-full justify-start overflow-x-auto" variant="line" aria-label="AI Studio inspector">
-          <TabsTrigger value="ai"><Palette />AI setup</TabsTrigger>
-          <TabsTrigger value="audience"><Users />Audience</TabsTrigger>
-          <TabsTrigger value="seo"><ScanSearch />SEO</TabsTrigger>
-          <TabsTrigger value="history"><History />History</TabsTrigger>
+          <TabsTrigger value="ai">Voice</TabsTrigger>
+          <TabsTrigger value="audience">Audience</TabsTrigger>
+          <TabsTrigger value="seo">SEO</TabsTrigger>
+          <TabsTrigger value="history">History</TabsTrigger>
         </TabsList>
 
         <TabsContent value="ai" className="mt-5 space-y-6">
           <section>
-            <h2 className="text-sm font-medium">Brand voice</h2>
+            <h2 className="sb-title-card">Brand voice</h2>
             <p className="mt-1 text-xs leading-relaxed text-muted-foreground">Applied to every new proposal and saved with your AI Studio changes for this workspace.</p>
             <Textarea
               value={brandVoice}
@@ -95,7 +94,7 @@ export function AIStudioInspector({
 
         <TabsContent value="seo" className="mt-5 space-y-4">
           <div>
-            <h2 className="text-sm font-medium">SEO metadata</h2>
+            <h2 className="sb-title-card">SEO metadata</h2>
             <p className="mt-1 text-xs text-muted-foreground">Suggestions are derived from the current master release.</p>
           </div>
           <div className="space-y-2"><Label htmlFor="seo-title">Title</Label><Input id="seo-title" readOnly value={release.title || "Untitled release"} /></div>
@@ -105,7 +104,7 @@ export function AIStudioInspector({
 
         <TabsContent value="history" className="mt-5">
           <div className="mb-3">
-            <h2 className="text-sm font-medium">Version history</h2>
+            <h2 className="sb-title-card">Version history</h2>
             <p className="mt-1 text-xs text-muted-foreground">Restore a saved master-release version when needed.</p>
           </div>
           <VersionHistory releaseId={release.id} refreshKey={versionHistoryRevision} onRestore={onRestoreVersion} />

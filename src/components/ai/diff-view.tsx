@@ -67,11 +67,11 @@ function DiffColumn({
     <div
       className={cn(
         "min-w-0 rounded-lg border p-3",
-        emphasized ? "border-primary/30 bg-primary/5" : "border-border bg-surface-subtle/50"
+        emphasized ? "border-border-strong bg-surface-subtle" : "border-border bg-surface-subtle/50"
       )}
     >
       <p className="mb-2 text-xs font-medium text-muted-foreground">{label}</p>
-      <p className={cn("truncate text-sm font-semibold", changed && "text-primary")}>{title || "Untitled"}</p>
+      <p className={cn("truncate text-sm font-semibold", changed && "text-primary-strong")}>{title || "Untitled"}</p>
       <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{summary || "No summary yet."}</p>
       <p className="mt-2 line-clamp-4 text-xs leading-relaxed text-foreground/80">
         {body || "No description yet."}

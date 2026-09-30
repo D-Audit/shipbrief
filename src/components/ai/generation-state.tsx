@@ -1,7 +1,7 @@
 "use client";
 
 import { AlertCircle, CheckCircle2, Loader2, RotateCcw } from "lucide-react";
-import { aiGenerationSteps } from "@/lib/mock-data/ai-studio";
+import { aiGenerationSteps } from "@/lib/ai-studio";
 import { Button } from "@/components/ui/button";
 import { DiffView } from "./diff-view";
 import type { AIGeneration } from "./types";
@@ -21,16 +21,16 @@ export function GenerationState({
 }) {
   if (generation.status === "generating") {
     return (
-      <div className="rounded-xl border border-primary/20 bg-primary/5 p-4" role="status" aria-live="polite">
+      <div className="rounded-xl border border-border-strong bg-surface-subtle p-4" role="status" aria-live="polite">
         <div className="flex items-center gap-2 text-sm font-medium">
-          <Loader2 className="size-4 animate-spin text-primary" />
+          <Loader2 className="size-4 animate-spin text-primary-strong" />
           Creating a proposal
         </div>
         <div className="mt-4 space-y-2">
           {aiGenerationSteps.map((label, index) => (
             <div key={label} className="flex items-center gap-2 text-xs text-muted-foreground">
               <span
-                className={`size-1.5 rounded-full ${index <= step ? "bg-primary" : "bg-border-strong"}`}
+                className={`size-1.5 rounded-full ${index <= step ? "bg-primary-strong" : "bg-border-strong"}`}
                 aria-hidden="true"
               />
               <span className={index === step ? "font-medium text-foreground" : undefined}>{label}</span>
@@ -70,7 +70,7 @@ export function GenerationState({
   if (!generation.proposal) return null;
 
   return (
-    <div className="rounded-xl border border-primary/20 bg-surface p-4">
+    <div className="rounded-xl border border-border-strong bg-surface p-4">
       <div className="flex items-start gap-2">
         <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-success" />
         <div>

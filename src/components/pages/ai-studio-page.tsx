@@ -2,10 +2,11 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ArrowLeft, Check, Loader2, Save, Send, Sparkles } from "lucide-react";
+import { ArrowLeft, Loader2, PenLine, Save, Send } from "lucide-react";
 import { toast } from "sonner";
 import {
   AIAssistantPanel,
+  GenerationState,
   AIStudioInspector,
   ReleaseCanvas,
   type AIGeneration,
@@ -13,11 +14,11 @@ import {
   type StudioDraft,
   type StudioScope,
 } from "@/components/ai";
-import { ErrorState, LoadingState, StatusBadge } from "@/components/shared/page-states";
-import { Badge } from "@/components/ui/badge";
+import { EmptyState, ErrorState, LoadingState, StatusBadge } from "@/components/shared/page-states";
+import { ButtonLink } from "@/components/ui/button-link";
 import { Button } from "@/components/ui/button";
 import { UnsavedChangesDialog } from "@/components/releases/unsaved-changes-dialog";
-import { suggestedAIStudioActions, defaultAIStudioReleaseId } from "@/lib/mock-data/ai-studio";
+import { suggestedAIStudioActions } from "@/lib/ai-studio";
 import { aiStudioService, audienceService, releaseService, settingsService } from "@/lib/services";
 import type { AIGenerationContext, Audience, Channel, ChannelVariant, Release, ReleaseVersion } from "@/types";
 
@@ -94,7 +95,7 @@ function inferredVariantChannel(prompt: string): Channel | undefined {
 export function AIStudioPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const releaseId = searchParams.get("release") ?? defaultAIStudioReleaseId;
+  const releaseId = searchParams.get("release");
   const [release, setRelease] = useState<Release | null>(null);
   const [variants, setVariants] = useState<VariantMap>({});
   const [audiences, setAudiences] = useState<Audience[]>([]);
@@ -110,6 +111,7 @@ export function AIStudioPage() {
   const [versionRevision, setVersionRevision] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [noReleases, setNoReleases] = useState(false);
   const [saving, setSaving] = useState(false);
   const [publishing, setPublishing] = useState(false);
   const [dirty, setDirty] = useState(false);
@@ -120,6 +122,16 @@ export function AIStudioPage() {
     setLoading(true);
     setError(null);
     try {
+      if (!releaseId) {
+        // No release chosen: open the most recently updated one.
+        const [latest] = await releaseService.list();
+        if (!latest) {
+          setNoReleases(true);
+          return;
+        }
+        router.replace(`/app/ai-studio?release=${latest.id}`);
+        return;
+      }
       const data = await releaseService.get(releaseId);
       setRelease(data);
       setVariants(data.channelVariants ?? {});
@@ -133,7 +145,7 @@ export function AIStudioPage() {
     } finally {
       setLoading(false);
     }
-  }, [releaseId]);
+  }, [releaseId, router]);
 
   useEffect(() => {
     void loadRelease();
@@ -392,7 +404,7 @@ export function AIStudioPage() {
     try {
       await persistDraft();
       setDirty(false);
-      toast.success("Release, channel variants, and AI context saved (mock).");
+      toast.success("Release, channel variants, and AI context saved.");
     } catch {
       toast.error("We could not save your draft. Your edits remain in this workspace.");
     } finally {
@@ -420,7 +432,7 @@ export function AIStudioPage() {
       setVariants(published.channelVariants ?? variants);
       setDirty(false);
       setVersionRevision((current) => current + 1);
-      toast.success("Release published to the selected channels (mock).");
+      toast.success("Release published to the selected channels.");
     } catch {
       toast.error("Publishing did not complete. Your draft is still safe.");
     } finally {
@@ -451,28 +463,37 @@ export function AIStudioPage() {
   };
 
   if (loading) return <LoadingState rows={7} />;
+  if (noReleases) {
+    return (
+      <EmptyState
+        icon={PenLine}
+        title="Nothing to write yet"
+        description="AI Studio works on a release. Create your first one, then open it here to rewrite, adapt it for each channel, and check quality."
+        action={<ButtonLink href="/app/releases/new">Create a release</ButtonLink>}
+      />
+    );
+  }
   if (error) return <ErrorState message={error} onRetry={loadRelease} />;
   if (!release) return null;
 
   return (
-    <div className="space-y-4 pb-6">
-      <header className="flex flex-col gap-4 border-b border-border pb-4 lg:flex-row lg:items-center lg:justify-between">
+    <div className="space-y-5 pb-6">
+      <header className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div className="flex min-w-0 items-start gap-3">
-          <Button type="button" variant="ghost" size="icon" className="mt-0.5 shrink-0" onClick={() => requestNavigation(`/app/releases/${release.id}`)} aria-label="Back to release editor">
-            <ArrowLeft className="size-4" />
-          </Button>
           <div className="min-w-0">
-            <div className="flex flex-wrap items-center gap-2">
-              <p className="text-xs font-medium uppercase tracking-[0.12em] text-primary">AI Studio</p>
+            <button type="button" onClick={() => requestNavigation(`/app/releases/${release.id}`)} className="inline-flex items-center gap-1 text-[13px] text-muted-foreground transition-colors hover:text-foreground">
+              <ArrowLeft className="size-3.5" />
+              Release editor
+            </button>
+            <div className="mt-1.5 flex flex-wrap items-center gap-2.5">
+              <h1 className="sb-title-page truncate">{release.title || "Untitled release"}</h1>
               <StatusBadge status={release.status} />
-              {dirty && <Badge variant="outline" className="text-warning">Unsaved changes</Badge>}
+              {dirty && <span className="text-xs text-muted-foreground">Unsaved changes</span>}
             </div>
-            <h1 className="mt-1 truncate text-xl font-semibold tracking-tight sm:text-2xl">{release.title || "Untitled release"}</h1>
-            <p className="mt-1 text-sm text-muted-foreground">Create deliberate drafts across each selected communication channel.</p>
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <Button type="button" variant="outline" onClick={undoLastChange} disabled={undoStack.length === 0}>Undo AI change</Button>
+          {undoStack.length > 0 && <Button type="button" variant="ghost" onClick={undoLastChange}>Undo AI change</Button>}
           <Button type="button" variant="outline" onClick={saveRelease} disabled={saving || publishing}>
             {saving ? <Loader2 className="animate-spin" /> : <Save />}
             Save
@@ -484,58 +505,61 @@ export function AIStudioPage() {
         </div>
       </header>
 
-      <div className="flex items-center gap-2 rounded-lg border border-primary/15 bg-primary/5 px-3 py-2 text-xs text-muted-foreground">
-        <Sparkles className="size-3.5 shrink-0 text-primary" />
-        AI proposes; people review and publish. Your master release and channel versions are kept separate.
-        <Check className="ml-auto size-3.5 shrink-0 text-success" aria-label="Human review required" />
-      </div>
+      <main className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_23rem]">
+        <div className="min-w-0 space-y-5">
+          {generation && (
+            <GenerationState
+              generation={generation}
+              step={generationStep}
+              onApply={applyGeneration}
+              onTryAnother={() => void startGeneration({ prompt: generation.prompt, kind: generation.kind, targetScope: generation.scope, attempt: generation.attempt + 1 })}
+              onContinueManually={() => setGeneration(null)}
+            />
+          )}
 
-      <main className="grid items-start gap-4 xl:grid-cols-[minmax(18rem,0.78fr)_minmax(0,1.45fr)_minmax(17rem,0.72fr)]">
-        <AIAssistantPanel
-          actions={suggestedAIStudioActions}
-          prompt={prompt}
-          scope={activeScope}
-          generation={generation}
-          generationStep={generationStep}
-          canUndo={undoStack.length > 0}
-          onPromptChange={setPrompt}
-          onAction={handleAction}
-          onSubmit={handlePromptSubmit}
-          onApply={applyGeneration}
-          onTryAnother={() => generation && void startGeneration({ prompt: generation.prompt, kind: generation.kind, targetScope: generation.scope, attempt: generation.attempt + 1 })}
-          onClearGeneration={() => setGeneration(null)}
-          onUndo={undoLastChange}
-        />
+          <ReleaseCanvas
+            activeScope={activeScope}
+            selectedChannels={release.channels}
+            content={currentDraft}
+            release={release}
+            audienceName={selectedAudience?.name}
+            onScopeChange={setActiveScope}
+            onContentChange={updateContent}
+          />
+          <p className="sb-meta">AI suggests; your team reviews and publishes. Channel versions never overwrite the master release.</p>
+        </div>
 
-        <ReleaseCanvas
-          activeScope={activeScope}
-          selectedChannels={release.channels}
-          content={currentDraft}
-          release={release}
-          audienceName={selectedAudience?.name}
-          onScopeChange={setActiveScope}
-          onContentChange={updateContent}
-        />
+        <div className="min-w-0 space-y-5 xl:sticky xl:top-6 xl:self-start">
+          <AIAssistantPanel
+            actions={suggestedAIStudioActions}
+            prompt={prompt}
+            scope={activeScope}
+            generation={generation}
+            onPromptChange={setPrompt}
+            onAction={handleAction}
+            onSubmit={handlePromptSubmit}
+          />
 
-        <AIStudioInspector
-          release={release}
-          audiences={audiences}
-          brandVoice={brandVoice}
-          brandVoiceLoading={brandVoiceLoading}
-          qualityState={qualityState}
-          versionHistoryRevision={versionRevision}
-          onBrandVoiceChange={(value) => {
-            setBrandVoice(value);
-            setDirty(true);
-          }}
-          onChannelsChange={updateChannels}
-          onAudienceChange={(audienceId) => {
-            setRelease((current) => current ? { ...current, audienceId } : current);
-            setDirty(true);
-          }}
-          onRunQualityCheck={() => void runQualityCheck()}
-          onRestoreVersion={restoreVersion}
-        />
+          <AIStudioInspector
+            release={release}
+            audiences={audiences}
+            brandVoice={brandVoice}
+            brandVoiceLoading={brandVoiceLoading}
+            qualityState={qualityState}
+            versionHistoryRevision={versionRevision}
+            onBrandVoiceChange={(value) => {
+              setBrandVoice(value);
+              setDirty(true);
+            }}
+            onChannelsChange={updateChannels}
+            onAudienceChange={(audienceId) => {
+              setRelease((current) => current ? { ...current, audienceId } : current);
+              setDirty(true);
+            }}
+            onRunQualityCheck={() => void runQualityCheck()}
+            onRestoreVersion={restoreVersion}
+          />
+        </div>
       </main>
       <UnsavedChangesDialog
         open={showUnsavedDialog}

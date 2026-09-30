@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { format } from "date-fns";
 import { MessageCircle, Pin, ThumbsUp } from "lucide-react";
-import type { Release } from "@/types";
+import type { PublicRelease } from "@/types";
 
 export function UpdateCard({
   workspace,
@@ -9,18 +9,18 @@ export function UpdateCard({
   featured = false,
 }: {
   workspace: string;
-  release: Release;
+  release: PublicRelease;
   featured?: boolean;
 }) {
   return (
     <Link
       href={`/c/${workspace}/${release.slug}`}
       className={featured
-        ? "block rounded-xl border border-primary/20 bg-primary/5 p-5 transition-colors hover:bg-primary/10 sm:p-6"
+        ? "block rounded-xl border border-border-strong bg-surface-subtle p-5 transition-[background-color,transform] hover:-translate-y-0.5 hover:bg-muted sm:p-6"
         : "block border-b border-border pb-6 transition-colors hover:opacity-80"}
     >
       <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-        {featured && <span className="inline-flex items-center gap-1 font-medium text-primary"><Pin className="size-3" />Featured</span>}
+        {featured && <span className="inline-flex items-center gap-1 font-medium text-primary-strong"><Pin className="size-3" />Featured</span>}
         <span>{release.category}</span>
         <span aria-hidden="true">/</span>
         <span>{release.publishedAt && format(new Date(release.publishedAt), "MMMM d, yyyy")}</span>

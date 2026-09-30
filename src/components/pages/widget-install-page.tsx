@@ -68,7 +68,7 @@ function WidgetInstallEditor({
     try {
       await widgetSettingsService.update(settings);
       await onReload();
-      toast.success("Widget installation settings saved (mock).");
+      toast.success("Widget installation settings saved.");
     } catch {
       toast.error("We could not save the widget settings.");
     } finally {
@@ -94,14 +94,14 @@ function WidgetInstallEditor({
     <div className="space-y-6">
       <PageHeader
         title="Widget install"
-        description="Configure the in-app update launcher, then use a single project snippet in your product. Everything here is a local frontend simulation."
+        description="Configure the in-app update launcher, then add a single snippet to your product."
         actions={<Button type="button" onClick={() => void save()} disabled={saving}>{saving ? <Loader2 className="animate-spin" /> : <Settings2 />}{saving ? "Saving..." : "Save configuration"}</Button>}
       />
 
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(22rem,.78fr)]">
         <main className="space-y-6">
           <section className="sb-panel p-4 sm:p-5">
-            <div className="flex items-start gap-3"><span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary"><Bell className="size-4" /></span><div><h2 className="text-base font-semibold">Choose how updates open</h2><p className="mt-1 text-sm leading-relaxed text-muted-foreground">Use ShipBrief&apos;s default launcher or open the feed from a control you already own.</p></div></div>
+            <div className="flex items-start gap-3"><Bell className="mt-0.5 size-4 shrink-0 text-muted-foreground" aria-hidden="true" /><div><h2 className="sb-title-section">Choose how updates open</h2><p className="mt-1 text-sm leading-relaxed text-muted-foreground">Use ShipBrief&apos;s default launcher or open the feed from a control you already own.</p></div></div>
             <div className="mt-5 grid gap-3 sm:grid-cols-2">
               <ModeCard active={settings.launcherMode === "default"} onSelect={() => update("launcherMode", "default")} icon={<Bell className="size-4" />} title="Default launcher" description="A compact What&apos;s New control appears in your product." />
               <ModeCard active={settings.launcherMode === "manual"} onSelect={() => update("launcherMode", "manual")} icon={<MousePointer2 className="size-4" />} title="Manual trigger" description="Open, close, or toggle the feed from your own navigation." />
@@ -109,7 +109,7 @@ function WidgetInstallEditor({
           </section>
 
           <section className="sb-panel p-4 sm:p-5">
-            <div className="flex items-start gap-3"><span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary"><Palette className="size-4" /></span><div><h2 className="text-base font-semibold">Match your product surface</h2><p className="mt-1 text-sm leading-relaxed text-muted-foreground">These local settings change the snippet and live preview. Saved branding still supplies the accent color.</p></div></div>
+            <div className="flex items-start gap-3"><Palette className="mt-0.5 size-4 shrink-0 text-muted-foreground" aria-hidden="true" /><div><h2 className="sb-title-section">Match your product surface</h2><p className="mt-1 text-sm leading-relaxed text-muted-foreground">These settings change the snippet and live preview. Saved branding supplies the accent color.</p></div></div>
             <div className="mt-5 grid gap-4 sm:grid-cols-3">
               <div className="space-y-2"><Label htmlFor="widget-placement">Launcher position</Label><Select value={settings.placement} onValueChange={(value) => value && update("placement", value as WidgetPlacement)}><SelectTrigger id="widget-placement" className="w-full"><SelectValue>{(value) => value === "bottom-left" ? "Bottom left" : "Bottom right"}</SelectValue></SelectTrigger><SelectContent><SelectItem value="bottom-right">Bottom right</SelectItem><SelectItem value="bottom-left">Bottom left</SelectItem></SelectContent></Select></div>
               <div className="space-y-2"><Label htmlFor="widget-install-theme">Widget theme</Label><Select value={settings.theme} onValueChange={(value) => value && update("theme", value as WidgetInstallSettings["theme"])}><SelectTrigger id="widget-install-theme" className="w-full"><SelectValue>{(value) => value === "inherit" ? "Inherit product theme" : String(value)}</SelectValue></SelectTrigger><SelectContent><SelectItem value="inherit">Inherit product theme</SelectItem><SelectItem value="light">Light</SelectItem><SelectItem value="dark">Dark</SelectItem></SelectContent></Select></div>
@@ -118,24 +118,24 @@ function WidgetInstallEditor({
           </section>
 
           <section className="sb-panel overflow-hidden">
-            <div className="flex flex-col gap-3 border-b border-border p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5"><div><h2 className="text-base font-semibold">Install your project snippet</h2><p className="mt-1 text-sm text-muted-foreground">Project ID <span className="font-mono text-foreground">{settings.projectId}</span></p></div><div className="flex gap-1 rounded-lg bg-surface-subtle p-1"><button type="button" onClick={() => setCodeTab("script")} className={cn("rounded-md px-2.5 py-1.5 text-xs font-medium", codeTab === "script" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground")}>Script</button><button type="button" onClick={() => setCodeTab("react")} className={cn("rounded-md px-2.5 py-1.5 text-xs font-medium", codeTab === "react" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground")}>React</button></div></div>
-            {codeTab === "script" ? <CodePanel name="Script snippet" code={scriptSnippet} copied={copied === "Script snippet"} onCopy={() => void copy("Script snippet", scriptSnippet)} /> : <CodePanel name="React snippet" code={reactSnippet} copied={copied === "React snippet"} onCopy={() => void copy("React snippet", reactSnippet)} />}
-            {settings.launcherMode === "manual" && <div className="border-t border-border bg-primary/[0.035] px-4 py-4 sm:px-5"><p className="text-sm font-medium">Manual trigger API</p><p className="mt-1 text-xs leading-relaxed text-muted-foreground">Call <code className="rounded bg-primary/10 px-1 py-0.5 text-primary">open()</code>, <code className="rounded bg-primary/10 px-1 py-0.5 text-primary">close()</code>, or <code className="rounded bg-primary/10 px-1 py-0.5 text-primary">toggle()</code> from your own product control.</p><div className="mt-3 flex flex-wrap gap-2"><CodePill value="window.ShipBrief.open()" onCopy={() => void copy("Open command", "window.ShipBrief.open()")}>Open</CodePill><CodePill value="window.ShipBrief.close()" onCopy={() => void copy("Close command", "window.ShipBrief.close()")}>Close</CodePill><CodePill value="window.ShipBrief.toggle()" onCopy={() => void copy("Toggle command", "window.ShipBrief.toggle()")}>Toggle</CodePill></div></div>}
+            <div className="flex flex-col gap-3 border-b border-border p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5"><div><h2 className="sb-title-section">Install your project snippet</h2><p className="mt-1 text-sm text-muted-foreground">Project ID <span className="font-mono text-foreground">{settings.projectId}</span></p></div><div className="flex gap-1 rounded-lg bg-surface-subtle p-1"><button type="button" onClick={() => setCodeTab("script")} className={cn("rounded-md px-2.5 py-1.5 text-xs font-medium", codeTab === "script" ? "bg-card text-foreground " : "text-muted-foreground hover:text-foreground")}>HTML</button><button type="button" onClick={() => setCodeTab("react")} className={cn("rounded-md px-2.5 py-1.5 text-xs font-medium", codeTab === "react" ? "bg-card text-foreground " : "text-muted-foreground hover:text-foreground")}>React</button></div></div>
+            {codeTab === "script" ? <CodePanel name="HTML snippet" code={scriptSnippet} copied={copied === "HTML snippet"} onCopy={() => void copy("HTML snippet", scriptSnippet)} /> : <CodePanel name="React snippet" code={reactSnippet} copied={copied === "React snippet"} onCopy={() => void copy("React snippet", reactSnippet)} />}
+            {settings.launcherMode === "manual" && <div className="border-t border-border bg-accent/40 px-4 py-4 sm:px-5"><p className="text-sm font-medium">Manual trigger API</p><p className="mt-1 text-xs leading-relaxed text-muted-foreground">Call <code className="rounded bg-accent px-1 py-0.5 text-primary-strong">open()</code>, <code className="rounded bg-accent px-1 py-0.5 text-primary-strong">close()</code>, or <code className="rounded bg-accent px-1 py-0.5 text-primary-strong">toggle()</code> from your own product control.</p><div className="mt-3 flex flex-wrap gap-2"><CodePill value="window.ShipBrief.open()" onCopy={() => void copy("Open command", "window.ShipBrief.open()")}>Open</CodePill><CodePill value="window.ShipBrief.close()" onCopy={() => void copy("Close command", "window.ShipBrief.close()")}>Close</CodePill><CodePill value="window.ShipBrief.toggle()" onCopy={() => void copy("Toggle command", "window.ShipBrief.toggle()")}>Toggle</CodePill></div></div>}
           </section>
 
-          <section className="flex items-start gap-3 border border-dashed border-border bg-surface-subtle/35 p-4 text-sm text-muted-foreground"><Code2 className="mt-0.5 size-4 shrink-0 text-primary" /><p>The public SDK URL and trigger methods are shown as a realistic integration contract. A future backend will supply the production project token, read state, and delivery metrics.</p></section>
+          <section className="flex items-start gap-3 border border-dashed border-border bg-surface-subtle/35 p-4 text-sm text-muted-foreground"><Code2 className="mt-0.5 size-4 shrink-0 text-muted-foreground" /><p>The widget tracks read state per visitor and reports views and clicks to Analytics.</p></section>
         </main>
 
         <aside className="space-y-5 xl:sticky xl:top-20 xl:self-start">
           <section className="sb-panel overflow-hidden">
-            <div className="flex items-center justify-between border-b border-border px-4 py-3"><div><p className="text-sm font-semibold">Live product preview</p><p className="text-[11px] text-muted-foreground">{settings.launcherMode === "manual" ? "Manual trigger mode" : "Default launcher mode"}</p></div><button type="button" onClick={() => setPreviewRevision((current) => current + 1)} className="text-xs font-medium text-primary hover:underline">Reset preview</button></div>
+            <div className="flex items-center justify-between border-b border-border px-4 py-3"><div><p className="text-sm font-semibold">Live product preview</p><p className="text-[11px] text-muted-foreground">{settings.launcherMode === "manual" ? "Manual trigger mode" : "Default launcher mode"}</p></div><button type="button" onClick={() => setPreviewRevision((current) => current + 1)} className="text-xs font-medium text-primary-strong hover:underline">Reset preview</button></div>
             <div className="relative min-h-[33rem] overflow-hidden bg-[#171718] p-4">
-              <div className="mx-auto max-w-sm border border-white/10 bg-[#202022] p-3 text-white"><div className="flex items-center justify-between"><span className="text-[10px] text-white/65">Acme workspace</span><span className="size-5 rounded-full bg-[#e40178]" /></div><p className="mt-8 text-lg font-medium tracking-tight">Welcome back, Avery.</p><div className="mt-4 h-16 border border-white/10 bg-white/5" /></div>
-              {settings.launcherMode === "default" && <span className={cn("absolute bottom-4 inline-flex h-9 items-center gap-2 bg-[#e40178] px-3 text-xs font-medium text-white shadow-lg", settings.placement === "bottom-left" ? "left-4" : "right-4")}><Bell className="size-3.5" />What&apos;s new{settings.showUnreadBadge && <span className="flex size-4 items-center justify-center rounded-full bg-white text-[9px] font-semibold text-[#bd0063]">3</span>}</span>}
+              <div className="mx-auto max-w-sm border border-white/10 bg-[#202022] p-3 text-white"><div className="flex items-center justify-between"><span className="text-[10px] text-white/65">Acme workspace</span><span className="size-5 rounded-full bg-[#c7f238]" /></div><p className="mt-8 text-lg font-medium tracking-tight">Welcome back, Avery.</p><div className="mt-4 h-16 border border-white/10 bg-white/5" /></div>
+              {settings.launcherMode === "default" && <span className={cn("absolute bottom-4 inline-flex h-9 items-center gap-2 bg-[#c7f238] px-3 text-xs font-medium text-[#171717]", settings.placement === "bottom-left" ? "left-4" : "right-4")}><Bell className="size-3.5" />What&apos;s new{settings.showUnreadBadge && <span className="flex size-4 items-center justify-center rounded-full bg-white text-[9px] font-semibold text-[#b9e422]">3</span>}</span>}
               <div className="absolute inset-x-4 top-20 flex justify-center"><WhatsNewWidget key={previewRevision} theme={settings.theme} accentColor={accentColor} /></div>
             </div>
           </section>
-          <section className="sb-panel p-4"><p className="text-sm font-semibold">After you install</p><ol className="mt-4 space-y-3 text-xs leading-relaxed text-muted-foreground"><li className="flex gap-2"><span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-primary/10 text-[10px] font-semibold text-primary">1</span><span>Publish an in-app release from the workspace.</span></li><li className="flex gap-2"><span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-primary/10 text-[10px] font-semibold text-primary">2</span><span>Preview the feed in your product before you share it.</span></li><li className="flex gap-2"><span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-primary/10 text-[10px] font-semibold text-primary">3</span><span>Use analytics and feedback to understand what customers did next.</span></li></ol><a href="/embed/whats-new" className="mt-4 inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline">Open standalone preview <ExternalLink className="size-3" /></a></section>
+          <section className="sb-panel p-4"><p className="text-sm font-semibold">After you install</p><ol className="mt-4 space-y-3 text-xs leading-relaxed text-muted-foreground"><li className="flex gap-2"><span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-muted text-[10px] font-semibold text-foreground/70">1</span><span>Publish an in-app release from the workspace.</span></li><li className="flex gap-2"><span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-muted text-[10px] font-semibold text-foreground/70">2</span><span>Preview the feed in your product before you share it.</span></li><li className="flex gap-2"><span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-muted text-[10px] font-semibold text-foreground/70">3</span><span>Use analytics and feedback to understand what customers did next.</span></li></ol><a href={`/embed/whats-new?key=${encodeURIComponent(settings.projectId)}`} className="mt-4 inline-flex items-center gap-1 text-xs font-medium text-primary-strong hover:underline">Open standalone preview <ExternalLink className="size-3" /></a></section>
         </aside>
       </div>
     </div>
@@ -143,7 +143,7 @@ function WidgetInstallEditor({
 }
 
 function ModeCard({ active, onSelect, icon, title, description }: { active: boolean; onSelect: () => void; icon: React.ReactNode; title: string; description: string }) {
-  return <button type="button" aria-pressed={active} onClick={onSelect} className={cn("flex min-h-28 items-start gap-3 border p-3.5 text-left transition-colors", active ? "border-primary/45 bg-primary/[0.045]" : "border-border bg-background hover:bg-surface-subtle/60")}><span className={cn("flex size-8 shrink-0 items-center justify-center rounded-lg", active ? "bg-primary text-primary-foreground" : "bg-surface-subtle text-muted-foreground")}>{icon}</span><span><span className="block text-sm font-medium">{title}</span><span className="mt-1 block text-xs leading-relaxed text-muted-foreground">{description}</span>{active && <span className="mt-2 inline-flex items-center gap-1 text-[11px] font-medium text-primary"><Check className="size-3" />Selected</span>}</span></button>;
+  return <button type="button" aria-pressed={active} onClick={onSelect} className={cn("flex min-h-28 items-start gap-3 rounded-[var(--radius-lg)] border p-3.5 text-left transition-colors", active ? "border-foreground/40 bg-surface" : "border-border bg-background hover:bg-surface-subtle/60")}><span className={cn("mt-0.5 flex shrink-0 [&_svg]:size-4", active ? "text-primary-strong" : "text-muted-foreground")}>{icon}</span><span><span className="block text-sm font-medium">{title}</span><span className="mt-1 block text-xs leading-relaxed text-muted-foreground">{description}</span>{active && <span className="mt-2 inline-flex items-center gap-1 text-[11px] font-medium text-primary-strong"><Check className="size-3" />Selected</span>}</span></button>;
 }
 
 function CodePanel({ name, code, copied, onCopy }: { name: string; code: string; copied: boolean; onCopy: () => void }) {
@@ -151,35 +151,37 @@ function CodePanel({ name, code, copied, onCopy }: { name: string; code: string;
 }
 
 function CodePill({ value, children, onCopy }: { value: string; children: string; onCopy: () => void }) {
-  return <button type="button" onClick={onCopy} title={value} className="border border-primary/20 bg-card px-2.5 py-1.5 text-[11px] font-medium text-primary transition-colors hover:bg-primary/5">{children}</button>;
+  return <button type="button" onClick={onCopy} title={value} className="border border-border-strong bg-card px-2.5 py-1.5 text-[11px] font-medium text-primary-strong transition-colors hover:bg-surface-subtle">{children}</button>;
 }
 
+function embedUrl(settings: WidgetInstallSettings) {
+  const origin = typeof window === "undefined" ? "" : window.location.origin;
+  return `${origin}/embed/whats-new?key=${encodeURIComponent(settings.projectId)}`;
+}
+
+/**
+ * The widget is served as an embeddable page, so installing it is one iframe.
+ * Placement and theme come from the saved settings above.
+ */
 function getScriptSnippet(settings: WidgetInstallSettings) {
-  return `<script src="https://cdn.shipbrief.app/widget.js" async></script>
-<script>
-  window.ShipBrief = window.ShipBrief || [];
-  window.ShipBrief.push(["init", {
-    workspace: "${settings.projectId}",
-    launcher: "${settings.launcherMode}",
-    position: "${settings.placement}",
-    unreadBadge: ${settings.showUnreadBadge},
-    theme: "${settings.theme}"
-  }]);
-</script>`;
+  const side = settings.placement === "bottom-left" ? "left" : "right";
+  return `<iframe
+  src="${embedUrl(settings)}"
+  title="What's new"
+  style="position:fixed;bottom:16px;${side}:16px;width:400px;height:560px;border:0;z-index:2147483000;background:transparent"
+  loading="lazy"
+></iframe>`;
 }
 
 function getReactSnippet(settings: WidgetInstallSettings) {
-  const launcher = settings.launcherMode === "manual" ? "false" : "true";
-  return `import { ShipBriefWidget } from "@shipbrief/react";
-
-export function ProductShell() {
+  const side = settings.placement === "bottom-left" ? "left" : "right";
+  return `export function WhatsNew() {
   return (
-    <ShipBriefWidget
-      workspace="${settings.projectId}"
-      launcher={${launcher}}
-      position="${settings.placement}"
-      unreadBadge={${settings.showUnreadBadge}}
-      theme="${settings.theme}"
+    <iframe
+      src="${embedUrl(settings)}"
+      title="What's new"
+      loading="lazy"
+      style={{ position: "fixed", bottom: 16, ${side}: 16, width: 400, height: 560, border: 0, zIndex: 2147483000, background: "transparent" }}
     />
   );
 }`;

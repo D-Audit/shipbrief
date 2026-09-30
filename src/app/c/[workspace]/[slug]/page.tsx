@@ -20,8 +20,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   try {
     const release = await changelogService.getPublic(workspace, slug);
-    const title = release.title;
-    const description = release.summary;
+    const title = release.seo?.title || release.title;
+    const description = release.seo?.description || release.summary;
 
     return {
       title,

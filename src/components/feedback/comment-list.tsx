@@ -32,11 +32,11 @@ export function CommentList({
 
   return (
     <section aria-labelledby="comments-heading" className="space-y-4">
-      <div className="flex items-center gap-2"><MessageSquarePlus className="size-4 text-primary" /><h2 id="comments-heading" className="text-base font-semibold">Conversation</h2><span className="text-sm text-muted-foreground">{comments.length} shown</span></div>
+      <div className="flex items-center gap-2"><MessageSquarePlus className="size-4 text-muted-foreground" /><h2 id="comments-heading" className="sb-title-section">Conversation</h2><span className="text-sm text-muted-foreground">{comments.length} shown</span></div>
       <div className="space-y-3">
         {comments.length === 0 ? <p className="rounded-lg border border-dashed border-border px-4 py-6 text-sm text-muted-foreground">No comments yet. Add context or invite a customer to share more.</p> : comments.map((comment) => (
           <article key={comment.id} className="rounded-lg border border-border bg-surface p-3">
-            <div className="flex flex-wrap items-center gap-2 text-xs"><span className="font-medium text-foreground">{comment.author}</span>{comment.isInternal && <span className="rounded bg-primary/10 px-1.5 py-0.5 font-medium text-primary">Internal note</span>}<time className="text-muted-foreground">{new Intl.DateTimeFormat("en", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }).format(new Date(comment.createdAt))}</time></div>
+            <div className="flex flex-wrap items-center gap-2 text-xs"><span className="font-medium text-foreground">{comment.author}</span>{comment.isInternal && <span className="rounded bg-muted px-1.5 py-0.5 font-medium text-foreground">Internal note</span>}<time className="text-muted-foreground">{new Intl.DateTimeFormat("en", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }).format(new Date(comment.createdAt))}</time></div>
             <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{comment.body}</p>
           </article>
         ))}

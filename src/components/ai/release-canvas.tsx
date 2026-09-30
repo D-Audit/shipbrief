@@ -31,10 +31,10 @@ export function ReleaseCanvas({
   const label = activeScope === "master" ? "Master release" : activeScope === "in_app" ? "In-App version" : `${activeScope[0].toUpperCase()}${activeScope.slice(1)} version`;
 
   return (
-    <section className="sb-panel-raised min-w-0 overflow-hidden">
+    <section className="sb-panel min-w-0 overflow-hidden">
       <div className="flex flex-col gap-4 border-b border-border p-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <div className="flex items-center gap-2 text-sm font-semibold"><PencilLine className="size-4 text-primary" />{label}</div>
+          <div className="flex items-center gap-2 text-sm font-semibold"><PencilLine className="size-4 text-muted-foreground" />{label}</div>
           <p className="mt-1 text-xs text-muted-foreground">
             {activeScope === "master"
               ? "The canonical source used to create channel-specific versions."
@@ -45,26 +45,8 @@ export function ReleaseCanvas({
       </div>
 
       <div className="space-y-5 p-4 sm:p-5">
-        <section aria-labelledby="live-preview-heading">
-          <div className="mb-3 flex items-center gap-2">
-            <Eye className="size-4 text-muted-foreground" />
-            <h2 id="live-preview-heading" className="text-sm font-medium">Live preview</h2>
-          </div>
-          <div className="rounded-xl bg-surface-subtle/70 p-3 sm:p-5">
-            {activeScope === "email" ? (
-              <EmailPreview content={content} cta={release.cta} audienceName={audienceName} />
-            ) : activeScope === "in_app" ? (
-              <InAppPreview content={content} cta={release.cta} />
-            ) : (
-              <ChangelogPreview content={content} category={release.category} cta={release.cta} />
-            )}
-          </div>
-        </section>
-
-        <section className="border-t border-border pt-5" aria-labelledby="content-editor-heading">
-          <h2 id="content-editor-heading" className="text-sm font-medium">Content canvas</h2>
-          <p className="mt-1 text-xs text-muted-foreground">Edit directly, or use an AI proposal without overwriting your current draft.</p>
-          <div className="mt-4 space-y-4">
+        <section aria-label="Content">
+          <div className="space-y-4">
             {activeScope === "email" && (
               <div className="space-y-2">
                 <Label htmlFor="email-subject">Subject line</Label>
@@ -110,7 +92,7 @@ export function ReleaseCanvas({
                   </SelectContent>
                 </Select>
                 <p id="in-app-format-help" className="text-xs leading-relaxed text-muted-foreground">
-                  Choose the frontend preview for this in-app version. Delivery placement and frequency are connected later.
+                  Choose how this in-app version is presented in the What&apos;s New widget.
                 </p>
               </div>
             )}
@@ -124,7 +106,7 @@ export function ReleaseCanvas({
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="studio-summary">Customer-value summary</Label>
+              <Label htmlFor="studio-summary">Summary</Label>
               <Textarea
                 id="studio-summary"
                 rows={2}
@@ -134,11 +116,27 @@ export function ReleaseCanvas({
               />
             </div>
             <div className="space-y-2">
-              <Label>Description</Label>
+              <Label>Details</Label>
               <RichTextEditor value={content.body} onChange={(body) => onContentChange({ body })} />
             </div>
           </div>
         </section>
+        <section className="border-t border-border pt-5" aria-labelledby="live-preview-heading">
+          <div className="mb-3 flex items-center gap-2">
+            <Eye className="size-4 text-muted-foreground" />
+            <h2 id="live-preview-heading" className="sb-title-card">Live preview</h2>
+          </div>
+          <div className="rounded-xl border border-border/70 bg-surface-subtle/70 p-3 sm:p-5">
+            {activeScope === "email" ? (
+              <EmailPreview content={content} cta={release.cta} audienceName={audienceName} />
+            ) : activeScope === "in_app" ? (
+              <InAppPreview content={content} cta={release.cta} />
+            ) : (
+              <ChangelogPreview content={content} category={release.category} cta={release.cta} />
+            )}
+          </div>
+        </section>
+
       </div>
     </section>
   );

@@ -7,15 +7,16 @@ export const metadata: Metadata = {
 };
 
 type ResetPasswordPageProps = {
-  searchParams: Promise<{ email?: string | string[] }>;
+  searchParams: Promise<{ email?: string | string[]; token?: string | string[] }>;
 };
 
 export default async function ResetPasswordPage({ searchParams }: ResetPasswordPageProps) {
   const params = await searchParams;
   const email = typeof params.email === "string" ? params.email : undefined;
+  const token = typeof params.token === "string" ? params.token : undefined;
   return (
-    <AuthShell eyebrow="Set a new password" title="Choose a fresh sign-in for ShipBrief." description="This page is a complete frontend reset interface. No account credentials are sent to a server in the demo.">
-      <ResetPasswordForm email={email} />
+    <AuthShell title="Choose a new password" description="Use at least 8 characters. You'll sign in with it afterwards.">
+      <ResetPasswordForm email={email} token={token} />
     </AuthShell>
   );
 }

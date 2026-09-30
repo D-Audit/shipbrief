@@ -19,7 +19,7 @@ export default async function CheckEmailPage({ searchParams }: CheckEmailPagePro
   const verification = flow === "verify";
 
   return (
-    <AuthShell eyebrow={verification ? "One quick check" : "Password reset"} title={verification ? "Confirm your email, then make the workspace yours." : "Your reset instructions are ready."} description={verification ? "We have prepared a local verification message so the sign-up flow feels complete before your first setup step." : "We have prepared a local reset message. Use the next step to update your demo password."}>
+    <AuthShell title="Check your email" description={verification ? "We sent a confirmation link. Open it to finish creating your workspace." : "We sent a link to reset your password. It expires in 30 minutes."}>
       <CheckEmailScreen email={email} flow={flow} nextPath={nextPath} />
     </AuthShell>
   );

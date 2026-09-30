@@ -77,15 +77,15 @@ function MockVideoPreview({ media, describedBy }: { media: ReleaseMedia; describ
       {posterAvailable ? (
         <img src={media.posterUrl} alt="" className="absolute inset-0 h-full w-full object-cover opacity-85" />
       ) : (
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_20%,rgba(150,152,255,0.45),transparent_35%),linear-gradient(135deg,#17172d,#302d66)]" />
+        <div className="absolute inset-0 bg-[#1c1c2e]" />
       )}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/5 to-transparent" aria-hidden="true" />
+      <div className="absolute inset-x-0 bottom-0 h-24 bg-black/45" aria-hidden="true" />
       <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-4 sm:p-5">
         <button
           type="button"
           onClick={() => setPlaying((value) => !value)}
           aria-pressed={playing}
-          className="inline-flex size-11 shrink-0 items-center justify-center rounded-full bg-white text-[#25235a] shadow-lg transition-transform hover:scale-105"
+          className="inline-flex size-11 shrink-0 items-center justify-center rounded-full bg-white text-[#25235a] transition-transform hover:scale-105"
         >
           {playing ? <Pause className="size-5" aria-hidden="true" /> : <Play className="size-5 translate-x-0.5" aria-hidden="true" />}
           <span className="sr-only">{playing ? "Pause" : "Play"} mock video preview</span>
@@ -153,7 +153,7 @@ export function ReleaseMediaGallery({ media }: { media?: ReleaseMedia[] }) {
         {usableMedia.length > 1 && <span className="text-xs text-muted-foreground">{currentIndex + 1} of {usableMedia.length}</span>}
       </div>
 
-      <figure className="overflow-hidden rounded-xl border border-border bg-surface shadow-sm">
+      <figure className="overflow-hidden rounded-xl border border-border bg-surface">
         <div className="aspect-video bg-surface-subtle">
           {activeMedia.type === "image" ? (
             <ReleaseImage key={`${activeMedia.id}:${activeMedia.url}`} media={activeMedia} describedBy={caption ? captionId : undefined} />
@@ -180,11 +180,11 @@ export function ReleaseMediaGallery({ media }: { media?: ReleaseMedia[] }) {
                 className={cn(
                   "flex min-w-0 items-center gap-3 rounded-lg border px-3 py-2.5 text-left text-sm transition-colors",
                   selected
-                    ? "border-primary/45 bg-primary/5 text-foreground"
+                    ? "border-border-strong bg-surface-subtle text-foreground"
                     : "border-border bg-surface text-muted-foreground hover:bg-surface-subtle hover:text-foreground"
                 )}
               >
-                <span className={cn("flex size-8 shrink-0 items-center justify-center rounded-md", selected ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground")}>
+                <span className={cn("flex size-8 shrink-0 items-center justify-center rounded-md", selected ? "bg-accent text-primary-strong" : "bg-muted text-muted-foreground")}>
                   <Icon className="size-4" aria-hidden="true" />
                 </span>
                 <span className="min-w-0">

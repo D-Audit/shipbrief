@@ -1,12 +1,10 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowRight, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
-import { toast } from "sonner";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { authService } from "@/lib/services/auth-service";
@@ -18,11 +16,11 @@ const forgotPasswordSchema = z.object({
 
 type ForgotPasswordValues = z.infer<typeof forgotPasswordSchema>;
 
-export function ForgotPasswordForm() {
+export function ForgotPasswordForm({ defaultEmail = "" }: { defaultEmail?: string }) {
   const router = useRouter();
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<ForgotPasswordValues>({
     resolver: zodResolver(forgotPasswordSchema),
-    defaultValues: { email: "" },
+    defaultValues: { email: defaultEmail },
   });
   const [submissionError, setSubmissionError] = useState<string | null>(null);
 
@@ -30,8 +28,7 @@ export function ForgotPasswordForm() {
     setSubmissionError(null);
     try {
       const result = await authService.requestPasswordReset(email);
-      toast.success("Password reset message prepared for the demo.");
-      const params = new URLSearchParams({ email: result.email, flow: result.flow });
+            const params = new URLSearchParams({ email: result.email, flow: result.flow });
       router.push(`/check-email?${params.toString()}`);
     } catch (error) {
       setSubmissionError(error instanceof Error ? error.message : "We could not prepare a reset link. Please try again.");
@@ -41,13 +38,11 @@ export function ForgotPasswordForm() {
   return (
     <form noValidate onSubmit={handleSubmit(submit)} className="space-y-5">
       {submissionError && <AuthNotice>{submissionError}</AuthNotice>}
-      <AuthNotice tone="info">No email is sent in this frontend preview. We will show the reset step locally after you continue.</AuthNotice>
       <AuthField id="forgot-password-email" label="Work email" type="email" autoComplete="email" placeholder="you@company.com" error={errors.email?.message} {...register("email")} />
       <Button type="submit" size="lg" className="h-10 w-full" disabled={isSubmitting}>
-        {isSubmitting ? <Loader2 className="animate-spin" /> : <ArrowRight />}
-        {isSubmitting ? "Preparing reset..." : "Send reset instructions"}
+        {isSubmitting && <Loader2 className="animate-spin" />}
+        {isSubmitting ? "Sending…" : "Send reset link"}
       </Button>
-      <p className="text-center text-sm text-muted-foreground"><Link href="/login" className="font-medium text-primary hover:underline">Back to sign in</Link></p>
     </form>
   );
 }

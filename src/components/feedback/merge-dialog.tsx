@@ -49,7 +49,7 @@ export function MergeDialog({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Merge duplicate request</DialogTitle>
-          <DialogDescription>Move the votes, comments, and tags from &ldquo;{request.title}&rdquo; into the canonical request. This mock action is reversible only when a backend audit trail is connected.</DialogDescription>
+          <DialogDescription>Move the votes, comments, and tags from &ldquo;{request.title}&rdquo; into the canonical request. The duplicate is hidden from the inbox; votes from the same person are counted once.</DialogDescription>
         </DialogHeader>
         {candidates.length === 0 ? <p className="text-sm text-muted-foreground">There are no other active requests to merge into.</p> : <div className="space-y-2"><Label htmlFor="merge-target">Canonical request</Label><Select value={activeTargetId} onValueChange={(value) => value && setTargetId(value)}><SelectTrigger id="merge-target" className="w-full"><SelectValue>{(value) => candidates.find((candidate) => candidate.id === value)?.title ?? "Choose a request"}</SelectValue></SelectTrigger><SelectContent>{candidates.map((candidate) => <SelectItem key={candidate.id} value={candidate.id}>{candidate.title} · {candidate.votes} votes</SelectItem>)}</SelectContent></Select></div>}
         <DialogFooter>

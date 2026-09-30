@@ -1,9 +1,10 @@
-import { withMockDelay } from "./utils";
+import { api } from "@/lib/api/client";
 
 export type WidgetLauncherMode = "default" | "manual";
 export type WidgetPlacement = "bottom-right" | "bottom-left";
 
 export type WidgetInstallSettings = {
+  /** The workspace's public widget key. */
   projectId: string;
   launcherMode: WidgetLauncherMode;
   placement: WidgetPlacement;
@@ -11,26 +12,64 @@ export type WidgetInstallSettings = {
   theme: "inherit" | "light" | "dark";
 };
 
-let widgetSettings: WidgetInstallSettings = {
-  projectId: "sb_acme_8e2f",
-  launcherMode: "default",
-  placement: "bottom-right",
-  showUnreadBadge: true,
-  theme: "inherit",
+export type WidgetUpdate = {
+  id: string;
+  slug: string;
+  publishedAt: string;
+  category: string;
+  format: "feed" | "banner" | "modal" | "toast" | "contextual";
+  title: string;
+  summary: string;
+  body: string;
+  cta?: { label: string; url: string };
+  reactions: number;
+  read: boolean;
 };
 
-/**
- * A deliberately isolated local boundary for the embed settings. A real
- * backend can replace this module without changing the installer UI.
- */
+export type WidgetConfig = {
+  workspace: { name: string; slug: string };
+  accentColor: string;
+  theme: "inherit" | "light" | "dark";
+  placement: WidgetPlacement;
+  launcherMode: WidgetLauncherMode;
+  showUnreadBadge: boolean;
+};
+
 export const widgetSettingsService = {
-  async get(): Promise<WidgetInstallSettings> {
-    return withMockDelay(() => ({ ...widgetSettings }), 260);
-  },
-  async update(patch: Partial<WidgetInstallSettings>): Promise<WidgetInstallSettings> {
-    return withMockDelay(() => {
-      widgetSettings = { ...widgetSettings, ...patch };
-      return { ...widgetSettings };
-    }, 420);
-  },
+  get: () => api.get<WidgetInstallSettings>("/widget"),
+  /** The project id is read-only; only placement and presentation are sent. */
+  update: ({ launcherMode, placement, showUnreadBadge, theme }: Partial<WidgetInstallSettings>) =>
+    api.patch<WidgetInstallSettings>("/widget", { launcherMode, placement, showUnreadBadge, theme }),
+};
+
+const VISITOR_KEY = "sb_widget_visitor";
+
+/** Anonymous, per-browser id so read state survives reloads without cookies. */
+function visitorId() {
+  try {
+    let id = localStorage.getItem(VISITOR_KEY);
+    if (!id) {
+      id = crypto.randomUUID().replace(/-/g, "");
+      localStorage.setItem(VISITOR_KEY, id);
+    }
+    return id;
+  } catch {
+    return undefined;
+  }
+}
+
+function visitorHeaders(): Record<string, string> {
+  const id = visitorId();
+  return id ? { "X-Visitor-Id": id } : {};
+}
+
+const options = () => ({ allowUnauthenticated: true, headers: visitorHeaders() });
+
+/** Public What's New widget API, addressed by the workspace's public key. */
+export const widgetService = {
+  config: (key: string) => api.get<WidgetConfig>(`/public/widget/${encodeURIComponent(key)}`, options()),
+  updates: (key: string) => api.get<{ items: WidgetUpdate[]; unreadCount: number }>(`/public/widget/${encodeURIComponent(key)}/updates`, options()),
+  markRead: (key: string, releaseId: string) => api.post<{ id: string; read: boolean }>(`/public/widget/${encodeURIComponent(key)}/updates/${releaseId}/read`, {}, options()),
+  markAllRead: (key: string) => api.post<{ ok: boolean }>(`/public/widget/${encodeURIComponent(key)}/updates/read-all`, {}, options()),
+  recordClick: (key: string, releaseId: string) => api.post<{ ok: boolean }>(`/public/widget/${encodeURIComponent(key)}/updates/${releaseId}/click`, {}, options()),
 };

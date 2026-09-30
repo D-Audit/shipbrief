@@ -17,7 +17,7 @@ export function ChangelogPreview({
 }) {
   return (
     <article className="mx-auto w-full max-w-2xl rounded-xl border border-border bg-background p-5 sm:p-7">
-      <p className="text-xs font-medium uppercase tracking-[0.12em] text-primary">{category}</p>
+      <p className="text-xs font-medium uppercase tracking-[0.12em] text-primary-strong">{category}</p>
       <h2 className="mt-3 text-2xl font-semibold tracking-tight sm:text-3xl">{content.title || "Untitled release"}</h2>
       <p className="mt-3 text-base leading-relaxed text-muted-foreground">
         {content.summary || "A customer-value summary will appear here."}

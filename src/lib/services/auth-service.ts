@@ -1,9 +1,8 @@
-import { withMockDelay } from "./utils";
+import { api, ApiError } from "@/lib/api/client";
 
 /**
- * Authentication remains a client-side mock boundary until an identity provider
- * is connected. Pages consume this service rather than carrying auth logic in
- * their UI, so it can be replaced without changing the flow.
+ * Authentication against the ShipBrief API. Sessions are httpOnly cookies set
+ * by the server; nothing sensitive is stored in the browser.
  */
 export type AuthUser = {
   id: string;
@@ -11,9 +10,15 @@ export type AuthUser = {
   email: string;
 };
 
+export type WorkspaceRole = "owner" | "admin" | "product_manager" | "marketer" | "developer" | "viewer";
+
 export type AuthSession = {
   user: AuthUser;
   needsOnboarding: boolean;
+  emailVerified: boolean;
+  workspace: { id: string; slug: string; name: string; role: WorkspaceRole } | null;
+  permissions: string[];
+  workspaces: { id: string; name: string; slug: string; role: WorkspaceRole }[];
 };
 
 export type SignInInput = {
@@ -25,9 +30,13 @@ export type SignUpInput = {
   name: string;
   email: string;
   password: string;
+  /** Optional; carried into onboarding so the workspace step is prefilled. */
+  workspaceName?: string;
 };
 
-export type AuthProvider = "google";
+export type AuthProvider = "google" | "github";
+
+export const authProviderNames: Record<AuthProvider, string> = { google: "Google", github: "GitHub" };
 
 export type OAuthIntent = "signIn" | "signUp";
 
@@ -37,25 +46,15 @@ export type OAuthInput = {
 };
 
 export type ResetPasswordInput = {
-  email: string;
+  token: string;
   password: string;
 };
 
 export type AuthEmailFlow = "verify" | "reset";
 
-export type OnboardingRole =
-  | "founder"
-  | "product"
-  | "engineering"
-  | "marketing"
-  | "customer_success"
-  | "other";
+export type OnboardingRole = "founder" | "product" | "engineering" | "marketing" | "customer_success" | "other";
 
-export type OnboardingGoal =
-  | "release_updates"
-  | "customer_feedback"
-  | "product_adoption"
-  | "all_of_the_above";
+export type OnboardingGoal = "release_updates" | "customer_feedback" | "product_adoption" | "all_of_the_above";
 
 export type OnboardingChannel = "changelog" | "email" | "in_app";
 
@@ -78,169 +77,89 @@ export type OnboardedWorkspace = OnboardingInput & {
   createdAt: string;
 };
 
-let session: AuthSession | null = null;
-let lastEmail: AuthEmailResult | null = null;
-let workspace: OnboardedWorkspace | null = null;
+const PENDING_WORKSPACE_KEY = "sb_pending_workspace_name";
+const quiet = { allowUnauthenticated: true } as const;
 
-const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-function normalizeEmail(email: string) {
-  return email.trim().toLowerCase();
-}
-
-function ensureEmail(email: string) {
-  const normalized = normalizeEmail(email);
-  if (!emailPattern.test(normalized)) {
-    throw new Error("Enter a valid email address.");
+function rememberWorkspaceName(name?: string) {
+  try {
+    if (name?.trim()) sessionStorage.setItem(PENDING_WORKSPACE_KEY, name.trim());
+  } catch {
+    // Storage can be unavailable (private mode); prefilling is only a convenience.
   }
-  return normalized;
-}
-
-function simulateProviderFailure(email: string) {
-  if (email === "offline@shipbrief.test") {
-    throw new Error("The demo identity provider is unavailable. Try a different email address.");
-  }
-}
-
-function userFromInput(input: Pick<SignUpInput, "name" | "email">): AuthUser {
-  const email = normalizeEmail(input.email);
-  const fallbackName = email.split("@")[0]?.replace(/[._-]+/g, " ") || "ShipBrief user";
-  return {
-    id: `user_${Date.now()}`,
-    name: input.name.trim() || fallbackName.replace(/\b\w/g, (letter) => letter.toUpperCase()),
-    email,
-  };
 }
 
 export const authService = {
+  /** Which social sign-in providers this installation has configured. */
+  getProviders: () => api.get<Record<AuthProvider, boolean>>("/auth/providers", quiet),
+
+  /**
+   * Starts Google or GitHub sign-in. The browser goes to the provider and
+   * returns through the API callback, so on success this promise never resolves.
+   */
   async continueWithProvider(input: OAuthInput): Promise<AuthSession> {
-    return withMockDelay(() => {
-      if (input.provider !== "google") {
-        throw new Error("That sign-in provider is not available in this preview.");
-      }
-
-      // This is a typed frontend boundary. Replace it with the real OAuth callback later.
-      session = {
-        user: {
-          id: `google_${Date.now()}`,
-          name: "Taylor Morgan",
-          email: "taylor@shipbrief.demo",
-        },
-        needsOnboarding: input.intent === "signUp",
-      };
-      return session;
-    }, 520);
+    const providers = await authService.getProviders();
+    if (!providers[input.provider]) {
+      throw new ApiError(`${authProviderNames[input.provider]} sign-in isn't set up yet. Use your email and password instead.`, "OAUTH_NOT_CONFIGURED", 503);
+    }
+    // An API route that redirects to the provider, so this must be a real navigation.
+    // eslint-disable-next-line @next/next/no-location-assign-relative-destination
+    window.location.assign(`/api/auth/oauth/${input.provider}/start?intent=${input.intent}`);
+    return new Promise<AuthSession>(() => undefined);
   },
 
-  async signIn(input: SignInInput): Promise<AuthSession> {
-    return withMockDelay(() => {
-      const email = ensureEmail(input.email);
-      simulateProviderFailure(email);
-      if (input.password.trim().length < 8) {
-        throw new Error("Use at least 8 characters for your password.");
-      }
-
-      session = {
-        user: userFromInput({ name: "", email }),
-        needsOnboarding: false,
-      };
-      return session;
-    }, 520);
-  },
+  signIn: (input: SignInInput) => api.post<AuthSession>("/auth/login", input, quiet),
 
   async signUp(input: SignUpInput): Promise<AuthEmailResult> {
-    return withMockDelay(() => {
-      const email = ensureEmail(input.email);
-      simulateProviderFailure(email);
-      if (input.name.trim().length < 2) {
-        throw new Error("Tell us the name you would like to use in ShipBrief.");
-      }
-      if (input.password.trim().length < 8) {
-        throw new Error("Use at least 8 characters for your password.");
-      }
-
-      session = {
-        user: userFromInput(input),
-        needsOnboarding: true,
-      };
-      lastEmail = { email, flow: "verify", sentAt: new Date().toISOString() };
-      return lastEmail;
-    }, 620);
+    const result = await api.post<AuthEmailResult>("/auth/register", { name: input.name, email: input.email, password: input.password }, quiet);
+    rememberWorkspaceName(input.workspaceName);
+    return result;
   },
 
-  async requestPasswordReset(email: string): Promise<AuthEmailResult> {
-    return withMockDelay(() => {
-      const normalizedEmail = ensureEmail(email);
-      simulateProviderFailure(normalizedEmail);
-      lastEmail = { email: normalizedEmail, flow: "reset", sentAt: new Date().toISOString() };
-      return lastEmail;
-    }, 520);
-  },
+  signOut: () => api.post<void>("/auth/logout", {}, quiet),
 
-  async resendEmail(email: string, flow: AuthEmailFlow): Promise<AuthEmailResult> {
-    return withMockDelay(() => {
-      const normalizedEmail = ensureEmail(email);
-      simulateProviderFailure(normalizedEmail);
-      lastEmail = { email: normalizedEmail, flow, sentAt: new Date().toISOString() };
-      return lastEmail;
-    }, 460);
-  },
+  requestPasswordReset: (email: string) => api.post<AuthEmailResult>("/auth/forgot-password", { email }, quiet),
 
+  resendEmail: (email: string, flow: AuthEmailFlow) => api.post<AuthEmailResult>("/auth/resend-email", { email, flow }, quiet),
+
+  /**
+   * Called from "I've verified my email". Verification itself happens when the
+   * emailed link is opened; this checks whether that has happened yet.
+   */
   async confirmEmail(email: string): Promise<AuthSession | null> {
-    return withMockDelay(() => {
-      const normalizedEmail = ensureEmail(email);
-      simulateProviderFailure(normalizedEmail);
-      if (session?.user.email === normalizedEmail) return session;
-      return null;
-    }, 360);
+    const session = await authService.getSession();
+    if (!session || session.user.email !== email.trim().toLowerCase()) return null;
+    if (!session.emailVerified) {
+      throw new ApiError("We haven't seen the confirmation yet. Open the link in the email we sent, then try again.", "EMAIL_NOT_VERIFIED", 409);
+    }
+    return session;
   },
 
-  async resetPassword(input: ResetPasswordInput): Promise<{ email: string }> {
-    return withMockDelay(() => {
-      const email = ensureEmail(input.email);
-      simulateProviderFailure(email);
-      if (input.password.trim().length < 8) {
-        throw new Error("Use at least 8 characters for your new password.");
-      }
-      return { email };
-    }, 520);
-  },
+  resetPassword: (input: ResetPasswordInput) => api.post<{ email: string }>("/auth/reset-password", input, quiet),
 
   async completeOnboarding(input: OnboardingInput): Promise<OnboardedWorkspace> {
-    return withMockDelay(() => {
-      const workspaceName = input.workspaceName.trim();
-      const workspaceSlug = input.workspaceSlug.trim().toLowerCase();
-      if (workspaceName.length < 2) {
-        throw new Error("Give your workspace a name with at least 2 characters.");
-      }
-      if (!/^[a-z0-9][a-z0-9-]{1,48}[a-z0-9]$/.test(workspaceSlug)) {
-        throw new Error("Use a URL-safe workspace address between 3 and 50 characters.");
-      }
-      if (input.channels.length === 0) {
-        throw new Error("Choose at least one channel to start with.");
-      }
-
-      workspace = {
-        ...input,
-        workspaceName,
-        workspaceSlug,
-        id: `workspace_${Date.now()}`,
-        createdAt: new Date().toISOString(),
-      };
-      if (session) session = { ...session, needsOnboarding: false };
-      return workspace;
-    }, 640);
+    const workspace = await api.post<OnboardedWorkspace>("/auth/onboarding", input, quiet);
+    try {
+      sessionStorage.removeItem(PENDING_WORKSPACE_KEY);
+    } catch {
+      // ignore
+    }
+    return workspace;
   },
 
-  async getSession(): Promise<AuthSession | null> {
-    return withMockDelay(() => session, 160);
-  },
+  getSession: () => api.get<AuthSession | null>("/auth/session", quiet),
 
-  async getLastEmail(): Promise<AuthEmailResult | null> {
-    return withMockDelay(() => lastEmail, 120);
-  },
+  switchWorkspace: (workspaceId: string) => api.post<AuthSession>("/auth/workspace", { workspaceId }),
 
-  async getWorkspace(): Promise<OnboardedWorkspace | null> {
-    return withMockDelay(() => workspace, 120);
+  updateProfile: (input: { name: string }) => api.patch<AuthUser>("/auth/profile", input),
+
+  changePassword: (input: { currentPassword: string; newPassword: string }) => api.post<void>("/auth/password", input),
+
+  /** Workspace name typed at sign-up, if any, to prefill onboarding. */
+  getPendingWorkspaceName(): string {
+    try {
+      return sessionStorage.getItem(PENDING_WORKSPACE_KEY) ?? "";
+    } catch {
+      return "";
+    }
   },
 };

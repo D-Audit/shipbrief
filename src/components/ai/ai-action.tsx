@@ -1,6 +1,5 @@
 "use client";
 
-import { WandSparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { AIAction } from "@/types";
 
@@ -18,10 +17,10 @@ export function AIActionButton({
       type="button"
       variant="outline"
       size="sm"
+      className="shrink-0 rounded-full"
       onClick={() => onSelect(action)}
       disabled={disabled}
     >
-      <WandSparkles className="text-primary" />
       {action.label}
     </Button>
   );

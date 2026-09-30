@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Copy, ExternalLink, Globe2, Pin, PinOff, Search } from "lucide-react";
+import { Copy, ExternalLink, Globe2, Heart, MessageSquare, Pin, PinOff, Search } from "lucide-react";
 import { toast } from "sonner";
 import { brandingService, changelogService, releaseService } from "@/lib/services";
 import { useAsyncData } from "@/hooks/use-async-data";
@@ -13,6 +13,9 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { ChangelogSort, ReleaseStatus, WorkspaceBranding } from "@/types";
 import { format } from "date-fns";
+import { categoryMeta } from "@/components/shared/category-meta";
+import { toneText } from "@/lib/tones";
+import { cn } from "@/lib/utils";
 
 const statuses: { value: "all" | ReleaseStatus; label: string }[] = [
   { value: "all", label: "All statuses" },
@@ -66,7 +69,7 @@ export function ChangelogManagerPage() {
     try {
       await releaseService.update(id, { featured: !featured });
       await reload();
-      toast.success(featured ? "Update unfeatured (mock)." : "Update featured (mock).");
+      toast.success(featured ? "Update unfeatured." : "Update featured.");
     } catch {
       toast.error("We could not update this changelog entry.");
     } finally {
@@ -137,25 +140,29 @@ export function ChangelogManagerPage() {
         <div className="space-y-3">
           {state.data.map((entry) => (
             <article key={entry.id} className="sb-panel flex flex-col gap-4 p-4 sm:flex-row sm:items-start sm:justify-between">
-              <div className="min-w-0">
-                <div className="flex flex-wrap items-center gap-2">
-                  {entry.featured && <Pin className="size-3.5 text-primary" aria-label="Featured" />}
-                  <h2 className="font-medium">{entry.title}</h2>
-                  <StatusBadge status={entry.status} />
-                  <Badge variant="secondary">{entry.category}</Badge>
-                  {entry.tags.map((item) => <Badge key={item} variant="outline">{item}</Badge>)}
+              <div className="flex min-w-0 gap-3.5">
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h2 className="sb-title-card">{entry.title}</h2>
+                    <StatusBadge status={entry.status} />
+                    {entry.featured && <span className="inline-flex items-center gap-1 text-xs font-medium text-primary-strong"><Pin className="size-3" />Featured</span>}
+                  </div>
+                  <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{entry.summary}</p>
+                  <div className="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs text-muted-foreground">
+                    <span className={cn("font-medium", toneText[categoryMeta(entry.category).tone])}>{entry.category}</span>
+                    <span>{format(new Date(entry.publishedAt), "MMM d, yyyy")}</span>
+                    <span className="inline-flex items-center gap-1"><Heart className="size-3" />{entry.reactions}</span>
+                    <span className="inline-flex items-center gap-1"><MessageSquare className="size-3" />{entry.comments}</span>
+                    {entry.tags.map((item) => <span key={item} className="rounded-full bg-surface-subtle px-2 py-0.5">#{item}</span>)}
+                  </div>
                 </div>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{entry.summary}</p>
-                <p className="mt-2 text-xs text-muted-foreground">
-                  {format(new Date(entry.publishedAt), "MMM d, yyyy")} / {entry.reactions} reactions / {entry.comments} comments
-                </p>
               </div>
               <div className="flex shrink-0 flex-wrap items-center gap-1">
                 <Button type="button" variant="ghost" size="sm" onClick={() => void copyLink(entry.slug)}><Copy />Copy link</Button>
                 <Button type="button" variant="ghost" size="sm" disabled={updatingId === entry.id} onClick={() => void toggleFeatured(entry.id, entry.featured)}>
                   {entry.featured ? <PinOff /> : <Pin />}{entry.featured ? "Unfeature" : "Feature"}
                 </Button>
-                <Link href={`/c/acme/${entry.slug}`} target="_blank" className="inline-flex h-7 items-center rounded-md px-2.5 text-[0.8rem] font-medium text-primary transition-colors hover:bg-primary/5">Preview</Link>
+                <Link href={`/c/acme/${entry.slug}`} target="_blank" className="inline-flex h-7 items-center rounded-md px-2.5 text-[0.8rem] font-medium text-muted-foreground transition-colors hover:text-foreground hover:bg-surface-subtle">Preview</Link>
               </div>
             </article>
           ))}
@@ -177,9 +184,9 @@ function ChangelogSeoPreview({ branding }: { branding: WorkspaceBranding }) {
     <section className="sb-panel overflow-hidden" aria-labelledby="changelog-seo-title">
       <div className="flex flex-col gap-4 p-4 sm:p-5 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex min-w-0 items-start gap-3">
-          <span className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-lg text-white" style={{ backgroundColor: branding.accentColor }}><Search className="size-4" /></span>
+          <Search className="mt-1 size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
           <div className="min-w-0">
-            <div className="flex flex-wrap items-center gap-2"><h2 id="changelog-seo-title" className="font-semibold">SEO &amp; custom-domain preview</h2><Badge variant="outline">{isConnected ? "Connected" : hasCustomDomain ? "Pending verification" : "ShipBrief route"}</Badge></div>
+            <div className="flex flex-wrap items-center gap-2"><h2 id="changelog-seo-title" className="sb-title-section">SEO &amp; custom-domain preview</h2><Badge variant="outline">{isConnected ? "Connected" : hasCustomDomain ? "Pending verification" : "ShipBrief route"}</Badge></div>
             <p className="mt-1 text-sm text-muted-foreground">This is the search listing visitors will associate with your branded changelog.</p>
           </div>
         </div>
@@ -188,7 +195,7 @@ function ChangelogSeoPreview({ branding }: { branding: WorkspaceBranding }) {
       <div className="grid gap-4 border-t border-border bg-surface-subtle/40 p-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end sm:p-5">
         <div className="min-w-0" aria-label="Search result preview">
           <p className="truncate text-xs font-medium" style={{ color: branding.accentColor }}>{publicUrl}</p>
-          <p className="mt-1 truncate text-base font-medium text-primary">What&apos;s New | {titleDomain}</p>
+          <p className="mt-1 truncate text-base font-medium text-primary-strong">What&apos;s New | {titleDomain}</p>
           <p className="mt-1 max-w-2xl text-sm text-muted-foreground">Product updates, improvements, and launches in one searchable, customer-facing history.</p>
         </div>
         <div className="flex items-center gap-2 text-xs text-muted-foreground"><span className="size-2 rounded-full" style={{ backgroundColor: branding.accentColor }} aria-hidden="true" />{domainLabel}</div>

@@ -26,7 +26,7 @@ export function EmailPreview({
   viewport?: EmailPreviewViewport;
   id?: string;
 }) {
-  const sender = from?.trim() || "Acme Product Team";
+  const sender = from?.trim() || "Product team";
   const audience = audienceName || "Selected audience";
   const replyAddress = replyTo?.trim() || sender;
   const isMobile = viewport === "mobile";
@@ -42,7 +42,7 @@ export function EmailPreview({
         id={id}
         aria-label={`${isMobile ? "Mobile" : "Desktop"} email preview`}
         className={cn(
-          "overflow-hidden border border-border bg-background shadow-sm",
+          "overflow-hidden border border-border bg-background",
           isMobile ? "rounded-[1.75rem] border-[5px] border-foreground/15" : "rounded-xl"
         )}
       >
@@ -66,7 +66,7 @@ export function EmailPreview({
         </div>
         <div className={cn("border-b border-border bg-surface-subtle/70 text-xs text-muted-foreground", isMobile ? "px-4 py-3" : "px-5 py-3")}>
           <div className="flex min-w-0 items-start gap-2">
-            <span className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary"><Mail className="size-3.5" /></span>
+            <span className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-accent text-primary-strong"><Mail className="size-3.5" /></span>
             <dl className="min-w-0 flex-1 space-y-1">
               <div className="flex min-w-0 gap-1.5">
                 <dt className="shrink-0">From</dt>

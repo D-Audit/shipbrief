@@ -10,6 +10,7 @@
   --font-sans: var(--font-instrument-sans);
   --font-mono: var(--font-geist-mono);
   --font-heading: var(--font-instrument-sans);
+  --font-display: var(--font-bricolage);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -26,6 +27,7 @@
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
   --color-destructive: var(--destructive);
   --color-accent-foreground: var(--accent-foreground);
   --color-accent: var(--accent);
@@ -35,6 +37,11 @@
   --color-secondary: var(--secondary);
   --color-primary-foreground: var(--primary-foreground);
   --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-strong: var(--primary-strong);
+  --color-ink: var(--ink);
+  --color-ink-hover: var(--ink-hover);
+  --color-ink-foreground: var(--ink-foreground);
   --color-popover-foreground: var(--popover-foreground);
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
@@ -47,33 +54,52 @@
   --color-warning-muted: var(--warning-muted);
   --color-danger: var(--danger);
   --color-danger-muted: var(--danger-muted);
+  --color-info: var(--info);
+  --color-info-muted: var(--info-muted);
+  --color-violet: var(--violet);
+  --color-violet-muted: var(--violet-muted);
   --radius-sm: calc(var(--radius) * 0.75);
   --radius-md: var(--radius);
   --radius-lg: calc(var(--radius) * 1.25);
   --radius-xl: calc(var(--radius) * 1.6);
   --radius-2xl: calc(var(--radius) * 2);
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+/*
+ * ShipBrief palette, after daisy.now: cool greys and near-black ink carry the
+ * interface, with one green-yellow accent kept for links, highlights and state — never
+ * for large backgrounds. Primary buttons are ink, not lime.
+ * `src/lib/design-tokens.ts` mirrors these values for code that needs them.
+ */
 :root {
-  /* ShipBrief brand tokens */
-  --sb-background: #f8f8f9;
-  --sb-surface: #ffffff;
-  --sb-surface-subtle: #f1f1f3;
+  /* daisy.now's "smoke" greys: the page, a lighter panel, and a deeper fill. */
+  --sb-background: #ecedef;
+  --sb-surface: #f4f5f7;
+  --sb-surface-subtle: #e4e5e8;
   --sb-foreground: #171717;
-  --sb-muted: #68696e;
-  --sb-border: #e0e0e4;
-  --sb-border-strong: #cfd0d5;
-  --sb-primary: #e40178;
-  --sb-primary-hover: #bd0063;
-  --sb-primary-muted: #fee5f1;
-  --sb-success: #16a34a;
-  --sb-success-muted: #ecfdf3;
-  --sb-warning: #d97706;
-  --sb-warning-muted: #fffbeb;
-  --sb-danger: #dc2626;
-  --sb-danger-muted: #fef2f2;
+  --sb-muted: #636466;
+  --sb-border: #dedfe2;
+  --sb-border-strong: #d4d5d9;
+  --sb-ink: #171717;
+  --sb-ink-hover: #2e2e30;
+  /* Green-yellow accent: a bright chartreuse for fills (with ink text on top),
+     and a deeper lime for text, icons, dots and charts so it stays readable. */
+  --sb-primary: #c7f238;
+  --sb-primary-hover: #b9e422;
+  --sb-primary-strong: #566a00;
+  --sb-primary-muted: #eef8cf;
+  --sb-success: #1a6e45;
+  --sb-success-muted: #dff0e6;
+  --sb-warning: #8f520a;
+  --sb-warning-muted: #f8ead3;
+  --sb-danger: #b02e25;
+  --sb-danger-muted: #f8e1df;
+  --sb-info: #3d5f8f;
+  --sb-info-muted: #e3ebf6;
+  --sb-violet: #6a4fc0;
+  --sb-violet-muted: #ebe6f8;
 
-  /* shadcn semantic mapping */
   --background: var(--sb-background);
   --foreground: var(--sb-foreground);
   --surface: var(--sb-surface);
@@ -83,7 +109,90 @@
   --popover: var(--sb-surface);
   --popover-foreground: var(--sb-foreground);
   --primary: var(--sb-primary);
-  --primary-foreground: #ffffff;
+  --primary-hover: var(--sb-primary-hover);
+  --primary-strong: var(--sb-primary-strong);
+  --primary-foreground: #171717;
+  --ink: var(--sb-ink);
+  --ink-hover: var(--sb-ink-hover);
+  --ink-foreground: #ffffff;
+  --secondary: var(--sb-surface-subtle);
+  --secondary-foreground: var(--sb-foreground);
+  --muted: var(--sb-surface-subtle);
+  --muted-foreground: var(--sb-muted);
+  --accent: var(--sb-primary-muted);
+  --accent-foreground: var(--sb-primary-strong);
+  --destructive: var(--sb-danger);
+  --success: var(--sb-success);
+  --success-muted: var(--sb-success-muted);
+  --warning: var(--sb-warning);
+  --warning-muted: var(--sb-warning-muted);
+  --danger: var(--sb-danger);
+  --danger-muted: var(--sb-danger-muted);
+  --info: var(--sb-info);
+  --info-muted: var(--sb-info-muted);
+  --violet: var(--sb-violet);
+  --violet-muted: var(--sb-violet-muted);
+  --border: var(--sb-border);
+  --border-strong: var(--sb-border-strong);
+  --input: var(--sb-border-strong);
+  --ring: color-mix(in oklab, var(--sb-primary-strong) 40%, transparent);
+  --radius: 0.4375rem;
+  --chart-1: var(--sb-primary-strong);
+  --chart-2: #c7f238;
+  --chart-3: #545455;
+  --chart-4: #9b9ca3;
+  --chart-5: #e4e5e8;
+  --sidebar: var(--sb-background);
+  --sidebar-foreground: var(--sb-foreground);
+  --sidebar-primary: var(--sb-ink);
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: var(--sb-surface-subtle);
+  --sidebar-accent-foreground: var(--sb-foreground);
+  --sidebar-border: var(--sb-border);
+  --sidebar-ring: var(--ring);
+  --shadow-overlay: none;
+}
+
+.dark {
+  --sb-background: #0a0a0a;
+  --sb-surface: #121213;
+  --sb-surface-subtle: #1a1a1c;
+  --sb-foreground: #f4f5f7;
+  --sb-muted: #9b9ca3;
+  --sb-border: #242427;
+  --sb-border-strong: #333337;
+  --sb-ink: #f4f5f7;
+  --sb-ink-hover: #dedfe2;
+  --sb-primary: #c7f238;
+  --sb-primary-hover: #d3f65e;
+  --sb-primary-strong: #c7f238;
+  --sb-primary-muted: #1e2410;
+  --sb-success: #6cc497;
+  --sb-success-muted: #13241b;
+  --sb-warning: #e0a458;
+  --sb-warning-muted: #2a2013;
+  --sb-danger: #f0877e;
+  --sb-danger-muted: #2e1716;
+  --sb-info: #93b3e0;
+  --sb-info-muted: #172130;
+  --sb-violet: #b6a4f2;
+  --sb-violet-muted: #211b36;
+
+  --background: var(--sb-background);
+  --foreground: var(--sb-foreground);
+  --surface: var(--sb-surface);
+  --surface-subtle: var(--sb-surface-subtle);
+  --card: var(--sb-surface);
+  --card-foreground: var(--sb-foreground);
+  --popover: var(--sb-surface);
+  --popover-foreground: var(--sb-foreground);
+  --primary: var(--sb-primary);
+  --primary-hover: var(--sb-primary-hover);
+  --primary-strong: var(--sb-primary-strong);
+  --primary-foreground: #0a0a0a;
+  --ink: var(--sb-ink);
+  --ink-hover: var(--sb-ink-hover);
+  --ink-foreground: #0a0a0a;
   --secondary: var(--sb-surface-subtle);
   --secondary-foreground: var(--sb-foreground);
   --muted: var(--sb-surface-subtle);
@@ -97,65 +206,27 @@
   --warning-muted: var(--sb-warning-muted);
   --danger: var(--sb-danger);
   --danger-muted: var(--sb-danger-muted);
+  --info: var(--sb-info);
+  --info-muted: var(--sb-info-muted);
+  --violet: var(--sb-violet);
+  --violet-muted: var(--sb-violet-muted);
   --border: var(--sb-border);
-  --input: var(--sb-border);
-  --ring: color-mix(in oklab, var(--sb-primary) 35%, transparent);
-  --radius: 0.4375rem;
-  --chart-1: var(--sb-primary);
-  --chart-2: #ec4f9b;
-  --chart-3: #f37eb4;
-  --chart-4: #f8afd0;
-  --chart-5: #fddbed;
-  --sidebar: var(--sb-surface);
+  --border-strong: var(--sb-border-strong);
+  --input: var(--sb-border-strong);
+  --ring: color-mix(in oklab, var(--sb-primary-strong) 50%, transparent);
+  --chart-2: #8fae1c;
+  --chart-3: #9b9ca3;
+  --chart-4: #545455;
+  --chart-5: #2a2a2d;
+  --sidebar: var(--sb-background);
   --sidebar-foreground: var(--sb-foreground);
-  --sidebar-primary: var(--sb-primary);
-  --sidebar-primary-foreground: #ffffff;
+  --sidebar-primary: var(--sb-ink);
+  --sidebar-primary-foreground: #0a0a0a;
   --sidebar-accent: var(--sb-surface-subtle);
   --sidebar-accent-foreground: var(--sb-foreground);
   --sidebar-border: var(--sb-border);
   --sidebar-ring: var(--ring);
-}
-
-.dark {
-  --sb-background: #0b0b0c;
-  --sb-surface: #171718;
-  --sb-surface-subtle: #252527;
-  --sb-foreground: #f5f5f5;
-  --sb-muted: #acadb2;
-  --sb-border: #343438;
-  --sb-border-strong: #47474c;
-  --sb-primary: #ff76b3;
-  --sb-primary-hover: #ff9aca;
-  --sb-primary-muted: #501634;
-
-  --background: var(--sb-background);
-  --foreground: var(--sb-foreground);
-  --surface: var(--sb-surface);
-  --surface-subtle: var(--sb-surface-subtle);
-  --card: var(--sb-surface);
-  --card-foreground: var(--sb-foreground);
-  --popover: var(--sb-surface);
-  --popover-foreground: var(--sb-foreground);
-  --primary: var(--sb-primary);
-  --primary-foreground: #ffffff;
-  --secondary: var(--sb-surface-subtle);
-  --secondary-foreground: var(--sb-foreground);
-  --muted: var(--sb-surface-subtle);
-  --muted-foreground: var(--sb-muted);
-  --accent: var(--sb-primary-muted);
-  --accent-foreground: var(--sb-primary);
-  --destructive: #f87171;
-  --border: var(--sb-border);
-  --input: var(--sb-border);
-  --ring: color-mix(in oklab, var(--sb-primary) 45%, transparent);
-  --sidebar: var(--sb-surface);
-  --sidebar-foreground: var(--sb-foreground);
-  --sidebar-primary: var(--sb-primary);
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: var(--sb-surface-subtle);
-  --sidebar-accent-foreground: var(--sb-foreground);
-  --sidebar-border: var(--sb-border);
-  --sidebar-ring: var(--ring);
+  --shadow-overlay: none;
 }
 
 @layer base {
@@ -165,11 +236,17 @@
 
   html {
     @apply font-sans scroll-smooth;
+    color-scheme: light;
+  }
+
+  html.dark {
+    color-scheme: dark;
   }
 
   body {
     @apply bg-background text-foreground antialiased;
     font-feature-settings: "rlig" 1, "calt" 1;
+    text-rendering: optimizeLegibility;
   }
 
   h1,
@@ -179,6 +256,15 @@
   h5,
   h6 {
     @apply font-semibold tracking-tight text-foreground;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    background: color-mix(in oklab, var(--sb-primary) 45%, transparent);
   }
 
   :focus-visible {
@@ -200,7 +286,7 @@
 @layer utilities {
   .sb-page {
     @media (prefers-reduced-motion: no-preference) {
-      animation: sb-page-enter 180ms ease-out both;
+      animation: sb-page-enter 260ms var(--ease-out-soft) both;
     }
   }
 
@@ -208,23 +294,252 @@
     @apply rounded-[var(--radius-lg)] border border-border bg-card;
   }
 
+  /* Kept for existing call sites: elevation comes from a stronger border, not a shadow. */
   .sb-panel-raised {
-    @apply rounded-[var(--radius-lg)] border border-border bg-card shadow-sm;
+    @apply rounded-[var(--radius-lg)] border border-border-strong/70 bg-card;
+  }
+
+  /*
+   * Type scale — one ladder for every workspace screen:
+   *   page title (display face) → section title → card title → body → meta → eyebrow,
+   *   plus a stat size for key numbers.
+   */
+  .sb-title-page {
+    font-family: var(--font-display);
+    font-size: 1.875rem;
+    line-height: 1.15;
+    font-weight: 600;
+    letter-spacing: -0.025em;
+    color: var(--foreground);
+  }
+
+  .sb-title-section {
+    font-size: 1.0625rem;
+    line-height: 1.35;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    color: var(--foreground);
+  }
+
+  .sb-title-card {
+    font-size: 0.9375rem;
+    line-height: 1.4;
+    font-weight: 550;
+    letter-spacing: -0.01em;
+  }
+
+  .sb-body {
+    font-size: 0.875rem;
+    line-height: 1.6;
+  }
+
+  .sb-meta {
+    font-size: 0.78125rem;
+    line-height: 1.5;
+    color: var(--muted-foreground);
+  }
+
+  .sb-eyebrow {
+    font-size: 0.6875rem;
+    line-height: 1.4;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted-foreground);
+  }
+
+  .sb-stat {
+    font-size: 1.875rem;
+    line-height: 1.1;
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Account screens: a short fade-and-rise, staggered with animation-delay. */
+  .sb-auth-step {
+    @media (prefers-reduced-motion: no-preference) {
+      animation: sb-page-enter 320ms var(--ease-out-soft) both;
+    }
+  }
+
+  /*
+   * Feature panel: a calm grey block for the one thing a screen should draw the
+   * eye to (Up next, current plan, quick start…). It re-points the ink tokens
+   * locally, so children written with `text-ink-foreground/60`,
+   * `bg-ink-foreground/[0.07]` etc. read as ink-on-grey.
+   */
+  .sb-feature {
+    --ink: #e4e5e8;
+    --ink-hover: #dedfe2;
+    --ink-foreground: #171717;
+    background-color: var(--ink);
+    color: var(--ink-foreground);
+  }
+
+  .dark .sb-feature {
+    --ink: #1c1c1f;
+    --ink-hover: #26262a;
+    --ink-foreground: #f4f5f7;
+  }
+
+  /* Inverted (black) card — marketing pricing only, as on daisy.now. */
+  .sb-invert {
+    --ink: #171717;
+    --ink-hover: #2e2e30;
+    --ink-foreground: #f4f5f7;
+    background-color: var(--ink);
+    color: var(--ink-foreground);
+  }
+
+  /* On a dark page an "inverted" card can't be darker, so the highlight is a thin brand-colour edge. */
+  .dark .sb-invert {
+    --ink: #1c1c1f;
+    outline: 1px solid color-mix(in oklab, var(--primary) 55%, transparent);
+    outline-offset: -1px;
+  }
+
+  .sb-overlay-shadow {
+    box-shadow: var(--shadow-overlay);
+  }
+
+  .sb-numeric {
+    font-variant-numeric: tabular-nums;
   }
 
   .sb-control {
     @apply rounded-[var(--radius-md)];
   }
+
+  .sb-scrollbar-none {
+    scrollbar-width: none;
+  }
+
+  .sb-scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/*
+ * Rich text rendered from the editor and in every channel preview. The project
+ * does not ship the Tailwind typography plugin, so these rules give headings,
+ * lists and links the structure the editor produces.
+ */
+/*
+ * Accent word (e.g. "clearly" in the hero): letters in the exact #C7F238
+ * accent with a hairline olive edge so they stay legible on the light grey
+ * page. The edge is dropped in dark mode, where the accent reads on its own.
+ */
+.sb-accent-word {
+  color: var(--primary);
+  -webkit-text-stroke: 0.018em #4a5a00;
+  paint-order: stroke fill;
+}
+
+.dark .sb-accent-word {
+  -webkit-text-stroke: 0;
+}
+
+.sb-prose {
+  color: var(--foreground);
+  font-size: 0.9375rem;
+  line-height: 1.65;
+}
+
+.sb-prose > * + * {
+  margin-top: 0.75em;
+}
+
+.sb-prose h2 {
+  margin-top: 1.4em;
+  font-size: 1.125rem;
+  line-height: 1.35;
+}
+
+.sb-prose h3 {
+  margin-top: 1.2em;
+  font-size: 1rem;
+}
+
+.sb-prose ul,
+.sb-prose ol {
+  padding-left: 1.25em;
+}
+
+.sb-prose ul {
+  list-style: disc;
+}
+
+.sb-prose ol {
+  list-style: decimal;
+}
+
+.sb-prose li + li {
+  margin-top: 0.3em;
+}
+
+.sb-prose li::marker {
+  color: var(--muted-foreground);
+}
+
+.sb-prose a {
+  color: var(--primary-strong);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.sb-prose strong {
+  font-weight: 600;
+}
+
+.sb-prose blockquote {
+  border-left: 2px solid var(--border-strong);
+  padding-left: 1em;
+  color: var(--muted-foreground);
+}
+
+.sb-prose code {
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  background: var(--muted);
+  border-radius: 4px;
+  padding: 0.1em 0.35em;
+}
+
+.sb-prose-compact {
+  font-size: 0.875rem;
+  line-height: 1.55;
+}
+
+.sb-prose-compact > * + * {
+  margin-top: 0.5em;
+}
+
+.tiptap:focus {
+  outline: none;
+}
+
+.tiptap p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+  color: var(--muted-foreground);
 }
 
 @keyframes sb-page-enter {
   from {
     opacity: 0;
-    transform: translateY(4px);
+    transform: translateY(6px);
   }
 
   to {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+@keyframes sb-marquee {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-50%, 0, 0); }
 }

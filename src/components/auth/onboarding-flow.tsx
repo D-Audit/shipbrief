@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowLeft, ArrowRight, Check, CheckCircle2, FileText, Mail, MessageSquareText, Rocket, Sparkles, Users, type LucideIcon } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, CheckCircle2, FileText, Mail, MessageSquareText, LayoutGrid, Loader2, Rocket, Users, type LucideIcon } from "lucide-react";
 import { useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -31,7 +31,7 @@ const steps = ["Workspace", "Your focus", "Channels"];
 
 const roles: { value: OnboardingRole; title: string; detail: string; icon: LucideIcon }[] = [
   { value: "founder", title: "Founder", detail: "Own the narrative", icon: Rocket },
-  { value: "product", title: "Product", detail: "Bring releases to life", icon: Sparkles },
+  { value: "product", title: "Product", detail: "Bring releases to life", icon: LayoutGrid },
   { value: "engineering", title: "Engineering", detail: "Share shipped work", icon: FileText },
   { value: "marketing", title: "Marketing", detail: "Coordinate launch moments", icon: Mail },
   { value: "customer_success", title: "Customer success", detail: "Guide feature discovery", icon: Users },
@@ -60,6 +60,15 @@ export function OnboardingFlow() {
     resolver: zodResolver(onboardingSchema),
     defaultValues: { workspaceName: "", workspaceSlug: "", channels: [] },
   });
+
+  useEffect(() => {
+    // Prefill from the name typed at sign-up (kept in sessionStorage, so read it after mount).
+    const pendingName = authService.getPendingWorkspaceName();
+    if (pendingName) {
+      setValue("workspaceName", pendingName);
+      setValue("workspaceSlug", toSlug(pendingName));
+    }
+  }, [setValue]);
   const [step, setStep] = useState(0);
   const [slugEdited, setSlugEdited] = useState(false);
   const [submissionError, setSubmissionError] = useState<string | null>(null);
@@ -92,7 +101,7 @@ export function OnboardingFlow() {
     try {
       const result = await authService.completeOnboarding(values);
       setComplete(result);
-      toast.success("Mock workspace created. You are ready to explore ShipBrief.");
+      toast.success(`${result.workspaceName} is ready.`);
     } catch (error) {
       setSubmissionError(error instanceof Error ? error.message : "We could not set up your workspace. Please try again.");
     }
@@ -101,14 +110,14 @@ export function OnboardingFlow() {
   if (complete) {
     return (
       <div className="space-y-5">
-        <div className="border border-success/20 bg-success-muted/45 p-5">
-          <span className="flex size-9 items-center justify-center rounded-lg bg-success-muted text-success"><CheckCircle2 className="size-5" /></span>
+        <div>
+          <CheckCircle2 className="size-6 text-success" aria-hidden="true" />
           <h2 className="mt-4 text-lg font-semibold tracking-tight">{complete.workspaceName} is ready.</h2>
-          <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">Your local workspace has a {complete.channels.length === 1 ? "starting channel" : "starting channel set"}, ready for its first release brief.</p>
-          <div className="mt-4 flex flex-wrap gap-2">{complete.channels.map((channel) => <span key={channel} className="border border-success/20 bg-background px-2.5 py-1 text-xs font-medium text-success">{channels.find((item) => item.value === channel)?.title}</span>)}</div>
+          <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">Your workspace has a {complete.channels.length === 1 ? "starting channel" : "starting channel set"}, ready for its first release brief.</p>
+          <div className="mt-4 flex flex-wrap gap-2">{complete.channels.map((channel) => <span key={channel} className="rounded-full border border-border px-2.5 py-1 text-xs font-medium text-foreground/80">{channels.find((item) => item.value === channel)?.title}</span>)}</div>
         </div>
         <Link href="/app/overview?onboarding=complete" className={cn(buttonVariants({ size: "lg" }), "h-10 w-full")}>Open {complete.workspaceName} <ArrowRight /></Link>
-        <p className="text-center text-xs text-muted-foreground">This workspace is held in the mock service until a real backend is connected.</p>
+        <p className="text-center text-xs text-muted-foreground">You can invite teammates and change these choices any time from settings.</p>
       </div>
     );
   }
@@ -118,7 +127,7 @@ export function OnboardingFlow() {
       <ol className="grid grid-cols-3 gap-2" aria-label="Onboarding progress">
         {steps.map((label, index) => (
           <li key={label} className="min-w-0">
-            <div className={cn("h-1 rounded-full", index <= step ? "bg-primary" : "bg-muted")} aria-hidden="true" />
+            <div className={cn("h-1 rounded-full", index <= step ? "bg-foreground" : "bg-muted")} aria-hidden="true" />
             <p className={cn("mt-2 truncate text-[11px] font-medium", index <= step ? "text-foreground" : "text-muted-foreground")}>{index + 1}. {label}</p>
           </li>
         ))}
@@ -139,7 +148,7 @@ export function OnboardingFlow() {
 
       {step === 1 && (
         <section className="space-y-6" aria-labelledby="onboarding-focus-title">
-          <div><h2 id="onboarding-focus-title" className="text-base font-semibold">Make the first workspace feel relevant.</h2><p className="mt-1 text-sm leading-relaxed text-muted-foreground">This only shapes your local starting context. It never limits what you can do later.</p></div>
+          <div><h2 id="onboarding-focus-title" className="text-base font-semibold">Make the first workspace feel relevant.</h2><p className="mt-1 text-sm leading-relaxed text-muted-foreground">This only shapes your starting context. It never limits what you can do later.</p></div>
           <fieldset className="space-y-2.5"><legend className="text-sm font-medium">Your role</legend><div role="radiogroup" aria-label="Your role" className="grid gap-2 sm:grid-cols-2">{roles.map((role) => <SelectionCard key={role.value} selected={selectedRole === role.value} onClick={() => setValue("role", role.value, { shouldValidate: true })} icon={role.icon} title={role.title} detail={role.detail} radio />)}</div>{errors.role && <p className="text-xs text-destructive">{errors.role.message}</p>}</fieldset>
           <fieldset className="space-y-2.5"><legend className="text-sm font-medium">What should ShipBrief help with first?</legend><div role="radiogroup" aria-label="Primary goal" className="grid gap-2">{goals.map((goal) => <SelectionCard key={goal.value} selected={selectedGoal === goal.value} onClick={() => setValue("goal", goal.value, { shouldValidate: true })} title={goal.title} detail={goal.detail} radio />)}</div>{errors.goal && <p className="text-xs text-destructive">{errors.goal.message}</p>}</fieldset>
         </section>
@@ -149,13 +158,12 @@ export function OnboardingFlow() {
         <section className="space-y-6" aria-labelledby="onboarding-channels-title">
           <div><h2 id="onboarding-channels-title" className="text-base font-semibold">Pick the first places you will communicate.</h2><p className="mt-1 text-sm leading-relaxed text-muted-foreground">Choose one, two, or all three. Publishing is always explicit when you create a release.</p></div>
           <fieldset className="space-y-2.5"><legend className="sr-only">Starting channels</legend><div className="grid gap-2">{channels.map((channel) => <SelectionCard key={channel.value} selected={selectedChannels.includes(channel.value)} onClick={() => toggleChannel(channel.value)} icon={channel.icon} title={channel.title} detail={channel.detail} />)}</div>{errors.channels && <p className="text-xs text-destructive">{errors.channels.message}</p>}</fieldset>
-          <AuthNotice tone="info">Your workspace begins with mock data so you can explore a full ShipBrief workflow immediately.</AuthNotice>
         </section>
       )}
 
       <div className="flex items-center justify-between gap-3 border-t border-border pt-5">
         {step > 0 ? <Button type="button" variant="outline" size="lg" className="h-10" onClick={() => setStep((current) => current - 1)}><ArrowLeft />Back</Button> : <Link href="/signup" className="text-sm font-medium text-muted-foreground hover:text-foreground">Cancel</Link>}
-        {step < steps.length - 1 ? <Button type="button" size="lg" className="h-10" onClick={() => void nextStep()}>Continue <ArrowRight /></Button> : <Button type="submit" size="lg" className="h-10" disabled={isSubmitting}>{isSubmitting ? <Sparkles className="animate-spin" /> : <Check />}{isSubmitting ? "Creating workspace..." : "Create workspace"}</Button>}
+        {step < steps.length - 1 ? <Button type="button" size="lg" className="h-10" onClick={() => void nextStep()}>Continue <ArrowRight /></Button> : <Button type="submit" size="lg" className="h-10" disabled={isSubmitting}>{isSubmitting ? <Loader2 className="animate-spin" /> : <Check />}{isSubmitting ? "Creating workspace…" : "Create workspace"}</Button>}
       </div>
     </form>
   );
@@ -177,10 +185,10 @@ function SelectionCard({
   radio?: boolean;
 }) {
   return (
-    <button type="button" role={radio ? "radio" : "checkbox"} aria-checked={selected} onClick={onClick} className={cn("flex w-full items-center gap-3 border p-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring", selected ? "border-primary/40 bg-primary/5" : "border-border bg-background hover:bg-surface-subtle") }>
-      {Icon ? <span className={cn("flex size-8 shrink-0 items-center justify-center rounded-lg", selected ? "bg-primary/12 text-primary" : "bg-muted text-muted-foreground")}><Icon className="size-4" /></span> : <span className={cn("flex size-4 shrink-0 items-center justify-center rounded border", selected ? "border-primary bg-primary text-primary-foreground" : "border-input bg-background text-transparent")}><Check className="size-3" /></span>}
+    <button type="button" role={radio ? "radio" : "checkbox"} aria-checked={selected} onClick={onClick} className={cn("flex w-full items-center gap-3 rounded-lg border p-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring", selected ? "border-border-strong bg-surface-subtle" : "border-border bg-background hover:bg-surface-subtle") }>
+      {Icon ? <Icon aria-hidden="true" className={cn("size-4 shrink-0", selected ? "text-foreground" : "text-muted-foreground")} /> : <span className={cn("flex size-4 shrink-0 items-center justify-center rounded border", selected ? "border-foreground bg-foreground text-background" : "border-input bg-background text-transparent")}><Check className="size-3" /></span>}
       <span className="min-w-0 flex-1"><span className="block text-sm font-medium text-foreground">{title}</span><span className="mt-0.5 block text-xs leading-relaxed text-muted-foreground">{detail}</span></span>
-      <span className={cn("flex size-4 shrink-0 items-center justify-center rounded-full border", selected ? "border-primary bg-primary text-primary-foreground" : "border-input bg-background text-transparent", !radio && "rounded") }><Check className="size-3" /></span>
+      <span className={cn("flex size-4 shrink-0 items-center justify-center rounded-full border", selected ? "border-foreground bg-foreground text-background" : "border-input bg-background text-transparent", !radio && "rounded") }><Check className="size-3" /></span>
     </button>
   );
 }

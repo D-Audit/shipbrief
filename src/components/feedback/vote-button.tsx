@@ -31,9 +31,13 @@ export function VoteButton({
   return (
     <Button
       type="button"
-      variant={voted ? "secondary" : "outline"}
+      variant="outline"
       size={compact ? "sm" : "default"}
-      className={cn("shrink-0", !compact && "h-auto min-w-14 flex-col gap-1 py-2")}
+      className={cn(
+        "shrink-0 disabled:opacity-100",
+        !compact && "h-auto min-w-14 flex-col gap-1 py-2",
+        voted && "border-transparent bg-ink text-ink-foreground hover:bg-ink hover:text-ink-foreground"
+      )}
       onClick={() => void handleVote()}
       disabled={pending || voted}
       aria-label={voted ? "You voted for this request" : "Vote for this request"}

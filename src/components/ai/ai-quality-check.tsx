@@ -21,7 +21,7 @@ export function AIQualityCheck({
     <section className="space-y-3" aria-labelledby="quality-check-title">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <h3 id="quality-check-title" className="text-sm font-medium">Quality check</h3>
+          <h3 id="quality-check-title" className="sb-title-card">Quality check</h3>
           <p className="mt-0.5 text-xs text-muted-foreground">Benefit, clarity, CTA, and channel fit.</p>
         </div>
         <Button type="button" size="sm" variant="outline" onClick={onRun} disabled={state.status === "loading"}>
@@ -37,7 +37,7 @@ export function AIQualityCheck({
       )}
       {state.status === "loading" && (
         <div className="flex items-center gap-2 rounded-lg bg-muted/70 px-3 py-4 text-xs text-muted-foreground" role="status">
-          <Loader2 className="size-4 animate-spin text-primary" />
+          <Loader2 className="size-4 animate-spin text-primary-strong" />
           Reviewing the selected draft...
         </div>
       )}
@@ -54,8 +54,8 @@ export function AIQualityCheck({
 function QualityReport({ report }: { report: AIQualityReport }) {
   return (
     <div className="space-y-3">
-      <div className="flex items-center gap-3 rounded-lg bg-primary/5 p-3">
-        <div className="flex size-10 shrink-0 items-center justify-center rounded-full border-2 border-primary text-sm font-semibold text-primary">
+      <div className="flex items-center gap-3 rounded-lg bg-surface-subtle p-3">
+        <div className="flex size-10 shrink-0 items-center justify-center rounded-full border-2 border-primary-strong text-sm font-semibold text-primary-strong">
           {report.score}
         </div>
         <p className="text-xs leading-relaxed text-muted-foreground">
@@ -67,11 +67,11 @@ function QualityReport({ report }: { report: AIQualityReport }) {
       {report.issues.map((issue) => (
         <div key={issue.id} className="rounded-lg border border-border p-3">
           <div className="flex gap-2">
-            <TriangleAlert className={`mt-0.5 size-3.5 shrink-0 ${issue.severity === "warning" ? "text-warning" : "text-primary"}`} />
+            <TriangleAlert className={`mt-0.5 size-3.5 shrink-0 ${issue.severity === "warning" ? "text-warning" : "text-primary-strong"}`} />
             <div>
               <p className="text-xs font-medium">{issue.title}</p>
               <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{issue.detail}</p>
-              <p className="mt-2 text-xs text-primary">{issue.suggestion}</p>
+              <p className="mt-2 text-xs text-primary-strong">{issue.suggestion}</p>
             </div>
           </div>
         </div>

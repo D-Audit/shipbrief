@@ -1,19 +1,65 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
-import { ArrowUpRight, CreditCard, Download, Globe2, KeyRound, Laptop, Loader2, Save, ShieldCheck, Trash2, Users, Webhook, type LucideIcon } from "lucide-react";
+import { ArrowUpRight, Bell, Building2, Download, Laptop, LayoutGrid, Loader2, PenLine, ShieldCheck, Smartphone, TriangleAlert, type LucideIcon } from "lucide-react";
+import { formatDistanceToNow } from "date-fns";
 import { toast } from "sonner";
-import { ErrorState, LoadingState, PageHeader } from "@/components/shared/page-states";
+import { ErrorState, LoadingState, PageHeader, SectionHeader } from "@/components/shared/page-states";
+import { type Tone } from "@/lib/tones";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAsyncData } from "@/hooks/use-async-data";
 import { settingsService } from "@/lib/services";
+import { cn } from "@/lib/utils";
 import type { WorkspaceSettings } from "@/types";
+
+const sections = [
+  { id: "general", label: "General", icon: Building2, tone: "blue" },
+  { id: "ai", label: "AI & brand voice", icon: PenLine, tone: "violet" },
+  { id: "notifications", label: "Notifications", icon: Bell, tone: "amber" },
+  { id: "security", label: "Security", icon: ShieldCheck, tone: "green" },
+  { id: "workspace", label: "Workspace", icon: LayoutGrid, tone: "rose" },
+  { id: "danger", label: "Danger zone", icon: TriangleAlert, tone: "red" },
+] as const satisfies readonly { id: string; label: string; icon: LucideIcon; tone: Tone }[];
+
+type SectionId = (typeof sections)[number]["id"];
+
+const timezones = [
+  "America/Los_Angeles",
+  "America/New_York",
+  "America/Sao_Paulo",
+  "Europe/London",
+  "Europe/Berlin",
+  "Africa/Kigali",
+  "Africa/Lagos",
+  "Asia/Dubai",
+  "Asia/Kolkata",
+  "Asia/Singapore",
+  "Asia/Tokyo",
+  "Australia/Sydney",
+  "UTC",
+];
+
+const notificationCopy: Record<keyof WorkspaceSettings["notifications"], { title: string; detail: string }> = {
+  releaseApproved: { title: "Release approved", detail: "When a teammate approves a release you wrote." },
+  feedbackCluster: { title: "New feedback theme", detail: "When AI groups enough requests into a new theme." },
+  integrationErrors: { title: "Integration problems", detail: "When a source sync or webhook delivery fails." },
+  emailDigest: { title: "Weekly digest", detail: "A Monday summary of releases, reads and requests." },
+};
+
+const workspaceLinks = [
+  { title: "Members & roles", detail: "Invite teammates and choose who can review and publish.", href: "/app/team" },
+  { title: "Branding & domain", detail: "Logo, accent colour, custom domain and widget theme.", href: "/app/branding" },
+  { title: "Plan & billing", detail: "Plan, usage, invoices and payment method.", href: "/app/billing" },
+  { title: "API keys & webhooks", detail: "Server-side credentials and event delivery.", href: "/app/api" },
+  { title: "Integrations", detail: "GitHub, Linear, GitLab and Jira connections.", href: "/app/integrations" },
+];
 
 export function SettingsPage() {
   const { state, reload } = useAsyncData(() => settingsService.get(), []);
@@ -24,73 +70,344 @@ export function SettingsPage() {
 }
 
 function SettingsEditor({ settings, onReload }: { settings: WorkspaceSettings; onReload: () => Promise<void> }) {
-  const [name, setName] = useState(settings.name);
-  const [slug, setSlug] = useState(settings.slug);
-  const [timezone, setTimezone] = useState(settings.timezone);
-  const [brandVoice, setBrandVoice] = useState(settings.brandVoice);
-  const [notifications, setNotifications] = useState(settings.notifications);
-  const [saving, setSaving] = useState("");
+  const [section, setSection] = useState<SectionId>("general");
+  const [draft, setDraft] = useState<WorkspaceSettings>(settings);
+  const [saving, setSaving] = useState(false);
+  const [exporting, setExporting] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
 
-  const save = async (section: string, input: Partial<WorkspaceSettings>) => {
-    setSaving(section);
+  const dirty = useMemo(() => JSON.stringify(draft) !== JSON.stringify(settings), [draft, settings]);
+  const slugValid = /^[a-z0-9][a-z0-9-]{1,48}[a-z0-9]$/.test(draft.slug);
+  const nameValid = draft.name.trim().length >= 2;
+
+  const patch = (input: Partial<WorkspaceSettings>) => setDraft((current) => ({ ...current, ...input }));
+
+  const save = async () => {
+    if (!nameValid || !slugValid) {
+      setSection("general");
+      toast.error("Check the workspace name and URL before saving.");
+      return;
+    }
+    setSaving(true);
     try {
-      await settingsService.update(input);
+      await settingsService.update(draft);
       await onReload();
-      toast.success(section + " settings saved (mock).");
+      toast.success("Settings saved.");
     } catch {
-      toast.error("We could not save these settings.");
+      toast.error("We couldn't save your settings. Your changes are still here.");
     } finally {
-      setSaving("");
+      setSaving(false);
     }
   };
 
   const exportData = async () => {
+    setExporting(true);
     try {
       const result = await settingsService.exportData();
-      toast.success(result.filename + " prepared (mock export).");
+      toast.success(`${result.filename} downloaded.`);
     } catch {
-      toast.error("We could not prepare a data export.");
+      toast.error("We couldn't prepare the export. Please try again.");
+    } finally {
+      setExporting(false);
     }
   };
 
   return (
-    <div className="space-y-6">
-      <PageHeader title="Settings" description="Workspace preferences, safety controls, and data boundaries." />
-      <Tabs defaultValue="general">
-        <TabsList className="h-auto flex-wrap justify-start">
-          <TabsTrigger value="general">General</TabsTrigger>
-          <TabsTrigger value="ai">AI & Brand Voice</TabsTrigger>
-          <TabsTrigger value="team">Team</TabsTrigger>
-          <TabsTrigger value="notifications">Notifications</TabsTrigger>
-          <TabsTrigger value="domains">Domains</TabsTrigger>
-          <TabsTrigger value="billing">Billing</TabsTrigger>
-          <TabsTrigger value="api">API</TabsTrigger>
-          <TabsTrigger value="security">Security</TabsTrigger>
-          <TabsTrigger value="danger">Danger Zone</TabsTrigger>
-        </TabsList>
-        <TabsContent value="general" className="mt-5"><section className="sb-panel max-w-xl space-y-4 p-4 sm:p-5"><div><h2 className="text-base font-semibold">Workspace profile</h2><p className="text-sm text-muted-foreground">These fields appear across your internal workspace and public-facing configuration.</p></div><div className="space-y-2"><Label htmlFor="workspace-name">Workspace name</Label><Input id="workspace-name" value={name} onChange={(event) => setName(event.target.value)} /></div><div className="space-y-2"><Label htmlFor="workspace-slug">Workspace slug</Label><Input id="workspace-slug" value={slug} onChange={(event) => setSlug(event.target.value)} /><p className="text-xs text-muted-foreground">Used by the local public changelog path.</p></div><div className="space-y-2"><Label htmlFor="workspace-timezone">Timezone</Label><Input id="workspace-timezone" value={timezone} onChange={(event) => setTimezone(event.target.value)} /></div><Button type="button" onClick={() => void save("General", { name, slug, timezone })} disabled={saving === "General"}>{saving === "General" ? <Loader2 className="animate-spin" /> : <Save />}Save changes</Button></section></TabsContent>
-        <TabsContent value="ai" className="mt-5"><section className="sb-panel max-w-xl space-y-4 p-4 sm:p-5"><div><h2 className="text-base font-semibold">AI & brand voice</h2><p className="text-sm text-muted-foreground">This context guides suggestions without replacing a human decision.</p></div><div className="space-y-2"><Label htmlFor="brand-voice">Brand voice</Label><Textarea id="brand-voice" value={brandVoice} onChange={(event) => setBrandVoice(event.target.value)} rows={6} /></div><Button type="button" onClick={() => void save("Brand voice", { brandVoice })} disabled={saving === "Brand voice"}>{saving === "Brand voice" ? <Loader2 className="animate-spin" /> : <Save />}Save brand voice</Button></section></TabsContent>
-        <TabsContent value="team" className="mt-5"><SettingsDestination icon={Users} title="Team collaboration" description="Invite teammates, manage roles, and review the approval history for release communication." href="/app/team" action="Manage team" /></TabsContent>
-        <TabsContent value="notifications" className="mt-5"><section className="sb-panel max-w-xl space-y-4 p-4 sm:p-5"><div><h2 className="text-base font-semibold">Notification preferences</h2><p className="text-sm text-muted-foreground">Choose the events that deserve attention. Delivery channels connect later.</p></div><div className="divide-y divide-border">{Object.entries(notifications).map(([key, enabled]) => <label key={key} className="flex cursor-pointer items-center justify-between gap-4 py-3 text-sm"><span><span className="block font-medium">{key.replace(/([A-Z])/g, " $1")}</span><span className="block text-xs text-muted-foreground">Show this event in your workspace notification center.</span></span><input type="checkbox" checked={Boolean(enabled)} onChange={(event) => setNotifications((current) => ({ ...current, [key]: event.target.checked }))} className="size-4 accent-primary" /></label>)}</div><Button type="button" onClick={() => void save("Notifications", { notifications })} disabled={saving === "Notifications"}>{saving === "Notifications" ? <Loader2 className="animate-spin" /> : <Save />}Save preferences</Button></section></TabsContent>
-        <TabsContent value="domains" className="mt-5"><SettingsDestination icon={Globe2} title="Domains & public appearance" description="Configure the hosted changelog address, logo, accent color, and widget theme from one dedicated branding surface." href="/app/branding" action="Open branding" /></TabsContent>
-        <TabsContent value="billing" className="mt-5"><SettingsDestination icon={CreditCard} title="Plan & billing" description="Review plan limits, usage, invoices, and the payment-method placeholder. Payments remain outside this frontend phase." href="/app/billing" action="Manage billing" /></TabsContent>
-        <TabsContent value="api" className="mt-5"><SettingsDestination icon={Webhook} title="API & webhooks" description="Create or revoke masked API keys, configure webhook events, and inspect mock delivery history." href="/app/api" action="Manage API" /></TabsContent>
-        <TabsContent value="security" className="mt-5"><div className="grid gap-5 xl:grid-cols-2"><section className="sb-panel p-4 sm:p-5"><div className="flex items-center gap-2"><ShieldCheck className="size-4 text-success" /><div><h2 className="text-base font-semibold">Sessions & security</h2><p className="text-xs text-muted-foreground">Authentication enforcement is a backend boundary.</p></div></div><div className="mt-5 space-y-3"><div className="flex items-center justify-between rounded-lg border border-border p-3"><div className="flex items-center gap-3"><Laptop className="size-4 text-muted-foreground" /><div><p className="text-sm font-medium">Current session</p><p className="text-xs text-muted-foreground">Windows · Kigali · active now</p></div></div><span className="text-xs font-medium text-success">Current</span></div><div className="flex items-center justify-between rounded-lg border border-border p-3"><div className="flex items-center gap-3"><Laptop className="size-4 text-muted-foreground" /><div><p className="text-sm font-medium">Previous session</p><p className="text-xs text-muted-foreground">Chrome · 2 days ago</p></div></div><Button type="button" variant="ghost" size="sm" onClick={() => toast.message("Session revocation requires the authentication backend.")}>Revoke</Button></div></div><Button type="button" variant="outline" className="mt-4" onClick={() => toast.message("Password and SSO controls connect to the identity provider later.")}>Manage sign-in</Button></section>
-        <section className="sb-panel p-4 sm:p-5"><div className="flex items-center gap-2"><KeyRound className="size-4 text-primary" /><div><h2 className="text-base font-semibold">Data & API</h2><p className="text-xs text-muted-foreground">Export workspace data or manage server-side credentials.</p></div></div><div className="mt-5 space-y-3"><Button type="button" variant="outline" className="w-full justify-start" onClick={() => void exportData()}><Download />Export workspace data</Button><Link href="/app/api" className="flex h-9 items-center gap-2 rounded-lg border border-border px-3 text-sm font-medium transition-colors hover:bg-muted"><KeyRound className="size-4" />Manage API keys and webhooks</Link></div></section></div></TabsContent>
-        <TabsContent value="danger" className="mt-5"><section className="max-w-xl rounded-xl border border-destructive/30 bg-danger-muted/20 p-4 sm:p-5"><div className="flex items-start gap-3"><Trash2 className="mt-0.5 size-4 text-destructive" /><div><h2 className="font-semibold text-destructive">Delete workspace</h2><p className="mt-1 text-sm text-muted-foreground">This action needs a backend confirmation and data-retention process. The frontend only simulates the request.</p><Button type="button" variant="destructive" className="mt-4" onClick={() => setDeleteOpen(true)}>Delete workspace</Button></div></div></section></TabsContent>
-      </Tabs>
+    <div className="space-y-8 pb-20">
+      <PageHeader title="Settings" description={`Manage how ${settings.name} works in ShipBrief.`} />
+
+      <div className="grid gap-8 lg:grid-cols-[12rem_minmax(0,1fr)] lg:gap-12">
+        <nav aria-label="Settings sections" className="sb-scrollbar-none -mx-4 overflow-x-auto px-4 lg:mx-0 lg:overflow-visible lg:px-0">
+          <ul className="flex gap-1 lg:sticky lg:top-6 lg:flex-col">
+            {sections.map((item) => (
+              <li key={item.id} className="shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setSection(item.id)}
+                  aria-current={section === item.id ? "page" : undefined}
+                  className={cn(
+                    "flex w-full items-center gap-2.5 rounded-md px-2 py-1.5 text-left text-[13.5px] whitespace-nowrap transition-colors",
+                    section === item.id ? "bg-foreground/[0.06] font-medium text-foreground" : "text-muted-foreground hover:bg-foreground/[0.04] hover:text-foreground",
+                    item.id === "danger" && section !== item.id && "hover:text-danger"
+                  )}
+                >
+                  <item.icon className={cn("size-4 shrink-0", section === item.id ? "text-foreground" : "text-muted-foreground/80")} aria-hidden="true" />
+                  {item.label}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </nav>
+
+        <div className="min-w-0 max-w-3xl">
+          {section === "general" && (
+            <SettingsSection title="General" description="The basics of your workspace. The URL is also your public changelog address.">
+              <SettingRow label="Workspace name" htmlFor="workspace-name" hint="Shown to teammates and on customer-facing pages.">
+                <Input id="workspace-name" value={draft.name} onChange={(event) => patch({ name: event.target.value })} aria-invalid={!nameValid} />
+                {!nameValid && <p className="mt-1.5 text-xs text-destructive">Use at least 2 characters.</p>}
+              </SettingRow>
+              <SettingRow label="Workspace URL" htmlFor="workspace-slug" hint="Lowercase letters, numbers and hyphens.">
+                <div className={cn("flex h-8 items-center overflow-hidden rounded-lg border border-input bg-transparent text-sm focus-within:border-ring focus-within:ring-3 focus-within:ring-ring/50", !slugValid && "border-destructive")}>
+                  <span className="flex h-full items-center border-r border-input bg-surface-subtle px-2.5 text-muted-foreground">shipbrief.app/c/</span>
+                  <input
+                    id="workspace-slug"
+                    value={draft.slug}
+                    onChange={(event) => patch({ slug: event.target.value.toLowerCase().replace(/\s+/g, "-") })}
+                    aria-invalid={!slugValid}
+                    spellCheck={false}
+                    className="h-full min-w-0 flex-1 bg-transparent px-2.5 outline-none"
+                  />
+                </div>
+                {!slugValid && <p className="mt-1.5 text-xs text-destructive">Use 3–50 lowercase letters, numbers or hyphens.</p>}
+              </SettingRow>
+              <SettingRow label="Timezone" htmlFor="workspace-timezone" hint="Used for scheduled releases and digests.">
+                <Select value={draft.timezone} onValueChange={(value) => value && patch({ timezone: String(value) })}>
+                  <SelectTrigger id="workspace-timezone" className="w-full">
+                    <SelectValue>{(value) => String(value).replace(/_/g, " ")}</SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    {(timezones.includes(draft.timezone) ? timezones : [draft.timezone, ...timezones]).map((zone) => (
+                      <SelectItem key={zone} value={zone}>{zone.replace(/_/g, " ")}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </SettingRow>
+            </SettingsSection>
+          )}
+
+          {section === "ai" && (
+            <SettingsSection title="AI & brand voice" description="Guidance applied to every AI suggestion. AI never publishes on its own — a teammate always approves.">
+              <SettingRow label="Brand voice" htmlFor="brand-voice" hint="Describe tone, words to prefer or avoid, and who you write for." stacked>
+                <Textarea id="brand-voice" value={draft.brandVoice} onChange={(event) => patch({ brandVoice: event.target.value })} rows={6} placeholder="Friendly, clear and customer-focused. Lead with the benefit. Avoid internal jargon." />
+                <p className="mt-1.5 text-right text-xs text-muted-foreground sb-numeric">{draft.brandVoice.length} characters</p>
+              </SettingRow>
+            </SettingsSection>
+          )}
+
+          {section === "notifications" && (
+            <SettingsSection title="Notifications" description="Choose what shows up in your notification center.">
+              {(Object.keys(notificationCopy) as (keyof WorkspaceSettings["notifications"])[]).map((key) => (
+                <SettingRow key={key} label={notificationCopy[key].title} hint={notificationCopy[key].detail} inline>
+                  <Switch
+                    checked={Boolean(draft.notifications[key])}
+                    label={notificationCopy[key].title}
+                    onChange={(checked) => patch({ notifications: { ...draft.notifications, [key]: checked } })}
+                  />
+                </SettingRow>
+              ))}
+            </SettingsSection>
+          )}
+
+          {section === "security" && (
+            <>
+              <SettingsSection title="Sign-in" description="How people access this workspace.">
+                <SettingRow label="Password & single sign-on" hint="SAML SSO and enforced two-factor are available on Scale." inline>
+                  <Button type="button" variant="outline" onClick={() => toast.message("SSO and enforced two-factor aren't available yet. Members sign in with email and password or Google.")}>Manage</Button>
+                </SettingRow>
+              </SettingsSection>
+              <SettingsSection title="Active sessions" description="Devices currently signed in to your account.">
+                <ActiveSessions />
+              </SettingsSection>
+              <SettingsSection title="Data" description="Your content always belongs to you.">
+                <SettingRow label="Export workspace data" hint="Releases, feedback and roadmap as JSON." inline>
+                  <Button type="button" variant="outline" onClick={() => void exportData()} disabled={exporting}>
+                    {exporting ? <Loader2 className="animate-spin" /> : <Download />}
+                    Export
+                  </Button>
+                </SettingRow>
+              </SettingsSection>
+            </>
+          )}
+
+          {section === "workspace" && (
+            <SettingsSection title="Workspace" description="Everything else about your workspace lives on its own page.">
+              {workspaceLinks.map((link) => (
+                <Link key={link.href} href={link.href} className="group -mx-3 flex items-center justify-between gap-4 rounded-md px-3 py-4 transition-colors hover:bg-foreground/[0.03]">
+                  <span>
+                    <span className="block text-sm font-medium">{link.title}</span>
+                    <span className="mt-0.5 block text-[13px] text-muted-foreground">{link.detail}</span>
+                  </span>
+                  <ArrowUpRight className="size-4 shrink-0 text-muted-foreground transition-colors group-hover:text-foreground" />
+                </Link>
+              ))}
+            </SettingsSection>
+          )}
+
+          {section === "danger" && (
+            <SettingsSection title="Danger zone" description="Irreversible actions. Take a data export first.">
+              <SettingRow label="Delete workspace" hint={`Permanently remove ${settings.name}, its releases, feedback and public changelog.`} inline>
+                <Button type="button" variant="destructive" onClick={() => setDeleteOpen(true)}>Delete workspace</Button>
+              </SettingRow>
+            </SettingsSection>
+          )}
+        </div>
+      </div>
+
+      {dirty &&
+        createPortal(
+          // Portalled: the page wrapper's entrance transform would otherwise trap `position: fixed`.
+          <div role="region" aria-label="Unsaved changes" className="sb-overlay-shadow sb-auth-step fixed inset-x-4 bottom-5 z-30 mx-auto flex max-w-xl items-center justify-between gap-3 rounded-[var(--radius-xl)] border border-border bg-popover py-2 pr-2 pl-4 lg:left-[15.5rem]">
+            <p className="text-sm">You have unsaved changes.</p>
+            <div className="flex gap-2">
+              <Button type="button" variant="ghost" onClick={() => setDraft(settings)} disabled={saving}>Discard</Button>
+              <Button type="button" onClick={() => void save()} disabled={saving}>
+                {saving && <Loader2 className="animate-spin" />}
+                Save changes
+              </Button>
+            </div>
+          </div>,
+          document.body
+        )}
+
       <DeleteWorkspaceDialog open={deleteOpen} workspaceName={settings.name} onOpenChange={setDeleteOpen} />
     </div>
   );
 }
 
-function SettingsDestination({ icon: Icon, title, description, href, action }: { icon: LucideIcon; title: string; description: string; href: string; action: string }) {
-  return <section className="sb-panel max-w-xl p-4 sm:p-5"><div className="flex items-start gap-3"><span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary"><Icon className="size-4" /></span><div><h2 className="text-base font-semibold">{title}</h2><p className="mt-1 text-sm leading-relaxed text-muted-foreground">{description}</p><Link href={href} className="mt-4 inline-flex h-9 items-center gap-2 rounded-lg border border-border px-3 text-sm font-medium transition-colors hover:bg-muted">{action}<ArrowUpRight className="size-3.5" /></Link></div></div></section>;
+function SettingsSection({ title, description, children }: { title: string; description: string; children: React.ReactNode }) {
+  return (
+    <section aria-labelledby={`settings-${title}`} className="sb-panel mb-6 p-5 last:mb-0">
+      <SectionHeader id={`settings-${title}`} title={title} description={description} />
+      <div className="mt-3 divide-y divide-border">{children}</div>
+    </section>
+  );
+}
+
+/** Label and help on the left, control on the right — stacks on small screens. */
+function SettingRow({
+  label,
+  hint,
+  htmlFor,
+  inline = false,
+  stacked = false,
+  children,
+}: {
+  label: string;
+  hint?: string;
+  htmlFor?: string;
+  inline?: boolean;
+  stacked?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <div
+      className={cn(
+        "py-5",
+        inline ? "flex items-center justify-between gap-6" : stacked ? "space-y-3" : "grid gap-3 sm:grid-cols-[minmax(0,14rem)_minmax(0,1fr)] sm:gap-8"
+      )}
+    >
+      <div className="min-w-0">
+        {htmlFor ? <Label htmlFor={htmlFor}>{label}</Label> : <p className="text-sm font-medium">{label}</p>}
+        {hint && <p className="mt-1 text-[13px] leading-relaxed text-muted-foreground">{hint}</p>}
+      </div>
+      <div className={cn(inline ? "shrink-0" : "min-w-0")}>{children}</div>
+    </div>
+  );
+}
+
+function Switch({ checked, onChange, label }: { checked: boolean; onChange: (checked: boolean) => void; label: string }) {
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={checked}
+      aria-label={label}
+      onClick={() => onChange(!checked)}
+      className={cn(
+        "relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+        checked ? "bg-ink" : "bg-border-strong"
+      )}
+    >
+      <span className={cn("inline-block size-4 rounded-full bg-white transition-transform", checked ? "translate-x-[18px]" : "translate-x-0.5")} />
+    </button>
+  );
+}
+
+/** A readable device label from a user-agent string. */
+function describeDevice(userAgent: string | null) {
+  if (!userAgent) return { device: "Unknown device", mobile: false };
+  const browser = /Edg\//.test(userAgent) ? "Edge" : /Firefox\//.test(userAgent) ? "Firefox" : /Chrome\//.test(userAgent) ? "Chrome" : /Safari\//.test(userAgent) ? "Safari" : "Browser";
+  const os = /iPhone|iPad/.test(userAgent) ? "iOS" : /Android/.test(userAgent) ? "Android" : /Windows/.test(userAgent) ? "Windows" : /Mac OS/.test(userAgent) ? "macOS" : /Linux/.test(userAgent) ? "Linux" : "";
+  return { device: os ? `${browser} on ${os}` : browser, mobile: /Mobile|iPhone|Android/.test(userAgent) };
+}
+
+function ActiveSessions() {
+  const { state, reload } = useAsyncData(() => settingsService.listSessions(), []);
+  if (state.status === "loading" || state.status === "idle") return <p className="py-4 text-sm text-muted-foreground">Loading sessions…</p>;
+  if (state.status === "error") return <p className="py-4 text-sm text-muted-foreground">{state.error}</p>;
+  if (state.status !== "success") return null;
+  const revoke = async (id: string) => {
+    try {
+      await settingsService.revokeSession(id);
+      await reload();
+      toast.success("That device has been signed out.");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "We couldn't sign that device out.");
+    }
+  };
+  return (
+    <>
+      {state.data.map((session) => {
+        const { device, mobile } = describeDevice(session.userAgent);
+        const seen = session.current ? "Active now" : `Last active ${formatDistanceToNow(new Date(session.lastSeenAt), { addSuffix: true })}`;
+        return <SessionRow key={session.id} icon={mobile ? Smartphone : Laptop} device={device} detail={seen} current={session.current} onRevoke={() => void revoke(session.id)} />;
+      })}
+    </>
+  );
+}
+
+function SessionRow({ icon: Icon, device, detail, current = false, onRevoke }: { icon: typeof Laptop; device: string; detail: string; current?: boolean; onRevoke: () => void }) {
+  return (
+    <div className="flex items-center justify-between gap-4 py-4">
+      <div className="flex min-w-0 items-center gap-3">
+        <Icon className="size-4 shrink-0 text-muted-foreground" />
+        <div className="min-w-0">
+          <p className="text-sm font-medium">{device}</p>
+          <p className="text-[13px] text-muted-foreground">{detail}</p>
+        </div>
+      </div>
+      {current ? (
+        <span className="text-xs text-muted-foreground">This device</span>
+      ) : (
+        <Button type="button" variant="ghost" size="sm" onClick={onRevoke}>Sign out</Button>
+      )}
+    </div>
+  );
 }
 
 function DeleteWorkspaceDialog({ open, workspaceName, onOpenChange }: { open: boolean; workspaceName: string; onOpenChange: (open: boolean) => void }) {
   const [confirmation, setConfirmation] = useState("");
-  const submit = () => { if (confirmation !== workspaceName) return; toast.success("Workspace deletion request recorded (mock). No data was removed."); setConfirmation(""); onOpenChange(false); };
-  return <Dialog open={open} onOpenChange={onOpenChange}><DialogContent><DialogHeader><DialogTitle>Delete {workspaceName}?</DialogTitle><DialogDescription>Type the workspace name to acknowledge this destructive backend request. No local or remote data will be removed in this frontend phase.</DialogDescription></DialogHeader><div className="space-y-2"><Label htmlFor="delete-workspace-confirmation">Workspace name</Label><Input id="delete-workspace-confirmation" value={confirmation} onChange={(event) => setConfirmation(event.target.value)} placeholder={workspaceName} /></div><DialogFooter><Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button><Button type="button" variant="destructive" onClick={submit} disabled={confirmation !== workspaceName}>Request deletion</Button></DialogFooter></DialogContent></Dialog>;
+  const [deleting, setDeleting] = useState(false);
+  const submit = async () => {
+    if (confirmation !== workspaceName || deleting) return;
+    setDeleting(true);
+    try {
+      await settingsService.deleteWorkspace(confirmation);
+      toast.success(`${workspaceName} was deleted.`);
+      // Reload fully: the session falls back to another workspace, or onboarding if there are none.
+      // eslint-disable-next-line @next/next/no-location-assign-relative-destination
+      window.location.assign("/app/overview");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "We couldn't delete the workspace.");
+      setDeleting(false);
+    }
+  };
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Delete {workspaceName}?</DialogTitle>
+          <DialogDescription>This permanently removes the workspace for everyone. Type <span className="font-medium text-foreground">{workspaceName}</span> to confirm.</DialogDescription>
+        </DialogHeader>
+        <div className="space-y-2">
+          <Label htmlFor="delete-workspace-confirmation">Workspace name</Label>
+          <Input id="delete-workspace-confirmation" value={confirmation} onChange={(event) => setConfirmation(event.target.value)} placeholder={workspaceName} />
+        </div>
+        <DialogFooter>
+          <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
+          <Button type="button" variant="destructive" onClick={() => void submit()} disabled={confirmation !== workspaceName || deleting}>{deleting && <Loader2 className="animate-spin" />}Delete workspace</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
 }

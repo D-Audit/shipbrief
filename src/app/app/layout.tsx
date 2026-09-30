@@ -1,3 +1,4 @@
+import { SessionProvider } from "@/components/session/session-provider";
 import { AppShell } from "@/components/shell";
 
 export default function AppLayout({
@@ -5,5 +6,9 @@ export default function AppLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <AppShell>{children}</AppShell>;
+  return (
+    <SessionProvider>
+      <AppShell>{children}</AppShell>
+    </SessionProvider>
+  );
 }

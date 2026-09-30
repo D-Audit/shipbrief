@@ -65,11 +65,7 @@ export function PublicFeedbackDialog({ workspace }: { workspace: string }) {
     setMessage("");
 
     try {
-      await feedbackService.create({
-        title: cleanTitle,
-        description: cleanContext,
-        source: "customer",
-      });
+      await feedbackService.submitPublic(workspace, { title: cleanTitle, description: cleanContext });
       setState("success");
       setMessage("Thanks — your feedback has been saved.");
     } catch (cause) {
@@ -100,7 +96,7 @@ export function PublicFeedbackDialog({ workspace }: { workspace: string }) {
               </div>
               <DialogTitle>Feedback shared</DialogTitle>
               <DialogDescription>
-                {message} It is stored as local mock data while the frontend is connected to a real service later.
+                {message} The product team reviews every request.
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>

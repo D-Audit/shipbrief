@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
-import { Sparkles } from "lucide-react";
+import { PenLine } from "lucide-react";
 import type { Release } from "@/types";
 import { StatusBadge } from "@/components/shared/page-states";
 import { cn } from "@/lib/utils";
@@ -21,15 +21,15 @@ export function ReleaseCard({ release, className }: ReleaseCardProps) {
     <Link
       href={`/app/releases/${release.id}`}
       className={cn(
-        "group flex flex-col gap-3 rounded-lg border border-border bg-surface p-4 transition-colors hover:bg-surface-subtle sm:flex-row sm:items-center sm:justify-between",
+        "group flex flex-col gap-3 rounded-lg border border-border bg-surface p-4 transition-[background-color,border-color,transform] hover:border-border-strong hover:bg-surface-subtle/70 sm:flex-row sm:items-center sm:justify-between",
         className
       )}
     >
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
-          <p className="font-medium group-hover:text-primary">{release.title}</p>
+          <p className="font-medium tracking-tight group-hover:text-primary-strong">{release.title}</p>
           {release.sourceRefs.some((s) => s.type === "github" || s.type === "linear") && (
-            <Sparkles className="size-3.5 text-primary/60" aria-label="AI-assisted" />
+            <PenLine className="size-3.5 text-muted-foreground" aria-label="AI-assisted" />
           )}
         </div>
         <p className="mt-0.5 truncate text-sm text-muted-foreground">{release.summary}</p>

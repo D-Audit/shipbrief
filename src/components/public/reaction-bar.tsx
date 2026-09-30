@@ -26,7 +26,7 @@ export function ReactionBar({
         disabled={pending}
         className={cn(
           "inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-sm transition-colors disabled:cursor-wait disabled:opacity-60",
-          hasReacted ? "border-primary/30 bg-primary/5 text-primary" : "border-border text-muted-foreground hover:bg-muted"
+          hasReacted ? "border-border-strong bg-surface-subtle text-primary-strong" : "border-border text-muted-foreground hover:bg-muted"
         )}
       >
         <ThumbsUp className="size-4" />

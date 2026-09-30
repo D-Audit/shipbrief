@@ -1,26 +1,25 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Menu } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Sidebar } from "./sidebar";
 import { Topbar } from "./topbar";
 import { CommandPalette } from "./command-palette";
-import {
-  Drawer,
-  DrawerContent,
-  DrawerTitle,
-} from "@/components/ui/drawer";
-import { Button } from "@/components/ui/button";
+import { Drawer, DrawerContent, DrawerTitle } from "@/components/ui/drawer";
 
 interface AppShellProps {
   children: React.ReactNode;
 }
 
+/** Routes that use the full width of the content area (editors, boards). */
+const wideRoutes = [/^\/app\/releases\/[^/]+$/, /^\/app\/ai-studio/, /^\/app\/roadmap/];
+
 export function AppShell({ children }: AppShellProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [commandOpen, setCommandOpen] = useState(false);
+  const wide = wideRoutes.some((pattern) => pattern.test(pathname));
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -56,9 +55,9 @@ export function AppShell({ children }: AppShellProps) {
     <div className="flex h-dvh overflow-hidden bg-background">
       <a
         href="#main-content"
-        className="sr-only fixed top-3 left-3 z-[60] rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground shadow-sm focus:not-sr-only"
+        className="sr-only fixed top-3 left-3 z-[60] rounded-md bg-foreground px-3 py-2 text-sm font-medium text-background focus:not-sr-only"
       >
-        Skip to workspace content
+        Skip to content
       </a>
 
       <div className="hidden lg:block">
@@ -66,27 +65,18 @@ export function AppShell({ children }: AppShellProps) {
       </div>
 
       <Drawer open={mobileOpen} onOpenChange={setMobileOpen} swipeDirection="left">
-        <DrawerContent className="h-dvh max-h-dvh p-0 lg:hidden">
+        <DrawerContent className="h-dvh max-h-dvh w-[15.5rem] p-0 lg:hidden">
           <DrawerTitle className="sr-only">Navigation</DrawerTitle>
           <Sidebar onNavigate={() => setMobileOpen(false)} />
         </DrawerContent>
       </Drawer>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <div className="flex items-center gap-2 border-b border-border bg-surface px-2 py-2 lg:hidden">
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            onClick={() => setMobileOpen(true)}
-            aria-label="Open navigation"
-          >
-            <Menu />
-          </Button>
-          <span className="text-sm font-semibold">ShipBrief</span>
-        </div>
-        <Topbar onOpenCommand={() => setCommandOpen(true)} />
+        <Topbar onOpenCommand={() => setCommandOpen(true)} onOpenNavigation={() => setMobileOpen(true)} />
         <main id="main-content" tabIndex={-1} className="flex-1 overflow-y-auto focus:outline-none">
-          <div className="sb-page mx-auto max-w-6xl p-4 sm:p-6 lg:p-8">{children}</div>
+          <div key={pathname} className={`sb-page mx-auto px-4 pt-6 pb-16 sm:px-6 sm:pt-8 lg:px-10 ${wide ? "max-w-[88rem]" : "max-w-[72rem]"}`}>
+            {children}
+          </div>
         </main>
       </div>
 

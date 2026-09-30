@@ -58,3 +58,10 @@ export function useAsyncData<T>(
 
   return { state, reload };
 }
+
+/** For list data: the items once loaded (an "empty" result is just `[]`), or null while loading/failed. */
+export function listData<T>(state: AsyncState<T[]>): T[] | null {
+  if (state.status === "success") return state.data;
+  if (state.status === "empty") return [];
+  return null;
+}

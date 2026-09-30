@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Bot, Combine, ExternalLink, GitBranch, Loader2, Plus, Save, Sparkles } from "lucide-react";
+import { Combine, ExternalLink, GitBranch, Layers, Loader2, Plus, Save } from "lucide-react";
 import { toast } from "sonner";
 import { CommentList, MergeDialog, VoteButton } from "@/components/feedback";
 import { Badge } from "@/components/ui/badge";
@@ -44,7 +44,7 @@ export function FeedbackDetailPage({ id }: { id: string }) {
     try {
       await feedbackService.update(item.id, input);
       await reload();
-      toast.success(message + " (mock).");
+      toast.success(message + ".");
     } catch {
       toast.error("We could not save that feedback change.");
     }
@@ -56,7 +56,7 @@ export function FeedbackDetailPage({ id }: { id: string }) {
       await feedbackService.vote(item.id);
       setVoted(true);
       await reload();
-      toast.success("Vote added (mock).");
+      toast.success("Vote added.");
     } catch {
       toast.error("We could not add that vote.");
     }
@@ -67,7 +67,7 @@ export function FeedbackDetailPage({ id }: { id: string }) {
     try {
       await feedbackService.comment(item.id, input);
       await Promise.all([reload(), reloadComments()]);
-      toast.success(input.isInternal ? "Internal note added (mock)." : "Comment added (mock).");
+      toast.success(input.isInternal ? "Internal note added." : "Comment added.");
     } catch {
       toast.error("We could not add that comment.");
     }
@@ -91,7 +91,7 @@ export function FeedbackDetailPage({ id }: { id: string }) {
       await roadmapService.create({ title: item.title, description: item.description, status: "later", votes: item.votes, linkedFeedbackIds: [item.id] });
       await Promise.all([reload(), reloadRoadmap(), reloadFeedback()]);
       setRoadmapPickerOpen(false);
-      toast.success("New roadmap item linked (mock).");
+      toast.success("New roadmap item linked.");
     } catch {
       toast.error("We could not link this request to the roadmap.");
     } finally {
@@ -114,7 +114,7 @@ export function FeedbackDetailPage({ id }: { id: string }) {
       });
       await Promise.all([reload(), reloadRoadmap(), reloadFeedback()]);
       setRoadmapPickerOpen(false);
-      toast.success("Feedback linked to the selected roadmap item (mock).");
+      toast.success("Feedback linked to the selected roadmap item.");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "We could not link this request to the roadmap.");
     } finally {
@@ -126,7 +126,7 @@ export function FeedbackDetailPage({ id }: { id: string }) {
     if (!item) return;
     try {
       const target = await feedbackService.merge(item.id, targetId);
-      toast.success("Duplicate request merged (mock).");
+      toast.success("Duplicate request merged.");
       router.replace("/app/feedback/" + target.id);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "We could not merge this request.");
@@ -154,7 +154,7 @@ export function FeedbackDetailPage({ id }: { id: string }) {
               <div className="min-w-0"><p className="text-sm leading-relaxed text-muted-foreground">{item.description}</p>{item.tags.length > 0 && <div className="mt-4 flex flex-wrap gap-1.5">{item.tags.map((tag) => <Badge key={tag} variant="secondary">{tag}</Badge>)}</div>}</div>
               <VoteButton votes={item.votes} onVote={vote} voted={voted} />
             </div>
-            <div className="mt-5 flex flex-wrap items-center gap-2 border-t border-border pt-4 text-xs text-muted-foreground"><span>{item.comments} total comments</span>{item.createdAt && <span>Submitted {new Intl.DateTimeFormat("en", { month: "long", day: "numeric", year: "numeric" }).format(new Date(item.createdAt))}</span>}{item.aiClusterId && <span className="inline-flex items-center gap-1"><Sparkles className="size-3.5 text-primary" />AI cluster attached</span>}</div>
+            <div className="mt-5 flex flex-wrap items-center gap-2 border-t border-border pt-4 text-xs text-muted-foreground"><span>{item.comments} total comments</span>{item.createdAt && <span>Submitted {new Intl.DateTimeFormat("en", { month: "long", day: "numeric", year: "numeric" }).format(new Date(item.createdAt))}</span>}{item.aiClusterId && <span className="inline-flex items-center gap-1"><Layers className="size-3.5 text-muted-foreground" />AI cluster attached</span>}</div>
           </article>
           {commentsState.status === "loading" && <LoadingState rows={2} />}
           {commentsState.status === "error" && <ErrorState title="Comments unavailable" message={commentsState.error} onRetry={reloadComments} />}
@@ -162,15 +162,15 @@ export function FeedbackDetailPage({ id }: { id: string }) {
         </main>
         <aside className="space-y-4">
           <section className="sb-panel space-y-4 p-4">
-            <div><h2 className="text-sm font-semibold">Triage</h2><p className="mt-1 text-xs text-muted-foreground">Keep decisions visible to the team.</p></div>
+            <div><h2 className="sb-title-card">Triage</h2><p className="mt-1 text-xs text-muted-foreground">Keep decisions visible to the team.</p></div>
             <div className="space-y-2"><Label htmlFor="feedback-status">Status</Label><Select value={item.status} onValueChange={(value) => value && void update({ status: value as FeedbackStatus }, "Status updated")}><SelectTrigger id="feedback-status" className="w-full"><SelectValue>{(value) => value?.replace(/_/g, " ")}</SelectValue></SelectTrigger><SelectContent>{statuses.map((value) => <SelectItem key={value} value={value}>{value.replace(/_/g, " ")}</SelectItem>)}</SelectContent></Select></div>
             <div className="space-y-2"><Label htmlFor="feedback-priority">Priority</Label><Select value={item.priority ?? "medium"} onValueChange={(value) => value && void update({ priority: value as NonNullable<FeedbackRequest["priority"]> }, "Priority updated")}><SelectTrigger id="feedback-priority" className="w-full"><SelectValue>{(value) => String(value) + " priority"}</SelectValue></SelectTrigger><SelectContent><SelectItem value="high">High priority</SelectItem><SelectItem value="medium">Medium priority</SelectItem><SelectItem value="low">Low priority</SelectItem></SelectContent></Select></div>
             <Button type="button" className="w-full" variant="outline" onClick={openRoadmapPicker}><GitBranch />{linkedRoadmap ? "Open roadmap item" : "Link to roadmap"}</Button>
             <Button type="button" className="w-full" variant="outline" onClick={() => setMergeOpen(true)}><Combine />Merge duplicate</Button>
           </section>
-          {cluster && <section className="rounded-xl border border-primary/20 bg-primary/5 p-4"><div className="flex items-center gap-2"><Bot className="size-4 text-primary" /><h2 className="text-sm font-semibold">AI summary</h2></div><p className="mt-3 text-sm font-medium">{cluster.title}</p><p className="mt-1 text-sm leading-relaxed text-muted-foreground">{cluster.topNeed}</p><div className="mt-3 flex justify-between text-xs text-muted-foreground"><span>{cluster.votes} votes</span><span className="capitalize">{cluster.demand} demand</span></div><p className="mt-3 border-t border-primary/10 pt-3 text-xs italic leading-relaxed text-muted-foreground">&ldquo;{cluster.representativeQuotes[0]}&rdquo;</p></section>}
-          {linkedRoadmap && <section className="sb-panel p-4"><h2 className="text-sm font-semibold">Roadmap link</h2><Link href="/app/roadmap" className="mt-2 inline-flex items-center gap-1 text-sm text-primary hover:underline">{linkedRoadmap.title}<ExternalLink className="size-3.5" /></Link><p className="mt-1 text-xs text-muted-foreground">{linkedRoadmap.status.replace(/_/g, " ")}</p></section>}
-          {linkedRelease && <section className="sb-panel p-4"><h2 className="text-sm font-semibold">Shipped release</h2><Link href={"/app/releases/" + linkedRelease.id} className="mt-2 inline-flex items-center gap-1 text-sm text-primary hover:underline">{linkedRelease.title}<ExternalLink className="size-3.5" /></Link><p className="mt-1 text-xs text-muted-foreground">Customer communication is linked.</p></section>}
+          {cluster && <section className="rounded-xl border border-border-strong bg-surface-subtle p-4"><div className="flex items-center gap-2"><Layers className="size-4 text-muted-foreground" /><h2 className="sb-title-card">AI summary</h2></div><p className="mt-3 text-sm font-medium">{cluster.title}</p><p className="mt-1 text-sm leading-relaxed text-muted-foreground">{cluster.topNeed}</p><div className="mt-3 flex justify-between text-xs text-muted-foreground"><span>{cluster.votes} votes</span><span className="capitalize">{cluster.demand} demand</span></div><p className="mt-3 border-t border-primary-strong/10 pt-3 text-xs italic leading-relaxed text-muted-foreground">&ldquo;{cluster.representativeQuotes[0]}&rdquo;</p></section>}
+          {linkedRoadmap && <section className="sb-panel p-4"><h2 className="sb-title-card">Roadmap link</h2><Link href="/app/roadmap" className="mt-2 inline-flex items-center gap-1 text-sm text-primary-strong hover:underline">{linkedRoadmap.title}<ExternalLink className="size-3.5" /></Link><p className="mt-1 text-xs text-muted-foreground">{linkedRoadmap.status.replace(/_/g, " ")}</p></section>}
+          {linkedRelease && <section className="sb-panel p-4"><h2 className="sb-title-card">Shipped release</h2><Link href={"/app/releases/" + linkedRelease.id} className="mt-2 inline-flex items-center gap-1 text-sm text-primary-strong hover:underline">{linkedRelease.title}<ExternalLink className="size-3.5" /></Link><p className="mt-1 text-xs text-muted-foreground">Customer communication is linked.</p></section>}
           <InternalNotes initialValue={item.internalNotes ?? ""} onSave={saveNotes} saving={savingNotes} />
         </aside>
       </div>
@@ -212,5 +212,5 @@ export function FeedbackDetailPage({ id }: { id: string }) {
 
 function InternalNotes({ initialValue, onSave, saving }: { initialValue: string; onSave: (value: string) => Promise<void>; saving: boolean }) {
   const [value, setValue] = useState(initialValue);
-  return <section className="sb-panel p-4"><div className="flex items-center justify-between gap-2"><h2 className="text-sm font-semibold">Internal notes</h2><span className="rounded bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">TEAM ONLY</span></div><Textarea value={value} onChange={(event) => setValue(event.target.value)} rows={4} className="mt-3" placeholder="Decision context, research notes, or follow-up..." /><Button type="button" size="sm" variant="outline" className="mt-3 w-full" onClick={() => void onSave(value)} disabled={saving}>{saving ? <Loader2 className="animate-spin" /> : <Save />}{saving ? "Saving..." : "Save notes"}</Button></section>;
+  return <section className="sb-panel p-4"><div className="flex items-center justify-between gap-2"><h2 className="sb-title-card">Internal notes</h2><span className="rounded bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">TEAM ONLY</span></div><Textarea value={value} onChange={(event) => setValue(event.target.value)} rows={4} className="mt-3" placeholder="Decision context, research notes, or follow-up..." /><Button type="button" size="sm" variant="outline" className="mt-3 w-full" onClick={() => void onSave(value)} disabled={saving}>{saving ? <Loader2 className="animate-spin" /> : <Save />}{saving ? "Saving..." : "Save notes"}</Button></section>;
 }

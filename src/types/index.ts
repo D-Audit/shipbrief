@@ -52,6 +52,29 @@ export type Release = {
   createdBy?: string;
   reviewedBy?: string;
   publishedBy?: string;
+  /** Search and social metadata for the public changelog page. */
+  seo?: { title?: string; description?: string };
+  /** Reviewer note left when changes were requested. */
+  reviewNote?: string;
+  /** Per-channel delivery state, returned when a single release is fetched. */
+  publications?: ReleasePublication[];
+};
+
+export type ReleasePublication = {
+  channel: Channel;
+  status: "pending" | "published" | "failed" | "skipped";
+  publishedAt?: string;
+  error?: string;
+};
+
+/**
+ * The public changelog shape: only published, customer-facing fields. Internal
+ * data (authors, status, counters beyond engagement) never leaves the API.
+ */
+export type PublicRelease = Pick<Release, "id" | "title" | "summary" | "body" | "category" | "tags" | "reactions" | "comments" | "cta" | "media" | "seo"> & {
+  slug: string;
+  publishedAt: string;
+  featured: boolean;
 };
 
 /**
@@ -144,6 +167,10 @@ export type FeedbackRequest = {
   priority?: "low" | "medium" | "high";
   internalNotes?: string;
   mergedIntoId?: string;
+  /** Whether the signed-in teammate has voted for this request. */
+  hasVoted?: boolean;
+  /** Customer contact details; only returned to roles that manage feedback. */
+  submitter?: { name?: string; email?: string };
 };
 
 export type FeedbackComment = {
@@ -177,6 +204,8 @@ export type RoadmapItem = {
   linkedFeedbackIds: string[];
   linkedReleaseId?: string;
   targetDate?: string;
+  priority?: "low" | "medium" | "high";
+  isPublic?: boolean;
 };
 
 export type TeamRole =
@@ -204,6 +233,24 @@ export type Integration = {
   status: "connected" | "available" | "disconnected";
   detail: string;
   lastSync: string | null;
+  /** Connected account label (e.g. GitHub username). */
+  account?: string;
+  lastError?: string;
+  /** False when this installation has no OAuth app credentials for the provider. */
+  configured?: boolean;
+  /** What the detail field should contain (repository, project or team key). */
+  targetHint?: string;
+  /** GitHub/GitLab: read every commit on the default branch, or only merged pull/merge requests. */
+  track?: "commits" | "pull_requests";
+};
+
+/** A repository, project or team a connected source can watch. */
+export type IntegrationTarget = {
+  value: string;
+  label: string;
+  description?: string;
+  private?: boolean;
+  updatedAt?: string;
 };
 
 export type MigrationSource = "headway" | "featurebase" | "csv" | "json" | "other";
@@ -234,7 +281,7 @@ export type Audience = {
   };
 };
 
-export type CampaignStatus = "draft" | "scheduled" | "sent";
+export type CampaignStatus = "draft" | "scheduled" | "sending" | "sent" | "failed" | "cancelled";
 
 export type Campaign = {
   id: string;
@@ -249,6 +296,8 @@ export type Campaign = {
   sentAt: string | null;
   body?: string;
   cta?: { label: string; url: string };
+  stats?: { recipients: number; delivered: number; failed: number };
+  lastError?: string;
 };
 
 export type ChangelogEntry = {
@@ -294,6 +343,7 @@ export type AnalyticsOverview = {
   topReleases: { id: string; title: string; views: number; engagement: number }[];
   releasePerformance: { id: string; title: string; score: number }[];
   audiencePerformance?: { audience: string; engagement: number; recipients: number }[];
+  emailsSent?: number;
 };
 
 export type ActivityEvent = {
@@ -313,6 +363,13 @@ export type BillingInfo = {
   features: string[];
   invoices: { id: string; date: string; amount: number; status: string }[];
   paymentMethod?: { brand: string; last4: string; expires: string } | null;
+  status?: "trialing" | "active" | "past_due" | "canceled" | "incomplete";
+  effectivePlan?: string;
+  trialEndsAt?: string | null;
+  currentPeriodEnd?: string | null;
+  usage?: { aiGenerations: { used: number; limit: number }; emails: { used: number; limit: number } };
+  /** False when Stripe isn't configured for this installation. */
+  billingConfigured?: boolean;
 };
 
 export type ApiKey = {
@@ -321,7 +378,12 @@ export type ApiKey = {
   prefix: string;
   createdAt: string;
   lastUsed?: string;
+  scopes?: string[];
+  expiresAt?: string;
 };
+
+/** Returned once, at creation. The secret is never retrievable again. */
+export type CreatedApiKey = ApiKey & { secret: string };
 
 export type Webhook = {
   id: string;
@@ -331,13 +393,18 @@ export type Webhook = {
   lastDelivery?: string;
 };
 
+/** Returned once, at creation. Use the secret to verify the ShipBrief-Signature header. */
+export type CreatedWebhook = Webhook & { secret: string };
+
 export type WebhookDelivery = {
   id: string;
   webhookId: string;
   event: string;
-  status: "success" | "failed";
+  status: "pending" | "success" | "failed";
   deliveredAt: string;
   responseCode: number;
+  attempts?: number;
+  error?: string;
 };
 
 export type WorkspaceBranding = {

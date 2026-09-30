@@ -71,7 +71,7 @@ export function FeedbackRequestDialog({
   return (
     <Dialog open={open} onOpenChange={changeOpen}>
       <DialogContent className="sm:max-w-lg">
-        <DialogHeader><DialogTitle>Create feature request</DialogTitle><DialogDescription>Capture a request on behalf of a customer or your team. It will remain local mock data until the API is connected.</DialogDescription></DialogHeader>
+        <DialogHeader><DialogTitle>Create feature request</DialogTitle><DialogDescription>Capture a request on behalf of a customer or your team. It&apos;s added to the feedback inbox with your vote.</DialogDescription></DialogHeader>
         <form onSubmit={handleSubmit(submit)} className="space-y-4">
           <div className="space-y-2"><Label htmlFor="request-title">Request title</Label><Input id="request-title" placeholder="What should ShipBrief help customers do?" aria-invalid={Boolean(errors.title)} {...register("title")} />{errors.title && <p className="text-xs text-destructive">{errors.title.message}</p>}</div>
           <div className="space-y-2"><Label htmlFor="request-description">Context</Label><Textarea id="request-description" rows={4} placeholder="Describe the customer need, its impact, and any useful detail..." aria-invalid={Boolean(errors.description)} {...register("description")} />{errors.description && <p className="text-xs text-destructive">{errors.description.message}</p>}</div>

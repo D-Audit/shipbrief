@@ -1,8 +1,8 @@
-import { Bot, Quote, Sparkles } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { ArrowRight, Loader2 } from "lucide-react";
+import { cn } from "@/lib/utils";
 import type { FeedbackCluster } from "@/types";
 
+/** A compact AI theme: what customers want, how many asked, and the roadmap next step. */
 export function FeedbackClusterCard({
   cluster,
   onCreateRoadmap,
@@ -15,17 +15,30 @@ export function FeedbackClusterCard({
   creating?: boolean;
 }) {
   return (
-    <article className="sb-panel flex h-full flex-col p-4">
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex min-w-0 items-center gap-2"><span className="flex size-7 items-center justify-center rounded-lg bg-primary/10 text-primary"><Sparkles className="size-3.5" /></span><h3 className="truncate text-sm font-semibold">{cluster.title}</h3></div>
-        <Badge variant={cluster.demand === "high" ? "default" : "secondary"} className="capitalize">{cluster.demand} demand</Badge>
+    <article className="py-3.5">
+      <div className="flex items-baseline justify-between gap-3">
+        <h3 className="truncate text-sm font-medium">{cluster.title}</h3>
+        <span className="sb-numeric shrink-0 text-xs text-muted-foreground">{cluster.votes} votes</span>
       </div>
-      <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{cluster.topNeed}</p>
-      <div className="mt-3 rounded-lg bg-muted/60 p-3 text-xs leading-relaxed text-muted-foreground"><div className="mb-1 flex items-center gap-1 font-medium text-foreground"><Quote className="size-3" />Representative signal</div>&ldquo;{cluster.representativeQuotes[0]}&rdquo;</div>
-      <div className="mt-3 flex items-center justify-between text-xs text-muted-foreground"><span>{cluster.votes} votes</span><span>{cluster.comments} comments</span><span className="inline-flex items-center gap-1"><Bot className="size-3.5" />AI grouped</span></div>
-      <Button type="button" variant={hasRoadmap ? "outline" : "secondary"} size="sm" className="mt-4 w-full" onClick={onCreateRoadmap} disabled={creating}>
-        {hasRoadmap ? "View roadmap link" : creating ? "Creating item..." : "Create roadmap item"}
-      </Button>
+      <p className="mt-0.5 truncate text-[13px] text-muted-foreground" title={`“${cluster.representativeQuotes[0]}”`}>
+        {cluster.topNeed}
+      </p>
+      <div className="mt-2 flex items-center justify-between gap-3 text-xs">
+        <span className="inline-flex items-center gap-1.5 text-muted-foreground">
+          <span aria-hidden="true" className={cn("size-1.5 rounded-full", cluster.demand === "high" ? "bg-primary-strong" : "bg-border-strong")} />
+          <span className="capitalize">{cluster.demand} demand</span>
+        </span>
+        <button
+          type="button"
+          onClick={onCreateRoadmap}
+          disabled={creating}
+          className="inline-flex items-center gap-1 font-medium text-muted-foreground transition-colors hover:text-foreground disabled:opacity-60"
+        >
+          {creating && <Loader2 className="size-3 animate-spin" />}
+          {hasRoadmap ? "On roadmap" : creating ? "Adding…" : "Add to roadmap"}
+          {!creating && <ArrowRight className="size-3" />}
+        </button>
+      </div>
     </article>
   );
 }

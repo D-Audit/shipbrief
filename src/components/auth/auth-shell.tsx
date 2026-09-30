@@ -1,57 +1,64 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { ArrowLeft } from "lucide-react";
 import { ShipBriefLogo } from "@/components/brand";
 import { cn } from "@/lib/utils";
-import { AuthGardenVisual } from "./auth-garden-visual";
 
 type AuthShellProps = {
+  /** Kept for call sites that label a step (e.g. "Password reset"); shown quietly above the title. */
   eyebrow?: string;
   title: string;
-  description: string;
+  description?: string;
   children: ReactNode;
+  /** Optional line under the form, e.g. "Don't have an account? Create one". */
+  footer?: ReactNode;
   wide?: boolean;
 };
 
-export function AuthShell({ eyebrow, title, description, children, wide = false }: AuthShellProps) {
+/**
+ * One calm, centred card for every account screen (onboarding uses the wide,
+ * card-less variant). Entrance motion is CSS
+ * only (`.sb-auth-step`), short, and disabled under reduced motion.
+ */
+export function AuthShell({ eyebrow, title, description, children, footer, wide = false }: AuthShellProps) {
   return (
-    <main className="min-h-svh bg-[#f8f8f9] px-4 py-4 sm:px-6 sm:py-6 lg:px-8">
-      <div className="mx-auto flex min-h-[calc(100svh-2rem)] max-w-[80rem] flex-col sm:min-h-[calc(100svh-3rem)]">
-        <header className="flex h-11 shrink-0 items-center justify-between gap-4" aria-label="Authentication navigation">
-          <Link href="/" aria-label="Return to ShipBrief home" className="rounded-lg focus-visible:outline-none">
-            <ShipBriefLogo iconSize={22} />
-          </Link>
-          <Link href="/" className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
-            <ArrowLeft className="size-3.5" />
-            Back to home
-          </Link>
-        </header>
+    <main className="flex min-h-svh flex-col bg-background">
+      <header className="flex h-16 shrink-0 items-center px-5 sm:px-8" aria-label="Account navigation">
+        <Link href="/" aria-label="ShipBrief home" className="sb-auth-step rounded-md">
+          <ShipBriefLogo iconSize={28} />
+        </Link>
+      </header>
 
-        <div
-          className={cn(
-            "my-4 grid flex-1 overflow-hidden border border-white/80 bg-card/85 shadow-[0_22px_62px_rgb(31_32_35/0.08)] sm:my-6 sm:rounded-[1.75rem]",
-            wide ? "mx-auto w-full max-w-3xl" : "lg:grid-cols-[minmax(23rem,0.94fr)_minmax(0,1.06fr)]"
-          )}
-        >
-          <section className={cn("flex min-w-0 flex-col px-6 py-10 sm:px-12 sm:py-14", !wide && "justify-center", wide && "sm:px-12")}>{/* Content stays intentionally narrow for readable forms. */}
-            <div className={cn("w-full", wide ? "mx-auto max-w-2xl" : "mx-auto max-w-md")}>
-              <div className={cn(!wide && "text-center")}>
-                {eyebrow && (
-                  <p className="mb-3 text-[11px] font-medium tracking-[0.14em] text-primary uppercase">{eyebrow}</p>
-                )}
-                <h1 className="text-[1.75rem] font-semibold leading-[1.14] tracking-[-0.045em] text-foreground sm:text-[2rem]">{title}</h1>
-                <p className="mt-3 max-w-xl text-sm leading-relaxed text-muted-foreground">{description}</p>
-              </div>
-              <div className="mt-8 text-left">{children}</div>
+      <div className="flex flex-1 items-start justify-center px-4 pt-6 pb-16 sm:items-center sm:px-5 sm:pt-0">
+        <div className={cn("w-full", wide ? "max-w-xl" : "max-w-[420px]")}>
+          <div className={cn(!wide && "rounded-2xl border border-border bg-surface px-6 py-8 sm:px-9 sm:py-10")}>
+            <div className={cn("sb-auth-step [animation-delay:60ms]", !wide && "text-center")}>
+              {eyebrow && <p className="mb-2 text-[13px] font-medium text-muted-foreground">{eyebrow}</p>}
+              <h1 className="font-display text-[1.75rem] leading-[1.15] font-medium tracking-tighter text-foreground">{title}</h1>
+              {description && <p className="mt-2 text-[15px] leading-relaxed text-muted-foreground">{description}</p>}
             </div>
-          </section>
-          {!wide && <AuthGardenVisual />}
+            <div className="sb-auth-step mt-8 [animation-delay:120ms]">{children}</div>
+          </div>
+          {footer && <div className="sb-auth-step mt-6 text-center text-sm text-muted-foreground [animation-delay:180ms]">{footer}</div>}
         </div>
-
-        <footer className="pb-1 text-center text-[11px] text-muted-foreground sm:text-left">
-          ShipBrief frontend preview · Identity, email delivery, and access control connect in the backend phase.
-        </footer>
       </div>
+
+      <footer className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1 px-5 pb-6 text-xs text-muted-foreground">
+        <span>© {new Date().getFullYear()} ShipBrief</span>
+        <a href="#terms" className="hover:text-foreground">Terms</a>
+        <a href="#privacy" className="hover:text-foreground">Privacy</a>
+      </footer>
     </main>
+  );
+}
+
+/** "Question? Link" line used in the AuthShell footer. */
+export function AuthSwitch({ prompt, href, label }: { prompt: string; href: string; label: string }) {
+  return (
+    <p>
+      {prompt}{" "}
+      <Link href={href} className="font-medium text-foreground underline-offset-4 hover:underline">
+        {label}
+      </Link>
+    </p>
   );
 }

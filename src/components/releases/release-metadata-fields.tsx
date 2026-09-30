@@ -12,7 +12,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { mockAudiences } from "@/lib/mock-data";
+import { useAsyncData } from "@/hooks/use-async-data";
+import { audienceService } from "@/lib/services";
 
 const CATEGORIES = ["Feature", "Improvement", "Fix", "Security"];
 
@@ -22,6 +23,8 @@ interface ReleaseMetadataFieldsProps {
 }
 
 export function ReleaseMetadataFields({ release, onChange }: ReleaseMetadataFieldsProps) {
+  const { state: audienceState } = useAsyncData(() => audienceService.list(), []);
+  const audiences = audienceState.status === "success" ? audienceState.data : [];
   const tags = release.tags;
   const tagInput = tags.join(", ");
 
@@ -88,18 +91,18 @@ export function ReleaseMetadataFields({ release, onChange }: ReleaseMetadataFiel
       <div className="space-y-2">
         <Label>Audience</Label>
         <Select
-          value={release.audienceId ?? "aud_all"}
+          value={release.audienceId ?? ""}
           onValueChange={(v) => v && onChange({ audienceId: v })}
         >
           <SelectTrigger>
             <SelectValue>
               {(value) =>
-                mockAudiences.find((audience) => audience.id === value)?.name ?? "All users"
+                audiences.find((audience) => audience.id === value)?.name ?? "All users"
               }
             </SelectValue>
           </SelectTrigger>
           <SelectContent>
-            {mockAudiences.map((aud) => (
+            {audiences.map((aud) => (
               <SelectItem key={aud.id} value={aud.id}>
                 {aud.name} ({aud.size.toLocaleString()} users)
               </SelectItem>

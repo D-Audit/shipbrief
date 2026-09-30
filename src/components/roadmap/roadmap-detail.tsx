@@ -133,7 +133,7 @@ export function RoadmapDetail({
 
           <section className="space-y-3 rounded-lg border border-border bg-surface-subtle/60 p-3" aria-labelledby="roadmap-feedback-heading">
             <div className="flex items-center gap-2">
-              <MessageSquareText className="size-4 text-primary" />
+              <MessageSquareText className="size-4 text-muted-foreground" />
               <h3 id="roadmap-feedback-heading" className="text-sm font-medium">Linked feedback</h3>
               <span className="text-xs text-muted-foreground">{linkedFeedback.length}</span>
             </div>
@@ -155,7 +155,7 @@ export function RoadmapDetail({
               <ul className="space-y-2">
                 {linkedFeedback.map((request) => (
                   <li key={request.id} className="flex items-center justify-between gap-3 rounded-md bg-background/70 px-2.5 py-2">
-                    <Link href={`/app/feedback/${request.id}`} onClick={() => onOpenChange(false)} className="min-w-0 truncate text-sm text-primary hover:underline">
+                    <Link href={`/app/feedback/${request.id}`} onClick={() => onOpenChange(false)} className="min-w-0 truncate text-sm text-primary-strong hover:underline">
                       {request.title} <span className="text-muted-foreground">· {request.votes} votes</span>
                     </Link>
                     <Button type="button" variant="ghost" size="icon-xs" onClick={() => removeFeedback(request.id)} aria-label={`Remove ${request.title} from this roadmap item`}>
@@ -190,7 +190,7 @@ export function RoadmapDetail({
             </div>
             {linkedRelease && (
               <div className="rounded-md bg-success-muted/30 px-3 py-2">
-                <Link href={`/app/releases/${linkedRelease.id}`} onClick={() => onOpenChange(false)} className="inline-flex items-center gap-1 text-sm text-primary hover:underline">
+                <Link href={`/app/releases/${linkedRelease.id}`} onClick={() => onOpenChange(false)} className="inline-flex items-center gap-1 text-sm text-primary-strong hover:underline">
                   <Link2 className="size-3.5" />{linkedRelease.title}
                 </Link>
                 <p className="mt-1 text-xs text-muted-foreground">The customer-facing announcement is linked to this work.</p>

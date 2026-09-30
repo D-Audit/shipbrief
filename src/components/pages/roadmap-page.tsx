@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { CalendarPlus, Plus, Sparkles } from "lucide-react";
+import { CalendarPlus, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { RoadmapBoard, RoadmapDetail } from "@/components/roadmap";
-import { EmptyState, ErrorState, LoadingState, MetricCard, PageHeader } from "@/components/shared/page-states";
+import { EmptyState, ErrorState, LoadingState, PageHeader } from "@/components/shared/page-states";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -27,7 +27,7 @@ export function RoadmapPage() {
       const updated = await roadmapService.update(id, input);
       setSelected(updated);
       await Promise.all([reload(), reloadFeedback()]);
-      toast.success("Roadmap item saved (mock).");
+      toast.success("Roadmap item saved.");
       return true;
     } catch {
       toast.error("We could not save this roadmap item.");
@@ -39,7 +39,7 @@ export function RoadmapPage() {
     try {
       await roadmapService.create(input);
       await Promise.all([reload(), reloadFeedback()]);
-      toast.success("Roadmap item created (mock).");
+      toast.success("Roadmap item created.");
     } catch {
       toast.error("We could not create a roadmap item.");
     }
@@ -47,9 +47,8 @@ export function RoadmapPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Roadmap" description="A human-owned view of demand, intent, and shipped customer value." actions={<Button type="button" onClick={() => setCreateOpen(true)}><Plus />New roadmap item</Button>} />
-      {state.status === "success" && <div className="grid gap-3 sm:grid-cols-3"><MetricCard label="Customer demand" value={state.data.reduce((total, item) => total + item.votes, 0)} suffix="linked votes" /><MetricCard label="In progress now" value={state.data.filter((item) => item.status === "now").length} suffix="items" /><MetricCard label="Shipped" value={state.data.filter((item) => item.status === "shipped").length} suffix="items" /></div>}
-      <section className="flex items-start gap-3 rounded-xl border border-primary/15 bg-primary/5 p-4"><span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary"><Sparkles className="size-4" /></span><div><h2 className="text-sm font-semibold">Evidence informs the roadmap</h2><p className="mt-1 text-sm leading-relaxed text-muted-foreground">Votes and AI clusters help surface demand. Product teams choose the column, timing, and final outcome.</p></div></section>
+      <PageHeader title="Roadmap" description="What you’re building now, next and later — backed by customer votes." actions={<Button type="button" onClick={() => setCreateOpen(true)}><Plus />New roadmap item</Button>} />
+      {state.status === "success" && <p className="text-sm text-muted-foreground"><span className="sb-numeric font-medium text-foreground">{state.data.reduce((total, item) => total + item.votes, 0)}</span> linked votes · <span className="sb-numeric font-medium text-foreground">{state.data.filter((item) => item.status === "now").length}</span> in progress · <span className="sb-numeric font-medium text-foreground">{state.data.filter((item) => item.status === "shipped").length}</span> shipped</p>}
       {state.status === "loading" && <LoadingState rows={4} />}
       {state.status === "error" && <ErrorState message={state.error} onRetry={reload} />}
       {state.status === "empty" && <EmptyState title="Your roadmap is ready for its first signal" description="Create an item manually or turn an AI feedback cluster into a roadmap decision." action={<Button type="button" onClick={() => setCreateOpen(true)}><Plus />New roadmap item</Button>} />}

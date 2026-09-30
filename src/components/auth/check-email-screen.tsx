@@ -57,7 +57,7 @@ export function CheckEmailScreen({
     try {
       const activeSession = await authService.confirmEmail(email);
       if (!activeSession) {
-        throw new Error("We could not find this active demo signup. Create an account again to continue.");
+        throw new Error("Sign in with this email to continue, or open the link in the verification email.");
       }
       router.push(destination);
     } catch (reason) {
@@ -69,13 +69,12 @@ export function CheckEmailScreen({
 
   return (
     <div className="space-y-5">
-      <div className="border border-border bg-surface-subtle/55 p-4">
-        <span className="flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary"><Mail className="size-4" /></span>
-        <p className="mt-4 text-sm font-medium">Check {maskEmail(email ?? "")}</p>
+      <div className="rounded-lg border border-border bg-surface-subtle p-4">
+        <p className="flex items-center gap-2 text-sm font-medium"><Mail className="size-4 text-muted-foreground" />Check {maskEmail(email ?? "")}</p>
         <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
           {verification
             ? "Open the verification message to confirm your address, then return here to start your workspace."
-            : "Open the reset message to continue with a new password, then return to ShipBrief."}
+            : "Open the reset link in that message to choose a new password. It works once and expires after an hour."}
         </p>
       </div>
 
@@ -87,19 +86,18 @@ export function CheckEmailScreen({
         {verification ? (
           <Button type="button" size="lg" className="h-10 w-full" disabled={!validEmail || confirming} onClick={() => void continueAfterVerification()}>
             {confirming ? <Loader2 className="animate-spin" /> : <CheckCircle2 />}
-            {confirming ? "Confirming..." : "I’ve verified my email"}
+            {confirming ? "Confirming…" : "I’ve verified my email"}
           </Button>
         ) : (
-          <Link href={`/reset-password?email=${encodeURIComponent(email ?? "")}`} className={cn(buttonVariants({ size: "lg" }), "h-10 w-full")}>Continue to reset password <ArrowRight /></Link>
+          <Link href="/login" className={cn(buttonVariants({ size: "lg" }), "h-10 w-full")}>Back to sign in <ArrowRight /></Link>
         )}
         <Button type="button" variant="outline" size="lg" className="h-10 w-full" disabled={!validEmail || resending} onClick={() => void resend()}>
           {resending ? <Loader2 className="animate-spin" /> : <RotateCw />}
-          {resending ? "Preparing another message..." : "Resend instructions"}
+          {resending ? "Sending…" : "Resend email"}
         </Button>
       </div>
 
-      <p className="text-center text-xs text-muted-foreground">No inbox to check in this preview? The next action is available locally so you can continue the flow.</p>
-      <p className="text-center text-sm text-muted-foreground"><Link href={verification ? "/signup" : "/login"} className="font-medium text-primary hover:underline">Use a different email</Link></p>
+      <p className="text-center text-sm text-muted-foreground"><Link href={verification ? "/signup" : "/login"} className="font-medium text-foreground underline-offset-4 hover:underline">Use a different email</Link></p>
     </div>
   );
 }

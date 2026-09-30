@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { AuthShell } from "@/components/auth/auth-shell";
+import { AuthShell, AuthSwitch } from "@/components/auth/auth-shell";
 import { SignUpForm } from "@/components/auth/sign-up-form";
 
 export const metadata: Metadata = {
@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 
 export default function SignupPage() {
   return (
-    <AuthShell eyebrow="ShipBrief" title="Create your ShipBrief account" description="Start with Google or your work email, then make your next release clearer for customers.">
+    <AuthShell title="Create your ShipBrief workspace" description="Free for 14 days. No card required." footer={<AuthSwitch prompt="Already have an account?" href="/login" label="Sign in" />}>
       <SignUpForm />
     </AuthShell>
   );

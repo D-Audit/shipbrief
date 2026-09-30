@@ -32,7 +32,7 @@ export function AudienceTargetingPanel() {
       await audienceService.create({ name: segmentName.trim(), rules });
       await reload();
       setSegmentName("");
-      toast.success("Audience segment saved (mock).");
+      toast.success("Audience segment saved.");
     } catch {
       toast.error("We could not save that audience segment.");
     } finally {
@@ -42,7 +42,7 @@ export function AudienceTargetingPanel() {
 
   return (
     <section className="sb-panel p-4 sm:p-5" aria-labelledby="audience-targeting-heading">
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between"><div><div className="flex items-center gap-2"><Users className="size-4 text-primary" /><h2 id="audience-targeting-heading" className="text-base font-semibold">Audience targeting</h2></div><p className="mt-1 text-sm text-muted-foreground">Preview who will receive a channel-specific communication before it is scheduled.</p></div>{previewState.status === "success" && <div className="rounded-lg border border-primary/15 bg-primary/5 px-3 py-2 text-right"><p className="text-lg font-semibold text-primary">{previewState.data.size.toLocaleString()}</p><p className="text-[11px] text-muted-foreground">estimated recipients</p></div>}</div>
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between"><div><div className="flex items-center gap-2"><Users className="size-4 text-muted-foreground" /><h2 id="audience-targeting-heading" className="sb-title-section">Audience targeting</h2></div><p className="mt-1 text-sm text-muted-foreground">Preview who will receive a channel-specific communication before it is scheduled.</p></div>{previewState.status === "success" && <div className="rounded-lg border border-border-strong bg-surface-subtle px-3 py-2 text-right"><p className="text-lg font-semibold text-primary-strong">{previewState.data.size.toLocaleString()}</p><p className="text-[11px] text-muted-foreground">estimated recipients</p></div>}</div>
       <div className="mt-5 grid gap-4 sm:grid-cols-3">
         <div className="space-y-2"><Label htmlFor="audience-plan">Plan</Label><Select value={plan} onValueChange={(value) => value && setPlan(value)}><SelectTrigger id="audience-plan" className="w-full"><SelectValue>{(value) => value === "all" ? "All users" : String(value).charAt(0).toUpperCase() + String(value).slice(1)}</SelectValue></SelectTrigger><SelectContent><SelectItem value="all">All users</SelectItem><SelectItem value="free">Free</SelectItem><SelectItem value="pro">Pro</SelectItem><SelectItem value="enterprise">Enterprise</SelectItem></SelectContent></Select></div>
         <div className="space-y-2"><Label htmlFor="audience-age">Account age</Label><Input id="audience-age" type="number" min="0" value={accountAge} onChange={(event) => setAccountAge(event.target.value)} placeholder="Any age" /><p className="text-xs text-muted-foreground">Days or more</p></div>

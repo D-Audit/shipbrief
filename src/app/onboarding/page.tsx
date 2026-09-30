@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 
 export default function OnboardingPage() {
   return (
-    <AuthShell wide eyebrow="Workspace setup" title="Start with the release loop your team needs." description="A few focused decisions give ShipBrief useful local context without getting in the way of the work.">
+    <AuthShell wide title="Set up your workspace" description="Three quick steps. You can change any of this later in settings.">
       <OnboardingFlow />
     </AuthShell>
   );
