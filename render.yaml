@@ -6,8 +6,9 @@ services:
     runtime: node
     plan: free
     rootDir: backend
-    # devDependencies (typescript) are needed to compile.
-    buildCommand: npm ci --include=dev && npm run build
+    # devDependencies (typescript) are needed to compile. `npm install`, not `npm ci`:
+    # the lock file is written by a newer npm than Render's and `ci` rejects it.
+    buildCommand: npm install --include=dev && npm run build
     startCommand: npm run db:migrate:prod && npm start
     healthCheckPath: /api/health
     envVars:
