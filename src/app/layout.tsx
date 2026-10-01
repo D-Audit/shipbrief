@@ -26,7 +26,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "ShipBrief — Turn shipped work into customer communication",
+    default: "ShipBrief: Turn shipped work into customer communication",
     template: "%s · ShipBrief",
   },
   description:

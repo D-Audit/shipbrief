@@ -102,7 +102,8 @@ async function send<T>(path: string, options: RequestOptions = {}): Promise<{ da
 
   if (!response.ok || !envelope || !envelope.success) {
     const error = envelope && !envelope.success ? envelope.error : undefined;
-    if (response.status === 401 && !allowUnauthenticated) redirectToLogin();
+    // Only a missing/expired session signs the user out; other 401s (e.g. a third-party connection) surface as errors.
+    if (response.status === 401 && !allowUnauthenticated && (!error || error.code === "UNAUTHENTICATED")) redirectToLogin();
     throw new ApiError(
       error?.message ?? (response.status >= 500 ? "Something went wrong on our side. Please try again." : "The request couldn't be completed."),
       error?.code ?? "HTTP_ERROR",

@@ -6,6 +6,7 @@ import { Copy, ExternalLink, Globe2, Heart, MessageSquare, Pin, PinOff, Search }
 import { toast } from "sonner";
 import { brandingService, changelogService, releaseService } from "@/lib/services";
 import { useAsyncData } from "@/hooks/use-async-data";
+import { useSession } from "@/components/session/session-provider";
 import { EmptyState, ErrorState, LoadingState, PageHeader, StatusBadge } from "@/components/shared/page-states";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -34,6 +35,7 @@ const sortOptions: { value: ChangelogSort; label: string }[] = [
 ];
 
 export function ChangelogManagerPage() {
+  const publicPath = `/c/${useSession().session.workspace?.slug ?? ""}`;
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("all");
   const [status, setStatus] = useState<"all" | ReleaseStatus>("all");
@@ -82,7 +84,7 @@ export function ChangelogManagerPage() {
       const customDomain = brandingState.status === "success" && brandingState.data.domainStatus === "connected"
         ? brandingState.data.domain.trim()
         : "";
-      const baseUrl = customDomain ? `https://${customDomain}` : `${window.location.origin}/c/acme`;
+      const baseUrl = customDomain ? `https://${customDomain}` : `${window.location.origin}${publicPath}`;
       await navigator.clipboard.writeText(`${baseUrl}/${slug}`);
       toast.success("Public link copied.");
     } catch {
@@ -95,7 +97,7 @@ export function ChangelogManagerPage() {
       <PageHeader
         title="Changelog"
         description="Manage the permanent, searchable history of customer-facing product updates."
-        actions={<Link href="/c/acme" target="_blank" className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-border px-2.5 text-sm font-medium transition-colors hover:bg-muted"><ExternalLink className="size-4" />Public preview</Link>}
+        actions={<Link href={publicPath} target="_blank" className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-border px-2.5 text-sm font-medium transition-colors hover:bg-muted"><ExternalLink className="size-4" />Public preview</Link>}
       />
 
       <section className="space-y-3" aria-label="Changelog filters">
@@ -129,7 +131,7 @@ export function ChangelogManagerPage() {
         {filterOptionsState.status === "error" && <p className="text-xs text-destructive" role="alert">Tags could not load. <button type="button" onClick={() => void reloadFilterOptions()} className="font-medium underline underline-offset-2">Try again</button></p>}
       </section>
 
-      {brandingState.status === "success" && <ChangelogSeoPreview branding={brandingState.data} />}
+      {brandingState.status === "success" && <ChangelogSeoPreview publicPath={publicPath} branding={brandingState.data} />}
       {(brandingState.status === "loading" || brandingState.status === "idle") && <ChangelogSeoPreviewSkeleton />}
       {brandingState.status === "error" && <section className="sb-panel flex flex-wrap items-center justify-between gap-3 p-4" aria-live="polite"><div><p className="font-medium">SEO and domain preview is unavailable</p><p className="mt-1 text-sm text-muted-foreground">Your changelog entries are still available while branding reloads.</p></div><Button type="button" variant="outline" size="sm" onClick={() => void reloadBranding()}>Retry preview</Button></section>}
 
@@ -162,7 +164,7 @@ export function ChangelogManagerPage() {
                 <Button type="button" variant="ghost" size="sm" disabled={updatingId === entry.id} onClick={() => void toggleFeatured(entry.id, entry.featured)}>
                   {entry.featured ? <PinOff /> : <Pin />}{entry.featured ? "Unfeature" : "Feature"}
                 </Button>
-                <Link href={`/c/acme/${entry.slug}`} target="_blank" className="inline-flex h-7 items-center rounded-md px-2.5 text-[0.8rem] font-medium text-muted-foreground transition-colors hover:text-foreground hover:bg-surface-subtle">Preview</Link>
+                <Link href={`${publicPath}/${entry.slug}`} target="_blank" className="inline-flex h-7 items-center rounded-md px-2.5 text-[0.8rem] font-medium text-muted-foreground transition-colors hover:text-foreground hover:bg-surface-subtle">Preview</Link>
               </div>
             </article>
           ))}
@@ -172,13 +174,13 @@ export function ChangelogManagerPage() {
   );
 }
 
-function ChangelogSeoPreview({ branding }: { branding: WorkspaceBranding }) {
+function ChangelogSeoPreview({ branding, publicPath }: { branding: WorkspaceBranding; publicPath: string }) {
   const domain = branding.domain.trim();
   const hasCustomDomain = domain.length > 0;
   const isConnected = hasCustomDomain && branding.domainStatus === "connected";
   const titleDomain = hasCustomDomain ? domain : "your workspace";
   const domainLabel = isConnected ? "Live public URL" : hasCustomDomain ? "Custom domain preview" : "Current public route";
-  const publicUrl = isConnected ? `https://${domain}` : hasCustomDomain ? `https://${domain}` : "/c/acme";
+  const publicUrl = isConnected ? `https://${domain}` : hasCustomDomain ? `https://${domain}` : publicPath;
 
   return (
     <section className="sb-panel overflow-hidden" aria-labelledby="changelog-seo-title">

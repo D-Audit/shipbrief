@@ -78,7 +78,7 @@ function Hero() {
             Every release, explained <span className="sb-accent-word">clearly</span> to your customers.
           </h1>
           <p className="mx-auto mt-6 max-w-xl text-base leading-snug tracking-tight text-muted-foreground md:text-lg">
-            ShipBrief turns what your team shipped into changelog posts, emails and in-app updates — reviewed by a person, then sent.
+            ShipBrief turns what your team shipped into changelog posts, emails and in-app updates, reviewed by a person, then sent.
           </p>
           <div id="hero-cta" className="mt-9 flex flex-wrap items-center justify-center gap-3">
             <ButtonLink href="/signup" variant="cta" size="pill">
@@ -146,7 +146,7 @@ function AISection() {
       <div className="mx-auto grid max-w-[76rem] gap-14 px-4 py-24 sm:px-6 sm:py-28 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:gap-16 lg:px-8">
         <div className="lg:sticky lg:top-28 lg:self-start">
           <SectionIntro id="ai-heading" eyebrow="AI Studio" title="AI writes the first draft. Your team has the last word.">
-            Rewrite, shorten, simplify or turn a release into an email — right inside the editor, as suggestions you accept or ignore.
+            Rewrite, shorten, simplify or turn a release into an email, right inside the editor, as suggestions you accept or ignore.
           </SectionIntro>
           <Reveal delay={0.1}>
             <ul className="mt-10 space-y-5">
@@ -175,7 +175,7 @@ function Channels() {
     <section id="channels" aria-labelledby="channels-heading" className="scroll-mt-20 border-t border-border">
       <div className="mx-auto max-w-[76rem] px-4 py-24 sm:px-6 sm:py-28 lg:px-8">
         <SectionIntro center id="channels-heading" eyebrow="Channels" title="One release, shaped for every place it’s read.">
-          Choose changelog, email, in-app — or all three. ShipBrief keeps one source version and adapts it to each channel.
+          Choose changelog, email, in-app, or all three. ShipBrief keeps one source version and adapts it to each channel.
         </SectionIntro>
         <Reveal delay={0.1} className="mt-14">
           <ChannelShowcase />

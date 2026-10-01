@@ -11,13 +11,13 @@ const useMounted = () => useSyncExternalStore(() => () => undefined, () => true,
 /**
  * Light/dark switch for the marketing header: a small pill showing both a sun
  * and a moon, with a knob that slides under the active mode. Before mount the
- * knob sits on "light" (the server-rendered default) so nothing shifts during
+ * knob sits on "dark" (the server-rendered default) so nothing shifts during
  * hydration.
  */
 export function ThemeToggle({ className }: { className?: string }) {
   const { resolvedTheme, setTheme } = useTheme();
   const mounted = useMounted();
-  const dark = mounted && resolvedTheme === "dark";
+  const dark = !mounted || resolvedTheme === "dark";
 
   return (
     <button

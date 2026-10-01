@@ -1,0 +1,44 @@
+# Render Blueprint for the ShipBrief API (backend/).
+# The web app deploys to Vercel; Postgres lives on Neon.
+services:
+  - type: web
+    name: shipbrief-api
+    runtime: node
+    plan: free
+    rootDir: backend
+    # devDependencies (typescript) are needed to compile.
+    buildCommand: npm ci --include=dev && npm run build
+    startCommand: npm run db:migrate:prod && npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: "22"
+      # Render has no free background workers, so the API runs the job worker too.
+      - key: WORKER_MODE
+        value: embedded
+      # Vercel rewrite + Render's proxy.
+      - key: TRUST_PROXY
+        value: "2"
+      - key: ENCRYPTION_KEY
+        generateValue: true
+      # sync: false = Render asks for the value in the dashboard; it is never stored in git.
+      - key: DATABASE_URL
+        sync: false
+      - key: APP_URL
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: EMAIL_FROM
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: GITHUB_CLIENT_ID
+        sync: false
+      - key: GITHUB_CLIENT_SECRET
+        sync: false

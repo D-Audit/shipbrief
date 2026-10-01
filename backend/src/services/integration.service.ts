@@ -160,7 +160,8 @@ async function accessTokenFor(row: IntegrationRow) {
   if (!row.accessTokenEnc) throw badRequest("INTEGRATION_NOT_CONNECTED", "Connect this integration before syncing.");
   const source = sourceProviders[row.provider];
   if (row.tokenExpiresAt && row.tokenExpiresAt.getTime() < Date.now() + 60_000) {
-    if (!row.refreshTokenEnc || !source.refresh) throw new AppError(401, "INTEGRATION_EXPIRED", `The ${source.name} connection expired. Reconnect it.`);
+    // Not a 401: that status means the ShipBrief session is gone, and the app signs the user out on it.
+    if (!row.refreshTokenEnc || !source.refresh) throw badRequest("INTEGRATION_EXPIRED", `The ${source.name} connection expired. Reconnect it.`);
     const tokens = await source.refresh(decryptSecret(row.refreshTokenEnc));
     await db
       .update(integrations)

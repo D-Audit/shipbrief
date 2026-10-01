@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { PublicFeedbackDialog } from "./public-feedback-dialog";
 import { ShipBriefLogo } from "@/components/brand";
+import { ThemeToggle } from "@/components/theme/theme-toggle";
 import type { WorkspaceBranding } from "@/types";
 
 function workspaceName(workspace: string) {
@@ -33,6 +34,7 @@ export function PublicHeader({
         <div className="flex shrink-0 items-center gap-2">
           <PublicFeedbackDialog workspace={workspace} />
           <span className="hidden text-sm font-medium sm:inline" style={{ color: branding.accentColor }}>What&apos;s New</span>
+          <ThemeToggle />
         </div>
       </div>
     </header>

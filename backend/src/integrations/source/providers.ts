@@ -50,6 +50,14 @@ const github: SourceProvider = {
       }),
     );
   },
+  // GitHub Apps with expiring user tokens issue an 8-hour access token plus a refresh token.
+  async refresh(refreshToken) {
+    return toTokenSet(
+      await providerFetch<OAuthTokenResponse>("https://github.com/login/oauth/access_token", {
+        ...formBody({ client_id: config.GITHUB_CLIENT_ID ?? "", client_secret: config.GITHUB_CLIENT_SECRET ?? "", refresh_token: refreshToken, grant_type: "refresh_token" }),
+      }),
+    );
+  },
   async describeAccount(accessToken) {
     const user = await providerFetch<{ login: string }>("https://api.github.com/user", { token: accessToken });
     return { label: user.login };

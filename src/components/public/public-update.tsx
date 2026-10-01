@@ -6,7 +6,6 @@ import { format } from "date-fns";
 import { brandingService, changelogService, publicEngagementService } from "@/lib/services";
 import { ErrorState, LoadingState } from "@/components/shared/page-states";
 import { useAsyncData } from "@/hooks/use-async-data";
-import { cn } from "@/lib/utils";
 import { RichTextPreview } from "@/components/releases/rich-text-editor";
 import { PublicHeader } from "./public-header";
 import { PublicEngagement } from "./public-engagement";
@@ -33,7 +32,7 @@ export function PublicUpdatePage({ workspace, slug }: { workspace: string; slug:
   const { release, branding } = state.data;
 
   return (
-    <div className={cn("min-h-full bg-background", branding.publicTheme === "dark" && "dark")}>
+    <div className="min-h-full bg-background">
       <PublicHeader workspace={workspace} branding={branding} />
       <article className="mx-auto max-w-2xl px-4 py-8 sm:px-6">
         <div className="text-sm text-muted-foreground">

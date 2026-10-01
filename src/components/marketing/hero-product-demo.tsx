@@ -362,7 +362,7 @@ function useTyped(text: string, animate: boolean, delay = 0, speed = 22) {
 }
 
 function DraftScene({ animate }: { animate: boolean }) {
-  const summary = useTyped("See who changed what in your workspace, and when — without asking engineering.", animate, 500);
+  const summary = useTyped("See who changed what in your workspace, and when, without asking engineering.", animate, 500);
   const bullet1 = useTyped("Every role change, export and setting update in one timeline", animate, 2300);
   const bullet2 = useTyped("Filter by teammate or date, then export for your auditors", animate, 3200);
   return (
@@ -447,7 +447,7 @@ function ReviewScene({ animate }: { animate: boolean }) {
         <div className="rounded-lg border border-border bg-card p-5">
           <p className="text-[16px] font-semibold">See who changed what, and when.</p>
           <p className="mt-2 text-[13px] leading-relaxed text-muted-foreground">
-            Audit Log gives admins a complete timeline of role changes, exports and settings updates —{" "}
+            Audit Log gives admins a complete timeline of role changes, exports and settings updates,{" "}
             <span className="rounded-sm bg-accent px-0.5 text-foreground">ready for your next compliance review.</span>
           </p>
           <div className="mt-4 h-2 w-3/4 rounded-full bg-muted" />
@@ -547,7 +547,7 @@ function PublishScene({ animate }: { animate: boolean }) {
         </>}
       </div>
       {!published && (
-        <p className="mt-6 text-center text-[12px] text-muted-foreground">Each channel gets its own version — same release, shaped for where it’s read.</p>
+        <p className="mt-6 text-center text-[12px] text-muted-foreground">Each channel gets its own version: same release, shaped for where it’s read.</p>
       )}
     </div>
   );

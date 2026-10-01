@@ -18,7 +18,7 @@ const proposals: { id: string; label: string; tokens: Token[] }[] = [
       { text: "any report, however large", kind: "add" },
       { text: " async CSV job queue", kind: "remove" },
       { text: ". " },
-      { text: "We’ll email you a download link the moment it’s ready — no more 10,000-row limit.", kind: "add" },
+      { text: "We’ll email you a download link the moment it’s ready, with no more 10,000-row limit.", kind: "add" },
     ],
   },
   {

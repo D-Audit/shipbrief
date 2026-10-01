@@ -170,7 +170,7 @@ export const workspaces = pgTable(
     accentColor: text().notNull().default("#C85069"),
     customDomain: text(),
     domainStatus: text().$type<"connected" | "pending" | "none">().notNull().default("none"),
-    publicTheme: text().$type<"light" | "dark" | "system">().notNull().default("light"),
+    publicTheme: text().$type<"light" | "dark" | "system">().notNull().default("dark"),
     widgetTheme: text().$type<"inherit" | "light" | "dark">().notNull().default("inherit"),
     widgetLauncherMode: text().$type<"default" | "manual">().notNull().default("default"),
     widgetPlacement: text().$type<"bottom-right" | "bottom-left">().notNull().default("bottom-right"),

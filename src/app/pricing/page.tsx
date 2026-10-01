@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 const faqs = [
   ["What counts as a published release?", "A release that has been approved and sent to at least one channel. Drafts, reviews and scheduled releases don’t count toward the limit."],
-  ["Can I choose which channels each release uses?", "Yes. Every release has its own channel selection — changelog, email, in-app, or any combination."],
+  ["Can I choose which channels each release uses?", "Yes. Every release has its own channel selection: changelog, email, in-app, or any combination."],
   ["Does AI publish anything on its own?", "No. AI proposes drafts and edits. A person on your team reviews and approves every release before it goes out."],
   ["Can I change plans later?", "Anytime. Upgrades take effect immediately and downgrades apply at the end of the billing period."],
 ];

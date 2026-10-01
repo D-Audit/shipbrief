@@ -15,7 +15,7 @@ type PricingSectionProps = {
 export function PricingSection({
   eyebrow = "Pricing",
   title = "Simple pricing for every release loop.",
-  description = "Priced per workspace. Every plan includes the full workflow — pick the one that fits how often you ship.",
+  description = "Priced per workspace. Every plan includes the full workflow. Pick the one that fits how often you ship.",
   headingLevel = "h2",
 }: PricingSectionProps) {
   const [billingInterval, setBillingInterval] = useState<"monthly" | "yearly">("monthly");

@@ -4,7 +4,6 @@ import { useCallback, useEffect } from "react";
 import { brandingService, changelogService, publicEngagementService } from "@/lib/services";
 import { EmptyState, ErrorState, LoadingState } from "@/components/shared/page-states";
 import { useAsyncData } from "@/hooks/use-async-data";
-import { cn } from "@/lib/utils";
 import { PublicHeader } from "./public-header";
 import { UpdateCard } from "./update-card";
 
@@ -32,7 +31,7 @@ export function PublicChangelogPage({ workspace }: { workspace: string }) {
   const featured = releases.find((release) => release.featured);
 
   return (
-    <div className={cn("min-h-full bg-background", branding.publicTheme === "dark" && "dark")}>
+    <div className="min-h-full bg-background">
       <PublicHeader workspace={workspace} branding={branding} />
       <main className="mx-auto max-w-2xl px-4 py-10 sm:px-6 sm:py-14">
         {featured && <div className="mb-8"><UpdateCard workspace={workspace} release={featured} featured /></div>}
