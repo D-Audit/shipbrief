@@ -97,7 +97,8 @@ const schema = z
       if (value.EMAIL_PROVIDER === "log") {
         ctx.addIssue({ code: "custom", path: ["EMAIL_PROVIDER"], message: "The log email provider cannot run in production" });
       }
-      if (placeholderSenderDomain(value.EMAIL_FROM)) {
+      // Without a Resend key email is simply off, so the sender address is never used.
+      if (value.RESEND_API_KEY && placeholderSenderDomain(value.EMAIL_FROM)) {
         ctx.addIssue({ code: "custom", path: ["EMAIL_FROM"], message: "Set EMAIL_FROM to an address on a domain verified with your email provider" });
       }
       if (value.WEBHOOK_ALLOW_PRIVATE_TARGETS) {

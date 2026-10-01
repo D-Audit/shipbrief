@@ -29,10 +29,9 @@ services:
         sync: false
       - key: APP_URL
         sync: false
-      - key: RESEND_API_KEY
-        sync: false
-      - key: EMAIL_FROM
-        sync: false
+      # No email provider is configured, so sign-ups can't be asked to confirm their address.
+      - key: REQUIRE_EMAIL_VERIFICATION
+        value: "false"
       - key: ANTHROPIC_API_KEY
         sync: false
       - key: GOOGLE_CLIENT_ID

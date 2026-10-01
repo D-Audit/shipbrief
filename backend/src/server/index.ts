@@ -16,11 +16,14 @@ const server = app.listen(config.PORT, (error?: Error) => {
   logger.info({ port: config.PORT, ai: config.aiProvider, email: config.emailProvider, worker: config.WORKER_MODE }, "ShipBrief API listening");
 });
 
-if (config.emailProvider === "resend" && placeholderSenderDomain(config.EMAIL_FROM)) {
+if (config.RESEND_API_KEY && placeholderSenderDomain(config.EMAIL_FROM)) {
   logger.warn(
     { emailFrom: config.EMAIL_FROM },
     "EMAIL_FROM uses a placeholder domain, so Resend will reject every email. Set it to an address on a domain verified at resend.com/domains (or ShipBrief <onboarding@resend.dev> for testing).",
   );
+}
+if (config.emailProvider === "resend" && !config.RESEND_API_KEY) {
+  logger.warn("Email delivery is not configured: verification, reset and release emails will be recorded as failed.");
 }
 
 // In development the worker runs inside the API process; in production run `npm run start:worker` separately.
