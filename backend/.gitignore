@@ -3,5 +3,5 @@ dist
 .env
 .env.*
 !.env.example
-storage/
-storage-test/
+/storage/
+/storage-test/
