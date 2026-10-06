@@ -70,6 +70,10 @@ web app URL (e.g. `http://localhost:3000` locally, `https://app.yourdomain.com` 
    (Domains → Add domain, then add the DNS records it shows).
 2. Create an API key (API Keys → Create) and set `RESEND_API_KEY`.
 3. Set `EMAIL_FROM` to an address on that domain, e.g. `ShipBrief <no-reply@yourdomain.com>`.
+   A free mailbox (gmail.com, outlook.com, …) can't be verified, so Resend rejects it. Until the
+   domain is verified, `ShipBrief <onboarding@resend.dev>` works, but only to your Resend account's email.
+4. Set `EMAIL_PROVIDER=resend` (needed when Gmail or SMTP settings are also present, e.g. on Render).
+5. Restart the API and run `npm run email:test -- you@yourdomain.com`.
 
 Emails sent: email verification, welcome (after verification or first social sign-in), password
 reset, password-changed security alert, team invitations, workspace notifications, and release

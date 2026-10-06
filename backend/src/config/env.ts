@@ -27,6 +27,16 @@ export function placeholderSenderDomain(emailFrom: string) {
   return !domain || /(^|\.)(local|localhost|test|example|invalid)$/.test(domain) || /(^|\.)example\.(com|org|net)$/.test(domain);
 }
 
+/**
+ * True when the sender is a free mailbox (gmail.com, outlook.com, …). Nobody can
+ * verify those domains, so Resend rejects every email sent from them (403).
+ */
+export function publicMailboxSender(emailFrom: string) {
+  const address = emailFrom.match(/<([^>]+)>/)?.[1] ?? emailFrom;
+  const domain = address.split("@")[1]?.trim().toLowerCase() ?? "";
+  return /^(gmail|googlemail|outlook|hotmail|live|msn|icloud|me|mac|aol|proton|protonmail|pm|gmx|yandex|mail|zoho)\.[a-z.]+$/.test(domain) || /^yahoo\.[a-z.]+$/.test(domain);
+}
+
 type GmailEnv = { GMAIL_CLIENT_ID?: string; GMAIL_CLIENT_SECRET?: string; GMAIL_REFRESH_TOKEN?: string; GMAIL_SENDER?: string };
 const gmailConfigured = (env: GmailEnv) =>
   Boolean(env.GMAIL_CLIENT_ID && env.GMAIL_CLIENT_SECRET && env.GMAIL_REFRESH_TOKEN && env.GMAIL_SENDER);
@@ -133,6 +143,13 @@ const schema = z
       // Gmail and SMTP fall back to the account's own address, so a placeholder is fine there.
       if (value.RESEND_API_KEY && !value.SMTP_USER && !gmailConfigured(value) && placeholderSenderDomain(value.EMAIL_FROM)) {
         ctx.addIssue({ code: "custom", path: ["EMAIL_FROM"], message: "Set EMAIL_FROM to an address on a domain verified with your email provider" });
+      }
+      if (value.EMAIL_PROVIDER === "resend" && !value.RESEND_API_KEY) {
+        ctx.addIssue({ code: "custom", path: ["RESEND_API_KEY"], message: "Resend sending needs RESEND_API_KEY (resend.com → API Keys)" });
+      }
+      const usesResend = value.EMAIL_PROVIDER ? value.EMAIL_PROVIDER === "resend" : !gmailConfigured(value) && !(value.SMTP_USER && value.SMTP_PASSWORD);
+      if (usesResend && value.RESEND_API_KEY && publicMailboxSender(value.EMAIL_FROM)) {
+        ctx.addIssue({ code: "custom", path: ["EMAIL_FROM"], message: "Resend can't send from a free mailbox like gmail.com. Use an address on a domain verified at resend.com/domains" });
       }
       if (value.WEBHOOK_ALLOW_PRIVATE_TARGETS) {
         ctx.addIssue({ code: "custom", path: ["WEBHOOK_ALLOW_PRIVATE_TARGETS"], message: "Private webhook targets are not allowed in production" });

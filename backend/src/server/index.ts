@@ -1,5 +1,5 @@
 import { createApp } from "../app/create-app.js";
-import { config, placeholderSenderDomain } from "../config/env.js";
+import { config, placeholderSenderDomain, publicMailboxSender } from "../config/env.js";
 import { logger } from "../config/logger.js";
 import { pool } from "../database/client.js";
 import { startWorker } from "../workers/runner.js";
@@ -16,10 +16,16 @@ const server = app.listen(config.PORT, (error?: Error) => {
   logger.info({ port: config.PORT, ai: config.aiProvider, email: config.emailProvider, worker: config.WORKER_MODE }, "ShipBrief API listening");
 });
 
-if (config.RESEND_API_KEY && placeholderSenderDomain(config.EMAIL_FROM)) {
+if (config.emailProvider === "resend" && config.RESEND_API_KEY && placeholderSenderDomain(config.EMAIL_FROM)) {
   logger.warn(
     { emailFrom: config.EMAIL_FROM },
     "EMAIL_FROM uses a placeholder domain, so Resend will reject every email. Set it to an address on a domain verified at resend.com/domains (or ShipBrief <onboarding@resend.dev> for testing).",
+  );
+}
+if (config.emailProvider === "resend" && config.RESEND_API_KEY && publicMailboxSender(config.EMAIL_FROM)) {
+  logger.warn(
+    { emailFrom: config.EMAIL_FROM },
+    "EMAIL_FROM is a free mailbox (e.g. gmail.com), which Resend can't send from: every email will fail. Use an address on a domain verified at resend.com/domains (or ShipBrief <onboarding@resend.dev> for testing).",
   );
 }
 if (config.emailProvider === "resend" && !config.RESEND_API_KEY) {
