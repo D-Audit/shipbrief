@@ -1,4 +1,5 @@
-import { config } from "../../config/env.js";
+import nodemailer from "nodemailer";
+import { config, placeholderSenderDomain } from "../../config/env.js";
 import { logger } from "../../config/logger.js";
 
 export type EmailMessage = {
@@ -35,9 +36,9 @@ export interface EmailProvider {
   send(message: EmailMessage): Promise<EmailSendResult>;
 }
 
-function fromHeader(fromName?: string) {
-  if (!fromName) return config.EMAIL_FROM;
-  const address = config.EMAIL_FROM.match(/<([^>]+)>/)?.[1] ?? config.EMAIL_FROM;
+function fromHeader(fromName?: string, emailFrom = config.EMAIL_FROM) {
+  if (!fromName) return emailFrom;
+  const address = emailFrom.match(/<([^>]+)>/)?.[1] ?? emailFrom;
   return `${fromName.replace(/[<>"\r\n]/g, "").slice(0, 80)} <${address}>`;
 }
 
@@ -80,6 +81,131 @@ class ResendProvider implements EmailProvider {
 }
 
 /**
+ * Gmail API sending: the message is built as raw MIME and posted over HTTPS,
+ * so it works on hosts that block SMTP ports (e.g. Render's free plan). A
+ * long-lived refresh token is exchanged for short access tokens as needed.
+ */
+class GmailApiProvider implements EmailProvider {
+  readonly name = "gmail";
+  private readonly composer = nodemailer.createTransport({ streamTransport: true, buffer: true });
+  private readonly emailFrom: string;
+  private accessToken: { value: string; expiresAt: number } | null = null;
+
+  constructor(
+    private readonly clientId: string,
+    private readonly clientSecret: string,
+    private readonly refreshToken: string,
+    sender: string,
+  ) {
+    this.emailFrom = placeholderSenderDomain(config.EMAIL_FROM) ? `ShipBrief <${sender}>` : config.EMAIL_FROM;
+  }
+
+  private async token(): Promise<string> {
+    if (this.accessToken && this.accessToken.expiresAt > Date.now() + 60_000) return this.accessToken.value;
+    let response: Response;
+    try {
+      response = await fetch("https://oauth2.googleapis.com/token", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({
+          client_id: this.clientId,
+          client_secret: this.clientSecret,
+          refresh_token: this.refreshToken,
+          grant_type: "refresh_token",
+        }),
+        signal: AbortSignal.timeout(15_000),
+      });
+    } catch (error) {
+      throw new EmailSendError(`Google sign-in unreachable: ${(error as Error).message}`, true);
+    }
+    const body = (await response.json().catch(() => ({}))) as { access_token?: string; expires_in?: number; error?: string };
+    if (!response.ok || !body.access_token) {
+      // invalid_grant / invalid_client: the refresh token was revoked or expired, or the client is wrong. Needs a new token.
+      throw new EmailSendError(`Google refused the Gmail credentials (${response.status} ${body.error ?? ""})`.trim(), response.status >= 500);
+    }
+    this.accessToken = { value: body.access_token, expiresAt: Date.now() + (body.expires_in ?? 3600) * 1000 };
+    return body.access_token;
+  }
+
+  async send(message: EmailMessage): Promise<EmailSendResult> {
+    const built = await this.composer.sendMail({
+      from: fromHeader(message.fromName, this.emailFrom),
+      to: message.to,
+      subject: message.subject,
+      html: message.html,
+      text: message.text,
+      replyTo: message.replyTo ?? undefined,
+      headers: message.headers,
+    });
+    const raw = (built.message as Buffer).toString("base64url");
+
+    let response: Response;
+    try {
+      response = await fetch("https://gmail.googleapis.com/gmail/v1/users/me/messages/send", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${await this.token()}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ raw }),
+        signal: AbortSignal.timeout(15_000),
+      });
+    } catch (error) {
+      throw new EmailSendError(`Gmail unreachable: ${(error as Error).message}`, true);
+    }
+    if (response.status === 401) this.accessToken = null;
+    if (!response.ok) {
+      const detail = (await response.text().catch(() => "")).slice(0, 300);
+      // 401 (stale token, refreshed on retry), 429 (daily/rate limit) and 5xx are transient.
+      throw new EmailSendError(`Gmail rejected the message (${response.status}): ${detail}`, response.status === 401 || response.status === 429 || response.status >= 500);
+    }
+    const body = (await response.json().catch(() => ({}))) as { id?: string };
+    return { status: "sent", provider: this.name, providerMessageId: body.id };
+  }
+}
+
+/**
+ * SMTP sending, built for a Gmail account with an App Password. Gmail always
+ * sends as the signed-in account, so a placeholder EMAIL_FROM falls back to
+ * "ShipBrief <SMTP_USER>".
+ */
+class SmtpProvider implements EmailProvider {
+  readonly name = "smtp";
+  private readonly transport;
+  private readonly emailFrom: string;
+
+  constructor(user: string, password: string) {
+    this.transport = nodemailer.createTransport({
+      host: config.SMTP_HOST,
+      port: config.SMTP_PORT,
+      secure: config.SMTP_PORT === 465,
+      auth: { user, pass: password.replace(/\s+/g, "") },
+      connectionTimeout: 15_000,
+      greetingTimeout: 15_000,
+      socketTimeout: 20_000,
+    });
+    this.emailFrom = placeholderSenderDomain(config.EMAIL_FROM) ? `ShipBrief <${user}>` : config.EMAIL_FROM;
+  }
+
+  async send(message: EmailMessage): Promise<EmailSendResult> {
+    try {
+      const info = await this.transport.sendMail({
+        from: fromHeader(message.fromName, this.emailFrom),
+        to: message.to,
+        subject: message.subject,
+        html: message.html,
+        text: message.text,
+        replyTo: message.replyTo ?? undefined,
+        headers: message.headers,
+      });
+      return { status: "sent", provider: this.name, providerMessageId: info.messageId };
+    } catch (error) {
+      const err = error as Error & { code?: string; responseCode?: number };
+      // Bad credentials or a rejected address won't fix themselves; network errors and 4xx SMTP replies are transient.
+      const permanent = err.code === "EAUTH" || (err.responseCode !== undefined && err.responseCode >= 500);
+      throw new EmailSendError(`SMTP send failed: ${err.message}`, !permanent);
+    }
+  }
+}
+
+/**
  * Development provider: writes the message to the log (so verification and
  * reset links can be clicked locally) and reports `logged`, never `sent`.
  * Refused in production by env validation.
@@ -99,12 +225,16 @@ class LogProvider implements EmailProvider {
 class UnconfiguredProvider implements EmailProvider {
   readonly name = "unconfigured";
   async send(): Promise<EmailSendResult> {
-    throw new EmailSendError("Email delivery is not configured (set RESEND_API_KEY).", false);
+    throw new EmailSendError("Email delivery is not configured (set the GMAIL_* settings, SMTP_USER and SMTP_PASSWORD, or RESEND_API_KEY).", false);
   }
 }
 
 function createProvider(): EmailProvider {
   if (config.emailProvider === "log") return new LogProvider();
+  if (config.emailProvider === "gmail" && config.GMAIL_CLIENT_ID && config.GMAIL_CLIENT_SECRET && config.GMAIL_REFRESH_TOKEN && config.GMAIL_SENDER) {
+    return new GmailApiProvider(config.GMAIL_CLIENT_ID, config.GMAIL_CLIENT_SECRET, config.GMAIL_REFRESH_TOKEN, config.GMAIL_SENDER);
+  }
+  if (config.emailProvider === "smtp" && config.SMTP_USER && config.SMTP_PASSWORD) return new SmtpProvider(config.SMTP_USER, config.SMTP_PASSWORD);
   return config.RESEND_API_KEY ? new ResendProvider(config.RESEND_API_KEY) : new UnconfiguredProvider();
 }
 

@@ -194,6 +194,28 @@ export function notificationTemplate(input: { workspaceName: string; message: st
 // Customer-facing release email (workspace-branded)
 // ---------------------------------------------------------------------------
 
+/** Double opt-in for the public changelog's "Subscribe to updates" form. Sent in the customer's name and colours. */
+export function subscribeConfirmTemplate(input: { workspaceName: string; url: string; accent: string }): Rendered {
+  const header = `<tr><td style="padding:28px 32px 0;font-family:${FONT};font-size:15px;font-weight:700;letter-spacing:-0.2px;color:${INK}">${escapeHtml(input.workspaceName)}</td></tr>`;
+  return {
+    subject: `Confirm your subscription to ${input.workspaceName} updates`,
+    html: layout({
+      preheader: `One click to get product updates from ${input.workspaceName}.`,
+      accent: input.accent,
+      header,
+      bodyHtml:
+        heading("Confirm your subscription") +
+        paragraph(`Someone, hopefully you, asked to get product updates from ${escapeHtml(input.workspaceName)} at this address.`) +
+        button("Yes, subscribe me", input.url, input.accent) +
+        fallbackLink(input.url) +
+        divider() +
+        paragraph("If you didn't ask for this, ignore this email and you won't be subscribed. The link expires in 7 days.", true),
+      footerHtml: `Sent on behalf of ${escapeHtml(input.workspaceName)} by ShipBrief.`,
+    }),
+    text: `Confirm your subscription to product updates from ${input.workspaceName}:\n${input.url}\n\nIf you didn't ask for this, ignore this email and you won't be subscribed. The link expires in 7 days.`,
+  };
+}
+
 export function releaseEmailTemplate(input: {
   workspaceName: string;
   subject: string;
@@ -203,8 +225,13 @@ export function releaseEmailTemplate(input: {
   accent: string;
   unsubscribeUrl: string;
   changelogUrl: string;
+  /** This update's own changelog page, when it was published there. */
+  releaseUrl?: string | null;
 }): Rendered {
   const cta = input.cta?.label && input.cta.url ? button(input.cta.label, input.cta.url, input.accent) : "";
+  const readMore = input.releaseUrl
+    ? `<p style="margin:24px 0 0;font-size:14px"><a href="${escapeHtml(input.releaseUrl)}" style="color:${INK};font-weight:600">Read this update on the changelog &rarr;</a></p>`
+    : "";
   const header = `<tr><td style="padding:28px 32px 0;font-family:${FONT};font-size:15px;font-weight:700;letter-spacing:-0.2px;color:${INK}">${escapeHtml(input.workspaceName)}</td></tr>`;
   return {
     subject: input.subject,
@@ -212,9 +239,9 @@ export function releaseEmailTemplate(input: {
       preheader: input.previewText,
       accent: input.accent,
       header,
-      bodyHtml: `${input.bodyHtml}${cta}<p style="margin:24px 0 0;font-size:13px"><a href="${escapeHtml(input.changelogUrl)}" style="color:${MUTED}">See all updates from ${escapeHtml(input.workspaceName)}</a></p>`,
+      bodyHtml: `${input.bodyHtml}${cta}${readMore}<p style="margin:${readMore ? 8 : 24}px 0 0;font-size:13px"><a href="${escapeHtml(input.changelogUrl)}" style="color:${MUTED}">See all updates from ${escapeHtml(input.workspaceName)}</a></p>`,
       footerHtml: `You're receiving product updates from ${escapeHtml(input.workspaceName)}. <a href="${escapeHtml(input.unsubscribeUrl)}" style="color:${MUTED}">Unsubscribe</a>.`,
     }),
-    text: `${htmlToPlainText(input.bodyHtml)}\n\n${input.cta?.label && input.cta.url ? `${input.cta.label}: ${input.cta.url}\n\n` : ""}All updates: ${input.changelogUrl}\nUnsubscribe: ${input.unsubscribeUrl}`,
+    text: `${htmlToPlainText(input.bodyHtml)}\n\n${input.cta?.label && input.cta.url ? `${input.cta.label}: ${input.cta.url}\n\n` : ""}${input.releaseUrl ? `Read this update: ${input.releaseUrl}\n` : ""}All updates: ${input.changelogUrl}\nUnsubscribe: ${input.unsubscribeUrl}`,
   };
 }

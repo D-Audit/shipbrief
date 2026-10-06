@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -89,8 +90,8 @@ export function SignUpForm() {
           <label htmlFor="signup-terms" className="flex cursor-pointer items-start gap-2.5 text-[13px] leading-relaxed text-muted-foreground">
             <input id="signup-terms" type="checkbox" className="mt-[2px] size-4 rounded accent-[var(--ink)]" aria-invalid={Boolean(errors.terms)} aria-describedby={errors.terms ? "signup-terms-error" : undefined} {...register("terms")} />
             <span>
-              I agree to the <a href="#terms" className="text-foreground underline-offset-4 hover:underline">Terms</a> and{" "}
-              <a href="#privacy" className="text-foreground underline-offset-4 hover:underline">Privacy Policy</a>.
+              I agree to the <Link href="/terms" target="_blank" className="text-foreground underline-offset-4 hover:underline">Terms</Link> and{" "}
+              <Link href="/privacy" target="_blank" className="text-foreground underline-offset-4 hover:underline">Privacy Policy</Link>.
             </span>
           </label>
           {errors.terms && <p id="signup-terms-error" className="mt-1.5 text-xs text-destructive">{errors.terms.message}</p>}

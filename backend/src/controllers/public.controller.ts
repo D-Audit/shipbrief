@@ -3,6 +3,7 @@ import type { Request, Response } from "express";
 import { config } from "../config/env.js";
 import * as campaigns from "../services/campaign.service.js";
 import * as changelog from "../services/changelog.service.js";
+import * as contactsService from "../services/contact.service.js";
 import * as inApp from "../services/in-app.service.js";
 import { parse, sendData } from "../utils/http.js";
 import {
@@ -10,6 +11,8 @@ import {
   publicFeedbackSchema,
   publicListQuery,
   releaseParam,
+  subscribeConfirmQuery,
+  subscribeSchema,
   unsubscribeQuery,
   viewSchema,
   widgetListQuery,
@@ -143,6 +146,25 @@ export async function widgetDismiss(req: Request, res: Response) {
 export async function widgetClick(req: Request, res: Response) {
   const { key, releaseId } = parse(req, "params", widgetReleaseParam);
   sendData(res, await inApp.recordWidgetClick(key, releaseId, visitorId(req, res)));
+}
+
+// Subscribe to updates (double opt-in) -------------------------------------------
+
+export async function subscribe(req: Request, res: Response) {
+  const { workspace } = parse(req, "params", workspaceParam);
+  const { email } = parse(req, "body", subscribeSchema);
+  sendData(res, await contactsService.requestSubscription(workspace, email), 202);
+}
+
+/** The link in the confirmation email: subscribes, then returns the person to the changelog with a thank-you. */
+export async function confirmSubscribe(req: Request, res: Response) {
+  const { token } = parse(req, "query", subscribeConfirmQuery);
+  const confirmed = await contactsService.confirmSubscription(token);
+  if (confirmed) return res.redirect(303, `${config.APP_URL}/c/${confirmed.workspaceSlug}?subscribed=1`);
+  res
+    .status(400)
+    .type("html")
+    .send(`<!doctype html><meta charset="utf-8"><title>Subscription link expired</title><p>This subscription link is invalid or has expired. Subscribe again from the changelog page.</p>`);
 }
 
 // Email unsubscribe (link and RFC 8058 one-click POST) ---------------------------

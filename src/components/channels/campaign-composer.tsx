@@ -33,6 +33,7 @@ export function CampaignComposer({
     cta: campaign.cta ?? release.cta,
   });
   const [saving, setSaving] = useState(false);
+  const [testing, setTesting] = useState(false);
   const [previewViewport, setPreviewViewport] = useState<EmailPreviewViewport>("desktop");
   const audience = useMemo(() => audiences.find((item) => item.id === draft.audienceId), [audiences, draft.audienceId]);
   const update = (patch: Partial<Campaign>) => setDraft((current) => ({ ...current, ...patch }));
@@ -54,6 +55,21 @@ export function CampaignComposer({
     }
   };
 
+  const sendTest = async () => {
+    setTesting(true);
+    try {
+      // The test shows what's on screen, so save the edits first.
+      const saved = await campaignService.update(draft.id, draft);
+      onSaved(saved);
+      const result = await campaignService.sendTest(draft.id);
+      toast.success(result.status === "sent" ? `Test email sent to ${result.to}.` : `Test email written to the server log for ${result.to} (email sending isn't set up here).`);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "The test email couldn't be sent.");
+    } finally {
+      setTesting(false);
+    }
+  };
+
   return (
     <div className="space-y-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -69,7 +85,7 @@ export function CampaignComposer({
           </div>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Button type="button" variant="outline" onClick={() => toast.success("Test email queued. No email was sent.")}><TestTube2 />Send test</Button>
+          <Button type="button" variant="outline" disabled={testing || saving} onClick={() => void sendTest()} title="Sends this email to you only">{testing ? <Loader2 className="animate-spin" /> : <TestTube2 />}Send test</Button>
           <Button type="button" variant="outline" disabled={saving} onClick={() => void save("draft")}>{saving ? <Loader2 className="animate-spin" /> : null}Save draft</Button>
           <Button type="button" disabled={saving} onClick={() => void save("scheduled")}>{saving ? <Loader2 className="animate-spin" /> : <Send />}Schedule</Button>
         </div>

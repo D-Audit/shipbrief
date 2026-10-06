@@ -30,6 +30,8 @@ export const publicFeedbackSchema = z.object({
 });
 
 export const viewSchema = z.object({ slug: z.string().trim().toLowerCase().max(100).nullable().optional() });
+export const subscribeSchema = z.object({ email });
+export const subscribeConfirmQuery = z.object({ token: z.string().max(600).default("") });
 export const unsubscribeQuery = z.object({ c: z.string().max(40).default(""), t: z.string().max(64).default("") });
 export const widgetListQuery = z.object({ limit: z.coerce.number().int().min(1).max(50).default(20) });
 

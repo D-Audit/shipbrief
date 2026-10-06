@@ -9,7 +9,7 @@ import { NonRetryableJobError } from "../jobs/handlers/errors.js";
 import { enqueue } from "../jobs/queue.js";
 import type { ReleaseCta } from "../types/domain.js";
 import { hmacSha256Hex, safeEqual } from "../utils/crypto.js";
-import { badRequest, conflict, notFound } from "../utils/errors.js";
+import { badRequest, conflict, notConfigured, notFound } from "../utils/errors.js";
 import { sanitizeRichText } from "../utils/html.js";
 import type { Actor } from "../utils/http.js";
 import { recordActivity } from "./activity.service.js";
@@ -162,6 +162,38 @@ export async function updateCampaign(actor: Actor, id: string, input: CampaignIn
 // Delivery (worker)
 // ---------------------------------------------------------------------------
 
+/**
+ * Sends the campaign, exactly as saved, to the signed-in teammate only, so they
+ * can check it in a real inbox. Nobody in the audience receives it.
+ */
+export async function sendTestEmail(actor: Actor, campaignId: string) {
+  const [campaign] = await db.select().from(campaigns).where(and(eq(campaigns.id, campaignId), eq(campaigns.workspaceId, actor.workspaceId))).limit(1);
+  if (!campaign) throw notFound("CAMPAIGN_NOT_FOUND", "Campaign not found.");
+  const [release] = await db.select().from(releases).where(eq(releases.id, campaign.releaseId)).limit(1);
+  const [workspace] = await db.select().from(workspaces).where(eq(workspaces.id, actor.workspaceId)).limit(1);
+  if (!release || !workspace) throw notFound("CAMPAIGN_NOT_FOUND", "Campaign not found.");
+
+  const rendered = releaseEmailTemplate({
+    workspaceName: workspace.name,
+    subject: `[Test] ${campaign.subject}`,
+    previewText: campaign.previewText,
+    bodyHtml: sanitizeRichText(campaign.body ?? release.channelVariants.email?.body ?? release.body),
+    cta: campaign.cta ?? release.cta,
+    accent: workspace.accentColor,
+    // Real recipients get their own unsubscribe link; the test points at the changelog instead.
+    unsubscribeUrl: `${config.APP_URL}/c/${workspace.slug}`,
+    changelogUrl: `${config.APP_URL}/c/${workspace.slug}`,
+    releaseUrl: release.channels.includes("changelog") ? `${config.APP_URL}/c/${workspace.slug}/${release.slug}` : null,
+  });
+  try {
+    const result = await emailProvider.send({ to: actor.email, ...rendered, fromName: campaign.fromName, replyTo: campaign.replyTo });
+    return { to: actor.email, status: result.status };
+  } catch (error) {
+    logger.warn({ err: error, campaignId }, "Test email failed");
+    throw notConfigured("EMAIL_UNAVAILABLE", error instanceof EmailSendError && !error.retryable ? "Email sending isn't set up yet, so the test couldn't be sent." : "The test email couldn't be sent. Try again in a minute.");
+  }
+}
+
 export function unsubscribeToken(contactId: string) {
   return hmacSha256Hex(config.ENCRYPTION_KEY, `unsubscribe:${contactId}`).slice(0, 32);
 }
@@ -240,6 +272,8 @@ export async function sendCampaignJob(payload: Record<string, unknown>) {
         accent: workspace.accentColor,
         unsubscribeUrl: unsubscribe,
         changelogUrl: `${config.APP_URL}/c/${workspace.slug}`,
+        // Only link the release page when it exists: the release was also published to the changelog.
+        releaseUrl: release.channels.includes("changelog") ? `${config.APP_URL}/c/${workspace.slug}/${release.slug}` : null,
       });
       try {
         const result = await emailProvider.send({

@@ -29,7 +29,16 @@ services:
         sync: false
       - key: APP_URL
         sync: false
-      # No email provider is configured, so sign-ups can't be asked to confirm their address.
+      # Gmail API sending (HTTPS; the free plan blocks SMTP). See backend/.env.example.
+      - key: GMAIL_CLIENT_ID
+        sync: false
+      - key: GMAIL_CLIENT_SECRET
+        sync: false
+      - key: GMAIL_REFRESH_TOKEN
+        sync: false
+      - key: GMAIL_SENDER
+        sync: false
+      # Turn on once a test email arrives, so new sign-ups confirm their address.
       - key: REQUIRE_EMAIL_VERIFICATION
         value: "false"
       - key: ANTHROPIC_API_KEY

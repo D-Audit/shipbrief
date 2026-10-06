@@ -210,7 +210,7 @@ function AccountMenu() {
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <DropdownMenuLabel>Appearance</DropdownMenuLabel>
-          <DropdownMenuRadioGroup value={theme ?? "light"} onValueChange={(value) => setTheme(String(value))}>
+          <DropdownMenuRadioGroup value={theme ?? "dark"} onValueChange={(value) => setTheme(String(value))}>
             <DropdownMenuRadioItem value="light">Light</DropdownMenuRadioItem>
             <DropdownMenuRadioItem value="dark">Dark</DropdownMenuRadioItem>
             <DropdownMenuRadioItem value="system">System</DropdownMenuRadioItem>

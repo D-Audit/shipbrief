@@ -68,6 +68,9 @@ export const limits = {
   passwordReset: rateLimit({ name: "password-reset", windowSeconds: 15 * 60, max: 10 }),
   ai: rateLimit({ name: "ai", windowSeconds: 60, max: 20, key: userOrIp }),
   publicWrite: rateLimit({ name: "public-write", windowSeconds: 10 * 60, max: 20 }),
+  /** Each request sends an email, so keep it tight: a few tries per visitor per hour. */
+  subscribe: rateLimit({ name: "subscribe", windowSeconds: 60 * 60, max: 5 }),
+  testEmail: rateLimit({ name: "test-email", windowSeconds: 10 * 60, max: 10, key: userOrIp }),
   publicRead: rateLimit({ name: "public-read", windowSeconds: 60, max: 240 }),
   api: rateLimit({ name: "api", windowSeconds: 60, max: 600, key: userOrIp }),
   apiKey: rateLimit({

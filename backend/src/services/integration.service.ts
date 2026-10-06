@@ -1,8 +1,8 @@
-import { and, eq, inArray } from "drizzle-orm";
+import { and, asc, eq, inArray, isNotNull, isNull, lt, ne, or, sql } from "drizzle-orm";
 import { config } from "../config/env.js";
 import { logger } from "../config/logger.js";
 import { db } from "../database/client.js";
-import { integrationItems, integrations } from "../database/schema.js";
+import { integrationItems, integrations, memberships, releaseVersions, releases, users, workspaces } from "../database/schema.js";
 import { consumeOAuthState, createOAuthState } from "../integrations/oauth-state.js";
 import { sourceProviders } from "../integrations/source/providers.js";
 import { ProviderRequestError, type CompletedWork, type TrackMode } from "../integrations/source/types.js";
@@ -15,7 +15,7 @@ import { recordActivity } from "./activity.service.js";
 import { summarizeChanges } from "./ai.service.js";
 import { audit } from "./audit.service.js";
 import { notifyWorkspace } from "./notification.service.js";
-import { createRelease } from "./release.service.js";
+import { createRelease, updateRelease } from "./release.service.js";
 
 type IntegrationRow = typeof integrations.$inferSelect;
 
@@ -206,7 +206,12 @@ export const MAX_SYNC_LOOKBACK_DAYS = 90;
  * "since the last sync". Already-imported items are skipped either way, so an
  * earlier start date never duplicates a release.
  */
-export async function sync(actor: Actor, provider: IntegrationProvider, options: { since?: string } = {}) {
+/**
+ * `automatic` runs come from the background scheduler: they stay quiet when
+ * nothing is new and only notify on the first failure in a row, so a broken
+ * connection doesn't email the team every few minutes.
+ */
+export async function sync(actor: Actor, provider: IntegrationProvider, options: { since?: string; automatic?: boolean } = {}) {
   const row = await findIntegration(actor.workspaceId, provider);
   if (!row || row.status !== "connected") throw badRequest("INTEGRATION_NOT_CONNECTED", "Connect this integration before syncing.");
   const source = sourceProviders[provider];
@@ -230,8 +235,9 @@ export async function sync(actor: Actor, provider: IntegrationProvider, options:
       : error instanceof ProviderRequestError && error.status === 404
         ? `${source.name} can't find “${row.detail}”, or this connection can't access it. Choose it again in Manage.`
         : error instanceof Error ? error.message : "Sync failed";
-    await db.update(integrations).set({ lastError: message.slice(0, 300), status: error instanceof ProviderRequestError && error.status === 401 ? "error" : row.status }).where(eq(integrations.id, row.id));
-    await notifyWorkspace({ workspaceId: actor.workspaceId, setting: "integrationErrors", message: `${source.name} sync failed: ${message.slice(0, 140)}`, link: "/app/integrations" });
+    // updatedAt marks the attempt, so the scheduler waits a full interval before retrying.
+    await db.update(integrations).set({ lastError: message.slice(0, 300), status: error instanceof ProviderRequestError && error.status === 401 ? "error" : row.status, updatedAt: new Date() }).where(eq(integrations.id, row.id));
+    if (!options.automatic || !row.lastError) await notifyWorkspace({ workspaceId: actor.workspaceId, setting: "integrationErrors", message: `${source.name} sync failed: ${message.slice(0, 140)}`, link: "/app/integrations" });
     logger.warn({ provider, workspaceId: actor.workspaceId, err: error }, "Integration sync failed");
     if (error instanceof AppError) throw error;
     throw upstreamError("INTEGRATION_SYNC_FAILED", message);
@@ -247,30 +253,148 @@ export async function sync(actor: Actor, provider: IntegrationProvider, options:
   const fresh = work.filter((item) => inserted.some((row) => row.externalId === item.externalId));
 
   if (fresh.length) {
-    let draft: { title: string; summary: string; body: string; category: string };
-    try {
-      const summary = await summarizeChanges(actor, fresh.map((item) => ({ kind: item.kind, title: item.title })));
-      draft = { title: summary.title, summary: summary.summary, body: summary.bodyHtml, category: summary.category };
-    } catch {
-      // Without AI (or if it fails) the draft still lists the real work items — nothing is invented.
-      draft = {
-        title: fresh.length === 1 ? fresh[0]!.title : `${fresh.length} updates from ${source.name}`,
-        summary: "",
-        body: `<ul>${fresh.map((item) => `<li>${escapeHtml(item.title)}</li>`).join("")}</ul>`,
-        category: "Improvement",
-      };
-    }
-    const release = await createRelease(actor, {
-      ...draft,
-      sourceRefs: fresh.slice(0, 50).map((item) => ({ id: `${provider}:${item.externalId}`, type: provider, label: item.label, url: item.url })),
-    }, { changeNote: `Drafted from ${source.name} sync` });
-    await db.update(integrationItems).set({ releaseId: release.id }).where(inArray(integrationItems.id, inserted.map((item) => item.id)));
     const noun = trackOf(row) === "commits" && tracksCode(provider) ? "commit" : provider === "github" ? "merged pull request" : provider === "gitlab" ? "merged merge request" : "completed issue";
-    await recordActivity(db, { workspaceId: actor.workspaceId, type: "integration", message: `${source.name} detected ${fresh.length} ${noun}${fresh.length === 1 ? "" : "s"} for “${release.title}”`, link: `/app/releases/${release.id}`, actorName: source.name });
-  } else {
+    const counted = `${fresh.length} ${noun}${fresh.length === 1 ? "" : "s"}`;
+    const freshRefs = fresh.map((item) => ({ id: `${provider}:${item.externalId}`, type: provider, label: item.label, url: item.url }));
+    const open = await openSyncDraft(actor.workspaceId, row.id, source.name);
+
+    if (open) {
+      // Fold new work into the draft nobody has touched yet, so frequent syncs keep one rolling draft instead of many small ones.
+      const draft = await draftFromWork(actor, source.name, [...open.items, ...fresh]);
+      const refs = [...open.sourceRefs, ...freshRefs.filter((ref) => !open.sourceRefs.some((existing) => existing.id === ref.id))].slice(0, 50);
+      if (await openSyncDraft(actor.workspaceId, row.id, source.name)) {
+        await updateRelease(actor, open.id, { ...draft, sourceRefs: refs, changeNote: syncNotes(source.name).updated });
+        await db.update(integrationItems).set({ releaseId: open.id }).where(inArray(integrationItems.id, inserted.map((item) => item.id)));
+        await recordActivity(db, { workspaceId: actor.workspaceId, type: "integration", message: `${source.name} added ${counted} to the draft “${draft.title}”`, link: `/app/releases/${open.id}`, actorName: source.name });
+        const [updated] = await db.update(integrations).set({ lastSyncAt: new Date(), lastError: null, status: "connected" }).where(eq(integrations.id, row.id)).returning();
+        return { ...toIntegrationDto(provider, updated), newItems: fresh.length };
+      }
+    }
+
+    const draft = await draftFromWork(actor, source.name, fresh);
+    const release = await createRelease(actor, { ...draft, sourceRefs: freshRefs.slice(0, 50) }, { changeNote: syncNotes(source.name).drafted });
+    await db.update(integrationItems).set({ releaseId: release.id }).where(inArray(integrationItems.id, inserted.map((item) => item.id)));
+    await recordActivity(db, { workspaceId: actor.workspaceId, type: "integration", message: `${source.name} detected ${counted} for “${release.title}”`, link: `/app/releases/${release.id}`, actorName: source.name });
+  } else if (!options.automatic) {
     await recordActivity(db, { workspaceId: actor.workspaceId, type: "integration", message: `${source.name} sync completed — nothing new`, link: "/app/integrations", actorUserId: actor.userId, actorName: actor.name });
   }
 
   const [updated] = await db.update(integrations).set({ lastSyncAt: new Date(), lastError: null, status: "connected" }).where(eq(integrations.id, row.id)).returning();
   return { ...toIntegrationDto(provider, updated), newItems: fresh.length };
+}
+
+const syncNotes = (sourceName: string) => ({ drafted: `Drafted from ${sourceName} sync`, updated: `Updated from ${sourceName} sync` });
+
+/** A customer-facing draft from completed work; AI-written when available, otherwise the real item titles. */
+async function draftFromWork(actor: Actor, sourceName: string, items: { kind: string; title: string }[]) {
+  try {
+    const summary = await summarizeChanges(actor, items.map((item) => ({ kind: item.kind, title: item.title })));
+    return { title: summary.title, summary: summary.summary, body: summary.bodyHtml, category: summary.category };
+  } catch {
+    // Without AI (or if it fails) the draft still lists the real work items — nothing is invented.
+    return {
+      title: items.length === 1 ? items[0]!.title : `${items.length} updates from ${sourceName}`,
+      summary: "",
+      body: `<ul>${items.map((item) => `<li>${escapeHtml(item.title)}</li>`).join("")}</ul>`,
+      category: "Improvement",
+    };
+  }
+}
+
+/**
+ * The newest draft this integration produced, if no person has saved, edited or
+ * moved it on yet (every version is a sync version). Null once someone works on it.
+ */
+async function openSyncDraft(workspaceId: string, integrationId: string, sourceName: string) {
+  const [latest] = await db
+    .select({ releaseId: integrationItems.releaseId })
+    .from(integrationItems)
+    .where(and(eq(integrationItems.integrationId, integrationId), isNotNull(integrationItems.releaseId)))
+    .orderBy(sql`${integrationItems.createdAt} desc`)
+    .limit(1);
+  if (!latest?.releaseId) return null;
+
+  const [release] = await db
+    .select({ id: releases.id, status: releases.status, sourceRefs: releases.sourceRefs })
+    .from(releases)
+    .where(and(eq(releases.id, latest.releaseId), eq(releases.workspaceId, workspaceId), isNull(releases.deletedAt)))
+    .limit(1);
+  if (!release || release.status !== "draft") return null;
+
+  const notes = syncNotes(sourceName);
+  const [humanVersion] = await db
+    .select({ id: releaseVersions.id })
+    .from(releaseVersions)
+    .where(and(eq(releaseVersions.releaseId, release.id), or(isNull(releaseVersions.changeNote), and(ne(releaseVersions.changeNote, notes.drafted), ne(releaseVersions.changeNote, notes.updated)))))
+    .limit(1);
+  if (humanVersion) return null;
+
+  const items = await db
+    .select({ kind: integrationItems.kind, title: integrationItems.title })
+    .from(integrationItems)
+    .where(eq(integrationItems.releaseId, release.id));
+  if (items.length >= MAX_ROLLING_DRAFT_ITEMS) return null;
+  return { id: release.id, sourceRefs: release.sourceRefs, items };
+}
+
+const MAX_ROLLING_DRAFT_ITEMS = 50;
+
+/** Runs a sync as the person who connected the integration, or the workspace owner if they've left. */
+async function syncActor(row: IntegrationRow): Promise<Actor | null> {
+  const select = () =>
+    db
+      .select({ userId: users.id, name: users.name, email: users.email, role: memberships.role, workspaceSlug: workspaces.slug })
+      .from(memberships)
+      .innerJoin(users, eq(users.id, memberships.userId))
+      .innerJoin(workspaces, eq(workspaces.id, memberships.workspaceId))
+      .limit(1);
+  const [member] = row.connectedBy
+    ? await select().where(and(eq(memberships.workspaceId, row.workspaceId), eq(memberships.userId, row.connectedBy)))
+    : [];
+  const [owner] = member ? [member] : await select().where(and(eq(memberships.workspaceId, row.workspaceId), eq(memberships.role, "owner")));
+  return owner ? { ...owner, workspaceId: row.workspaceId } : null;
+}
+
+/**
+ * Background job: syncs every connected integration whose last sync (or failed
+ * attempt) is older than INTEGRATION_SYNC_MINUTES, oldest first. New work lands
+ * as a draft; publishing always stays with a person.
+ */
+export async function syncDueIntegrations(limit = 10) {
+  const minutes = config.INTEGRATION_SYNC_MINUTES;
+  if (!minutes) return 0;
+  const cutoff = new Date(Date.now() - minutes * 60_000);
+  const due = await db
+    .select({ integration: integrations })
+    .from(integrations)
+    .innerJoin(workspaces, eq(workspaces.id, integrations.workspaceId))
+    .where(
+      and(
+        eq(integrations.status, "connected"),
+        // Linear may watch every team (empty detail); the others need a chosen repository or project.
+        or(ne(integrations.detail, ""), eq(integrations.provider, "linear")),
+        isNull(workspaces.deletedAt),
+        or(
+          and(isNull(integrations.lastError), or(isNull(integrations.lastSyncAt), lt(integrations.lastSyncAt, cutoff))),
+          and(isNotNull(integrations.lastError), lt(integrations.updatedAt, cutoff)),
+        ),
+      ),
+    )
+    .orderBy(sql`${integrations.lastSyncAt} asc nulls first`, asc(integrations.createdAt))
+    .limit(limit);
+
+  let synced = 0;
+  for (const { integration } of due) {
+    if (!isConfigured(integration.provider)) continue;
+    const actor = await syncActor(integration);
+    if (!actor) continue;
+    try {
+      await sync(actor, integration.provider, { automatic: true });
+      synced += 1;
+    } catch (error) {
+      // Already recorded on the integration by sync(); keep going with the others.
+      logger.debug({ err: error, integrationId: integration.id }, "Automatic sync failed");
+    }
+  }
+  return synced;
 }

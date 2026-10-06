@@ -270,6 +270,33 @@ export type MigrationResult = MigrationPreview & {
   preservedFormatting: boolean;
 };
 
+export type Contact = {
+  id: string;
+  email: string | null;
+  name: string | null;
+  plan: string | null;
+  tags: string[];
+  externalId: string | null;
+  subscribed: boolean;
+  unsubscribedAt: string | null;
+  createdAt: string;
+};
+
+export type ContactStatusFilter = "all" | "subscribed" | "unsubscribed";
+
+export type ContactList = {
+  items: Contact[];
+  total: number;
+  counts: { total: number; subscribed: number; unsubscribed: number };
+};
+
+export type ContactImportResult = {
+  added: number;
+  updated: number;
+  skipped: { row: number; reason: string }[];
+  skippedCount: number;
+};
+
 export type Audience = {
   id: string;
   name: string;

@@ -1,6 +1,7 @@
 import {
   Blocks,
   ChartNoAxesColumn,
+  Contact,
   CreditCard,
   FileText,
   LayoutDashboard,
@@ -46,6 +47,7 @@ export const workspaceNav: NavSection[] = [
     items: [
       { title: "Changelog", href: "/app/changelog", icon: ScrollText },
       { title: "Email", href: "/app/campaigns", icon: Mail },
+      { title: "Contacts", href: "/app/contacts", icon: Contact },
       { title: "In-app", href: "/app/widget", icon: PanelTop },
     ],
   },

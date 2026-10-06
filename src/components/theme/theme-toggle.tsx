@@ -61,7 +61,7 @@ export function ThemeSegmented({ className }: { className?: string }) {
   return (
     <div role="radiogroup" aria-label="Appearance" className={cn("grid grid-cols-3 gap-1 rounded-lg bg-surface-subtle p-1", className)}>
       {options.map(({ value, label, icon: Icon }) => {
-        const active = mounted && (theme ?? "light") === value;
+        const active = mounted && (theme ?? "dark") === value;
         return (
           <button
             key={value}

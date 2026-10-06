@@ -39,6 +39,7 @@ export function AIStudioInspector({
   const slug = release.title.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "untitled-release";
   const selectedAudience = audiences.find((audience) => audience.id === release.audienceId);
 
+
   return (
     <aside className="sb-panel min-w-0 p-4">
       <Tabs defaultValue="ai">

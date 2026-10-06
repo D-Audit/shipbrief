@@ -125,7 +125,15 @@ function IntegrationSection({ title, description, integrations, empty, busyId, o
 
 function IntegrationCard({ integration, busy, onManage, onConnect, onSync }: { integration: Integration; busy: boolean; onManage: () => void; onConnect: () => void; onSync: () => void }) {
   const meta = providerMeta[integration.provider];
-  return <article className="sb-panel p-4"><div className="flex items-start justify-between gap-3"><div className="flex min-w-0 items-center gap-3"><IconTile icon={meta.icon} tone={meta.tone} size="lg" /><div className="min-w-0"><h3 className="font-medium">{integration.name}</h3><p className="truncate text-sm text-muted-foreground">{integration.lastError ?? (integration.detail || integration.account || (integration.configured === false ? "Not set up for this installation yet" : "Not connected"))}</p></div></div><StatusBadge status={integration.status} /></div>{integration.lastSync ? <p className="mt-4 text-xs text-muted-foreground">Last sync {formatDistanceToNow(new Date(integration.lastSync), { addSuffix: true })}</p> : <p className="mt-4 text-xs text-muted-foreground">Permissions and repository filters are configured after connection.</p>}<div className="mt-4 flex flex-wrap gap-2">{integration.status === "connected" ? <><Button type="button" variant="outline" size="sm" onClick={onManage}>Manage</Button><Button type="button" variant="ghost" size="sm" onClick={onSync} disabled={busy}>{busy ? <Loader2 className="animate-spin" /> : <RefreshCw />}Sync now</Button></> : <Button type="button" size="sm" onClick={onConnect} disabled={busy || integration.configured === false} title={integration.configured === false ? `An administrator needs to add ${integration.name} OAuth credentials first.` : undefined}>{busy && <Loader2 className="animate-spin" />}Connect</Button>}</div></article>;
+  return <article className="sb-panel p-4"><div className="flex items-start justify-between gap-3"><div className="flex min-w-0 items-center gap-3"><IconTile icon={meta.icon} tone={meta.tone} size="lg" /><div className="min-w-0"><h3 className="font-medium">{integration.name}</h3><p className="truncate text-sm text-muted-foreground">{integration.lastError ?? (integration.detail || integration.account || (integration.configured === false ? "Not set up for this installation yet" : "Not connected"))}</p></div></div><StatusBadge status={integration.status} /></div><p className="mt-4 text-xs text-muted-foreground">{integrationSyncNote(integration)}</p><div className="mt-4 flex flex-wrap gap-2">{integration.status === "connected" ? <><Button type="button" variant="outline" size="sm" onClick={onManage}>Manage</Button><Button type="button" variant="ghost" size="sm" onClick={onSync} disabled={busy}>{busy ? <Loader2 className="animate-spin" /> : <RefreshCw />}Sync now</Button></> : <Button type="button" size="sm" onClick={onConnect} disabled={busy || integration.configured === false} title={integration.configured === false ? `An administrator needs to add ${integration.name} OAuth credentials first.` : undefined}>{busy && <Loader2 className="animate-spin" />}Connect</Button>}</div></article>;
+}
+
+/** Under each card: when it last synced, and that new work is picked up on its own. */
+function integrationSyncNote(integration: Integration) {
+  if (integration.status !== "connected") return "Permissions and repository filters are configured after connection.";
+  if (!integration.detail && integration.provider !== "linear") return "Choose what to watch in Manage, and new work will be drafted automatically.";
+  const last = integration.lastSync ? `Last sync ${formatDistanceToNow(new Date(integration.lastSync), { addSuffix: true })}. ` : "";
+  return `${last}New work is checked automatically and drafted for review.`;
 }
 
 function watchingMessage(detail: string, track?: Integration["track"]) {
@@ -284,7 +292,7 @@ function IntegrationManager({ integration, open, onOpenChange, onSaved, onSync, 
           <div className="rounded-lg border border-border p-3">
             <p className="text-[13px] font-medium text-foreground">Include earlier work</p>
             <p className="mt-0.5 text-xs text-muted-foreground">
-              Sync normally picks up work since the last sync. Choose a date to pull in anything completed from then on (up to 90 days back). Items already imported are never duplicated.
+              ShipBrief checks for new work automatically and adds it to a draft for you to review. Choose a date to pull in anything completed from then on (up to 90 days back). Items already imported are never duplicated.
             </p>
             <div className="mt-2.5 flex flex-wrap items-center gap-2">
               <Input type="date" value={since} min={earliest} max={today} onChange={(event) => setSince(event.target.value)} aria-label="Sync from date" className="h-9 w-auto" />

@@ -10,9 +10,9 @@ const ORDER: AuthProvider[] = ["google", "github"];
 const MARKS: Record<AuthProvider, () => React.ReactElement> = { google: GoogleMark, github: GitHubMark };
 
 /**
- * "Continue with Google / GitHub" buttons plus the divider, showing only the
- * providers this installation has configured. Renders nothing while loading or
- * when none are set up, so the email form never shows a dead button.
+ * "Continue with Google / GitHub" buttons plus the divider. Both render
+ * immediately (the API can be slow to wake up), and a provider is hidden only
+ * once the API confirms it isn't configured, so there's never a dead button.
  */
 export function SocialSignIn({
   intent,
@@ -25,27 +25,28 @@ export function SocialSignIn({
   onError: (message: string) => void;
   onPendingChange?: (pending: boolean) => void;
 }) {
-  const [available, setAvailable] = useState<AuthProvider[]>([]);
+  const [configured, setConfigured] = useState<Partial<Record<AuthProvider, boolean>>>();
   const [pending, setPending] = useState<AuthProvider | null>(null);
 
   useEffect(() => {
     let active = true;
     authService
       .getProviders()
-      .then((providers) => active && setAvailable(ORDER.filter((provider) => providers?.[provider])))
+      .then((providers) => active && providers && setConfigured(providers))
       .catch(() => undefined);
     return () => {
       active = false;
     };
   }, []);
 
+  const available = configured ? ORDER.filter((provider) => configured[provider]) : ORDER;
   if (available.length === 0) return null;
 
   const start = async (provider: AuthProvider) => {
     setPending(provider);
     onPendingChange?.(true);
     try {
-      await authService.continueWithProvider({ provider, intent });
+      await authService.continueWithProvider({ provider, intent }, configured);
     } catch (error) {
       onError(error instanceof Error ? error.message : `We couldn't continue with ${authProviderNames[provider]}. Please try again.`);
       setPending(null);

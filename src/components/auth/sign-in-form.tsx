@@ -30,6 +30,7 @@ const NOTICES: Record<string, { tone: "success" | "error"; text: string }> = {
   "oauth-email-unverified": { tone: "error", text: "Your {provider} account needs a verified email address. Verify it with {provider}, or sign up with email." },
 };
 
+
 export function SignInForm({ next, notice, provider }: { next?: string; notice?: string; provider?: string }) {
   const providerName = provider && provider in authProviderNames ? authProviderNames[provider as AuthProvider] : "that provider";
   const redirectNotice = notice && NOTICES[notice] ? { ...NOTICES[notice], text: NOTICES[notice].text.replaceAll("{provider}", providerName) } : undefined;

@@ -15,6 +15,7 @@ import { jobs } from "../database/schema.js";
 
 export type JobType =
   | "release.publish_due"
+  | "integration.sync_due"
   | "campaign.send"
   | "email.send"
   | "webhook.deliver"

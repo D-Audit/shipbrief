@@ -45,6 +45,12 @@ workspaceRoutes.get("/campaigns", p("release:read"), ws.listCampaigns);
 workspaceRoutes.get("/campaigns/by-release", p("release:read"), ws.campaignByRelease);
 workspaceRoutes.post("/campaigns", p("campaign:write"), ws.createCampaign);
 workspaceRoutes.patch("/campaigns/:id", p("campaign:write"), ws.updateCampaign);
+workspaceRoutes.post("/campaigns/:id/test", p("campaign:write"), limits.testEmail, ws.sendTestCampaign);
+// Contacts are customers' personal data, so only people who can email them can see the list.
+workspaceRoutes.get("/contacts", p("audience:write"), ws.listContacts);
+workspaceRoutes.post("/contacts", p("audience:write"), ws.addContact);
+workspaceRoutes.post("/contacts/import", p("audience:write"), ws.importContacts);
+workspaceRoutes.delete("/contacts/:id", p("audience:write"), ws.deleteContact);
 workspaceRoutes.get("/audiences", p("release:read"), ws.listAudiences);
 workspaceRoutes.post("/audiences", p("audience:write"), ws.createAudience);
 workspaceRoutes.post("/audiences/preview", p("release:read"), ws.previewAudience);

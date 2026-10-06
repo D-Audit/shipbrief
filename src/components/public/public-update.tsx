@@ -9,6 +9,7 @@ import { useAsyncData } from "@/hooks/use-async-data";
 import { RichTextPreview } from "@/components/releases/rich-text-editor";
 import { PublicHeader } from "./public-header";
 import { PublicEngagement } from "./public-engagement";
+import { PublicSubscribe } from "./public-subscribe";
 import { ReleaseMediaGallery } from "./release-media-gallery";
 
 export function PublicUpdatePage({ workspace, slug }: { workspace: string; slug: string }) {
@@ -17,7 +18,7 @@ export function PublicUpdatePage({ workspace, slug }: { workspace: string; slug:
       changelogService.getPublic(workspace, slug),
       brandingService.getPublic(workspace),
     ]);
-    return { release, branding: publicWorkspace.branding };
+    return { release, branding: publicWorkspace.branding, name: publicWorkspace.name };
   }, [slug, workspace]);
   const { state, reload } = useAsyncData(fetchUpdate, [slug, workspace]);
 
@@ -29,7 +30,7 @@ export function PublicUpdatePage({ workspace, slug }: { workspace: string; slug:
   if (state.status === "error") return <div className="mx-auto max-w-2xl p-8"><ErrorState message={state.error} title="Update not found" onRetry={() => void reload()} /></div>;
   if (state.status !== "success") return <div className="mx-auto max-w-2xl p-8"><ErrorState message="Not found" title="Update not found" onRetry={() => void reload()} /></div>;
 
-  const { release, branding } = state.data;
+  const { release, branding, name } = state.data;
 
   return (
     <div className="min-h-full bg-background">
@@ -44,6 +45,7 @@ export function PublicUpdatePage({ workspace, slug }: { workspace: string; slug:
         <ReleaseMediaGallery media={release.media} />
         {release.cta && <Link href={release.cta.url} onClick={() => publicEngagementService.recordClick(workspace, slug).catch(() => undefined)} className="mt-8 inline-flex h-8 items-center rounded-lg bg-primary px-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/80">{release.cta.label}</Link>}
         <div className="mt-10"><PublicEngagement workspace={workspace} slug={slug} /></div>
+        <PublicSubscribe workspace={workspace} workspaceName={name} className="mt-10" />
       </article>
     </div>
   );

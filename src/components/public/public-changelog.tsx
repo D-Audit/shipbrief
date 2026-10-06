@@ -5,6 +5,7 @@ import { brandingService, changelogService, publicEngagementService } from "@/li
 import { EmptyState, ErrorState, LoadingState } from "@/components/shared/page-states";
 import { useAsyncData } from "@/hooks/use-async-data";
 import { PublicHeader } from "./public-header";
+import { PublicSubscribe } from "./public-subscribe";
 import { UpdateCard } from "./update-card";
 
 export function PublicChangelogPage({ workspace }: { workspace: string }) {
@@ -13,7 +14,7 @@ export function PublicChangelogPage({ workspace }: { workspace: string }) {
       changelogService.getPublicList(workspace),
       brandingService.getPublic(workspace),
     ]);
-    return { releases, branding: publicWorkspace.branding };
+    return { releases, branding: publicWorkspace.branding, name: publicWorkspace.name };
   }, [workspace]);
   const { state, reload } = useAsyncData(fetchChangelog, [workspace]);
 
@@ -26,7 +27,7 @@ export function PublicChangelogPage({ workspace }: { workspace: string }) {
   if (state.status === "error") return <div className="mx-auto max-w-2xl p-8"><ErrorState message={state.error} onRetry={() => void reload()} /></div>;
   if (state.status !== "success") return <div className="mx-auto max-w-2xl p-8"><ErrorState message="Unable to load this changelog." onRetry={() => void reload()} /></div>;
 
-  const { releases, branding } = state.data;
+  const { releases, branding, name } = state.data;
 
   const featured = releases.find((release) => release.featured);
 
@@ -34,6 +35,7 @@ export function PublicChangelogPage({ workspace }: { workspace: string }) {
     <div className="min-h-full bg-background">
       <PublicHeader workspace={workspace} branding={branding} />
       <main className="mx-auto max-w-2xl px-4 py-10 sm:px-6 sm:py-14">
+        <PublicSubscribe workspace={workspace} workspaceName={name} className="mb-8" />
         {featured && <div className="mb-8"><UpdateCard workspace={workspace} release={featured} featured /></div>}
         {releases.length === 0 ? (
           <EmptyState title="No updates yet" description="Published product updates will appear here." />

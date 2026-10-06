@@ -27,6 +27,8 @@ publicRoutes.post("/widget/:key/updates/:releaseId/read", limits.publicRead, pub
 publicRoutes.post("/widget/:key/updates/:releaseId/dismiss", limits.publicRead, pub.widgetDismiss);
 publicRoutes.post("/widget/:key/updates/:releaseId/click", limits.publicRead, pub.widgetClick);
 
+publicRoutes.post("/workspaces/:workspace/subscribe", limits.subscribe, pub.subscribe);
+publicRoutes.get("/subscribe/confirm", limits.publicWrite, pub.confirmSubscribe);
 publicRoutes.get("/unsubscribe", limits.publicWrite, pub.unsubscribe);
 publicRoutes.post("/unsubscribe", limits.publicWrite, pub.unsubscribe);
 

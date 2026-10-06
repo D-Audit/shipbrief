@@ -166,6 +166,27 @@ describe("channel publishing", () => {
     await sendCampaignJob({ campaignId: campaign!.id });
     expect((await db.select().from(emailDeliveries).where(eq(emailDeliveries.campaignId, campaign!.id))).length).toBe(1);
   });
+  it("links each email to the release's own changelog page, but only when it was published there", async () => {
+    const { client: c, workspaceId, slug } = await ownerWithWorkspace("email-link");
+    await db.insert(contacts).values({ workspaceId, email: `reader-${slug}@example.com` });
+    const { devOutbox } = await import("../src/integrations/email/provider.js");
+    const sentFor = async (title: string, channels: string[]) => {
+      const release = await createRelease(c, { title, channels });
+      await publishRelease(c, release.id);
+      const [campaign] = await db.select().from(campaigns).where(eq(campaigns.releaseId, release.id));
+      await sendCampaignJob({ campaignId: campaign!.id });
+      return { release, message: [...devOutbox()].reverse().find((m) => m.to === `reader-${slug}@example.com` && m.subject === title)! };
+    };
+
+    const both = await sentFor("Changelog and email", ["changelog", "email"]);
+    const pageUrl = `http://localhost:3000/c/${slug}/${both.release.slug}`;
+    expect(both.message.html).toContain(`href="${pageUrl}"`);
+    expect(both.message.text).toContain(`Read this update: ${pageUrl}`);
+
+    const emailOnly = await sentFor("Email only", ["email"]);
+    expect(emailOnly.message.text).not.toContain("Read this update");
+    expect(emailOnly.message.text).toContain(`All updates: http://localhost:3000/c/${slug}`);
+  });
 });
 
 describe("public engagement", () => {

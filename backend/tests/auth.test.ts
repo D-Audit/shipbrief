@@ -45,6 +45,7 @@ describe("registration", () => {
     expect(dup.body.error.code).toBe("EMAIL_TAKEN");
   });
 
+
   it("verifies email with a one-time link and then allows onboarding", async () => {
     const c = client();
     const email = uniqueEmail();
@@ -76,6 +77,7 @@ describe("registration", () => {
     expect(invalid.status).toBe(400);
   });
 });
+
 
 describe("login and sessions", () => {
   it("logs in with correct credentials and rejects wrong ones with the same message", async () => {

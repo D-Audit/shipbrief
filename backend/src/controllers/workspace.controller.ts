@@ -6,6 +6,7 @@ import * as audiences from "../services/audience.service.js";
 import * as billing from "../services/billing.service.js";
 import * as campaigns from "../services/campaign.service.js";
 import * as changelog from "../services/changelog.service.js";
+import * as contactsService from "../services/contact.service.js";
 import { exportWorkspace } from "../services/export.service.js";
 import * as feedback from "../services/feedback.service.js";
 import * as overview from "../services/overview.service.js";
@@ -16,7 +17,10 @@ import { actorOf, parse, sendData } from "../utils/http.js";
 import { uuidParam } from "../validators/common.js";
 import {
   activityQuery,
+  addContactSchema,
   audienceRulesSchema,
+  importContactsSchema,
+  listContactsQuery,
   brandingSchema,
   byReleaseQuery,
   checkoutSchema,
@@ -193,6 +197,30 @@ export async function createCampaign(req: Request, res: Response) {
 export async function updateCampaign(req: Request, res: Response) {
   const { id } = parse(req, "params", uuidParam);
   sendData(res, await campaigns.updateCampaign(actorOf(req), id, parse(req, "body", updateCampaignSchema)));
+}
+
+export async function sendTestCampaign(req: Request, res: Response) {
+  const { id } = parse(req, "params", uuidParam);
+  sendData(res, await campaigns.sendTestEmail(actorOf(req), id));
+}
+
+// Contacts ---------------------------------------------------------------------
+
+export async function listContacts(req: Request, res: Response) {
+  sendData(res, await contactsService.listContacts(actorOf(req), parse(req, "query", listContactsQuery)));
+}
+
+export async function addContact(req: Request, res: Response) {
+  sendData(res, await contactsService.addContact(actorOf(req), parse(req, "body", addContactSchema)), 201);
+}
+
+export async function importContacts(req: Request, res: Response) {
+  sendData(res, await contactsService.importContacts(actorOf(req), parse(req, "body", importContactsSchema).csv));
+}
+
+export async function deleteContact(req: Request, res: Response) {
+  const { id } = parse(req, "params", uuidParam);
+  sendData(res, await contactsService.deleteContact(actorOf(req), id));
 }
 
 export const listAudiences = async (req: Request, res: Response) => sendData(res, await audiences.listAudiences(actorOf(req)));

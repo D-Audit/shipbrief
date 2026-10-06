@@ -27,6 +27,10 @@ export function placeholderSenderDomain(emailFrom: string) {
   return !domain || /(^|\.)(local|localhost|test|example|invalid)$/.test(domain) || /(^|\.)example\.(com|org|net)$/.test(domain);
 }
 
+type GmailEnv = { GMAIL_CLIENT_ID?: string; GMAIL_CLIENT_SECRET?: string; GMAIL_REFRESH_TOKEN?: string; GMAIL_SENDER?: string };
+const gmailConfigured = (env: GmailEnv) =>
+  Boolean(env.GMAIL_CLIENT_ID && env.GMAIL_CLIENT_SECRET && env.GMAIL_REFRESH_TOKEN && env.GMAIL_SENDER);
+
 const schema = z
   .object({
     NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
@@ -48,6 +52,8 @@ const schema = z
     REQUIRE_EMAIL_VERIFICATION: bool(true),
 
     WORKER_MODE: z.enum(["embedded", "off"]).default("embedded"),
+    /** How often connected sources (GitHub, GitLab, Linear, Jira) are checked for new work. 0 turns automatic sync off. */
+    INTEGRATION_SYNC_MINUTES: z.coerce.number().int().min(0).max(1440).default(15),
     WORKER_CONCURRENCY: z.coerce.number().int().min(1).max(64).default(8),
 
     AI_PROVIDER: z.enum(["anthropic", "dev", "none"]).optional(),
@@ -55,8 +61,22 @@ const schema = z
     AI_MODEL: z.string().default("claude-opus-5-5"),
     AI_TIMEOUT_MS: z.coerce.number().int().positive().default(45_000),
 
-    EMAIL_PROVIDER: z.enum(["resend", "log"]).optional(),
+    EMAIL_PROVIDER: z.enum(["gmail", "resend", "smtp", "log"]).optional(),
     RESEND_API_KEY: optionalString,
+    /**
+     * Gmail API sending (HTTPS, so it works where SMTP ports are blocked). An
+     * OAuth client plus a refresh token granted for the gmail.send scope.
+     */
+    GMAIL_CLIENT_ID: optionalString,
+    GMAIL_CLIENT_SECRET: optionalString,
+    GMAIL_REFRESH_TOKEN: optionalString,
+    /** The Gmail address that granted the refresh token; emails are sent from it. */
+    GMAIL_SENDER: optionalString,
+    /** SMTP sending, e.g. a Gmail account with an App Password. Defaults suit Gmail. */
+    SMTP_HOST: z.string().default("smtp.gmail.com"),
+    SMTP_PORT: z.coerce.number().int().positive().default(465),
+    SMTP_USER: optionalString,
+    SMTP_PASSWORD: optionalString,
     EMAIL_FROM: z.string().default("ShipBrief <no-reply@shipbrief.local>"),
 
     STORAGE_PROVIDER: z.enum(["local", "s3"]).default("local"),
@@ -97,8 +117,15 @@ const schema = z
       if (value.EMAIL_PROVIDER === "log") {
         ctx.addIssue({ code: "custom", path: ["EMAIL_PROVIDER"], message: "The log email provider cannot run in production" });
       }
+      if (value.EMAIL_PROVIDER === "gmail" && !gmailConfigured(value)) {
+        ctx.addIssue({ code: "custom", path: ["GMAIL_REFRESH_TOKEN"], message: "Gmail sending needs GMAIL_CLIENT_ID, GMAIL_CLIENT_SECRET, GMAIL_REFRESH_TOKEN and GMAIL_SENDER" });
+      }
+      if (value.EMAIL_PROVIDER === "smtp" && !(value.SMTP_USER && value.SMTP_PASSWORD)) {
+        ctx.addIssue({ code: "custom", path: ["SMTP_USER"], message: "SMTP sending needs SMTP_USER and SMTP_PASSWORD" });
+      }
       // Without a Resend key email is simply off, so the sender address is never used.
-      if (value.RESEND_API_KEY && placeholderSenderDomain(value.EMAIL_FROM)) {
+      // Gmail and SMTP fall back to the account's own address, so a placeholder is fine there.
+      if (value.RESEND_API_KEY && !value.SMTP_USER && !gmailConfigured(value) && placeholderSenderDomain(value.EMAIL_FROM)) {
         ctx.addIssue({ code: "custom", path: ["EMAIL_FROM"], message: "Set EMAIL_FROM to an address on a domain verified with your email provider" });
       }
       if (value.WEBHOOK_ALLOW_PRIVATE_TARGETS) {
@@ -117,7 +144,9 @@ function load() {
 
   const aiProvider =
     env.AI_PROVIDER ?? (env.ANTHROPIC_API_KEY ? "anthropic" : env.NODE_ENV === "production" ? "none" : "dev");
-  const emailProvider = env.EMAIL_PROVIDER ?? (env.RESEND_API_KEY ? "resend" : env.NODE_ENV === "production" ? "resend" : "log");
+  const emailProvider =
+    env.EMAIL_PROVIDER ??
+    (gmailConfigured(env) ? "gmail" : env.SMTP_USER && env.SMTP_PASSWORD ? "smtp" : env.RESEND_API_KEY ? "resend" : env.NODE_ENV === "production" ? "resend" : "log");
 
   return {
     ...env,

@@ -213,6 +213,8 @@ const statusStyles: Record<string, { label?: string; tone: "neutral" | "warning"
   available: { label: "Not connected", tone: "neutral" },
   disconnected: { tone: "neutral" },
   active: { tone: "success" },
+  subscribed: { label: "Subscribed", tone: "success" },
+  unsubscribed: { label: "Unsubscribed", tone: "neutral" },
   inactive: { label: "Paused", tone: "neutral" },
   invited: { label: "Invitation sent", tone: "warning" },
   new: { tone: "accent" },

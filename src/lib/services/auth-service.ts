@@ -95,10 +95,11 @@ export const authService = {
   /**
    * Starts Google or GitHub sign-in. The browser goes to the provider and
    * returns through the API callback, so on success this promise never resolves.
+   * Pass `providers` when already known to fail fast for an unconfigured one;
+   * otherwise it navigates straight away rather than waiting on the API.
    */
-  async continueWithProvider(input: OAuthInput): Promise<AuthSession> {
-    const providers = await authService.getProviders();
-    if (!providers[input.provider]) {
+  async continueWithProvider(input: OAuthInput, providers?: Partial<Record<AuthProvider, boolean>>): Promise<AuthSession> {
+    if (providers?.[input.provider] === false) {
       throw new ApiError(`${authProviderNames[input.provider]} sign-in isn't set up yet. Use your email and password instead.`, "OAUTH_NOT_CONFIGURED", 503);
     }
     // An API route that redirects to the provider, so this must be a real navigation.

@@ -12,6 +12,10 @@ import type {
   BillingInfo,
   Campaign,
   Channel,
+  Contact,
+  ContactImportResult,
+  ContactList,
+  ContactStatusFilter,
   ChangelogEntry,
   ChangelogFilterOptions,
   ChangelogListFilters,
@@ -303,6 +307,15 @@ export const campaignService = {
   getByRelease: (releaseId: string) => api.get<Campaign | null>("/campaigns/by-release", { query: { releaseId } }),
   create: (input: Partial<Campaign>) => api.post<Campaign>("/campaigns", toCampaignPayload(input)),
   update: (id: string, input: Partial<Campaign>) => api.patch<Campaign>(`/campaigns/${id}`, toCampaignPayload(input)),
+  /** Sends the saved campaign to the signed-in teammate only. */
+  sendTest: (id: string) => api.post<{ to: string; status: "sent" | "logged" }>(`/campaigns/${id}/test`),
+};
+
+export const contactService = {
+  list: (query: { search?: string; status?: ContactStatusFilter; page?: number; pageSize?: number } = {}) => api.get<ContactList>("/contacts", { query }),
+  add: (input: { email: string; name?: string; plan?: string; tags?: string[] }) => api.post<Contact>("/contacts", input),
+  importCsv: (csv: string) => api.post<ContactImportResult>("/contacts/import", { csv }),
+  remove: (id: string) => api.delete<{ id: string }>(`/contacts/${id}`),
 };
 
 // ---------------------------------------------------------------------------
@@ -314,6 +327,9 @@ export const changelogService = {
   getFilterOptions: () => api.get<ChangelogFilterOptions>("/changelog/filters"),
   getPublic: (workspace: string, slug: string) =>
     api.get<PublicRelease>(`/public/workspaces/${encodeURIComponent(workspace)}/releases/${encodeURIComponent(slug)}`, { allowUnauthenticated: true }),
+  /** Public "Get updates by email": sends a confirmation link; the visitor is subscribed once they click it. */
+  subscribe: (workspace: string, email: string) =>
+    api.post<{ sent: boolean }>(`/public/workspaces/${encodeURIComponent(workspace)}/subscribe`, { email }, { allowUnauthenticated: true }),
   async getPublicList(workspace: string, filters?: { search?: string; tag?: string; page?: number }) {
     const { data } = await api.list<PublicRelease>(`/public/workspaces/${encodeURIComponent(workspace)}/releases`, { query: { pageSize: 50, ...filters }, allowUnauthenticated: true });
     return data;

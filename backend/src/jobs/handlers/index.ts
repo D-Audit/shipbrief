@@ -1,5 +1,6 @@
 import { rollupAnalytics } from "../../services/analytics.service.js";
 import { sendCampaignJob } from "../../services/campaign.service.js";
+import { syncDueIntegrations } from "../../services/integration.service.js";
 import { sendNotificationJob } from "../../services/notification.service.js";
 import { publishDueReleases } from "../../services/release.service.js";
 import { deliverWebhookJob } from "../../services/webhook.service.js";
@@ -16,6 +17,9 @@ export const jobHandlers: Record<JobType, JobHandler> = {
   "release.publish_due": async () => {
     await publishDueReleases();
   },
+  "integration.sync_due": async () => {
+    await syncDueIntegrations();
+  },
   "campaign.send": sendCampaignJob,
   "email.send": async (payload) => {
     if (payload.kind !== "notification") throw new NonRetryableJobError(`Unknown email job kind: ${String(payload.kind)}`);
@@ -31,6 +35,7 @@ export const jobHandlers: Record<JobType, JobHandler> = {
 /** Scheduled by every worker; de-duplicated so only one instance of each is queued at a time. */
 export const recurringJobs: { type: JobType; everyMs: number }[] = [
   { type: "release.publish_due", everyMs: 30_000 },
+  { type: "integration.sync_due", everyMs: 60_000 },
   { type: "analytics.rollup", everyMs: 60_000 },
   { type: "maintenance.cleanup", everyMs: 60 * 60 * 1000 },
 ];

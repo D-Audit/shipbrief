@@ -8,6 +8,7 @@ function toPlainText(value: string) {
   return value.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
 }
 
+
 export function DiffView({
   before,
   after,
@@ -21,6 +22,7 @@ export function DiffView({
   const changedSummary = before.summary !== after.summary;
   const beforeText = toPlainText(before.body);
   const afterText = toPlainText(after.body);
+
 
   return (
     <section className={cn("space-y-3", className)} aria-label="Suggested content changes">
@@ -48,6 +50,7 @@ export function DiffView({
   );
 }
 
+
 function DiffColumn({
   label,
   title,
@@ -62,6 +65,7 @@ function DiffColumn({
   body: string;
   emphasized?: boolean;
   changed?: boolean;
+  
 }) {
   return (
     <div
@@ -76,6 +80,7 @@ function DiffColumn({
       <p className="mt-2 line-clamp-4 text-xs leading-relaxed text-foreground/80">
         {body || "No description yet."}
       </p>
+      
     </div>
   );
 }

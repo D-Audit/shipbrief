@@ -6,11 +6,7 @@ export type StudioDraft = Pick<
   ChannelVariant,
   "title" | "summary" | "body" | "subject" | "previewText"
 > & {
-  /**
-   * Used exclusively by the in-app scope. Keeping it on the transient studio
-   * draft lets AI proposals and undo retain the selected presentation without
-   * leaking it into master release content.
-   */
+  
   format?: InAppFormat;
 };
 

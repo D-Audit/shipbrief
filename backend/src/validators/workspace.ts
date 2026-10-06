@@ -85,6 +85,14 @@ const audienceRules = z
   })
   .strict();
 export const audienceRulesSchema = audienceRules;
+export const listContactsQuery = z.object({
+  search: shortText(200).optional(),
+  status: z.enum(["all", "subscribed", "unsubscribed"]).default("all"),
+  page: z.coerce.number().int().min(1).default(1),
+  pageSize: z.coerce.number().int().min(1).max(100).default(50),
+});
+export const addContactSchema = z.object({ email, name: shortText(120).optional(), plan: shortText(40).optional(), tags: tags.optional() });
+export const importContactsSchema = z.object({ csv: z.string().min(1, "Choose a CSV file first.").max(900_000, "That file is too large. Split it into smaller files.") });
 export const createAudienceSchema = z.object({ name: name, rules: audienceRules });
 
 // Team -------------------------------------------------------------------------
