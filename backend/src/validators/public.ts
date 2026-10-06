@@ -30,7 +30,7 @@ export const publicFeedbackSchema = z.object({
 });
 
 export const viewSchema = z.object({ slug: z.string().trim().toLowerCase().max(100).nullable().optional() });
-export const subscribeSchema = z.object({ email });
+export const subscribeSchema = z.object({ email, source: z.enum(["changelog", "widget"]).default("changelog") });
 export const subscribeConfirmQuery = z.object({ token: z.string().max(600).default("") });
 export const unsubscribeQuery = z.object({ c: z.string().max(40).default(""), t: z.string().max(64).default("") });
 export const widgetListQuery = z.object({ limit: z.coerce.number().int().min(1).max(50).default(20) });
@@ -45,3 +45,17 @@ export const contactSchema = z
     signedUpAt: z.iso.datetime({ offset: true }).optional(),
   })
   .refine((value) => value.externalId || value.email, "Provide an externalId or an email.");
+
+/** A signed-in user of the customer's product, sent by the widget with the HMAC their server computed. */
+export const widgetIdentifySchema = z.object({
+  user: z.object({
+    id: z.coerce.string().trim().min(1, "user.id is required.").max(200),
+    email: email.optional().or(z.literal("").transform(() => undefined)),
+    name: shortText(120).optional(),
+    plan: shortText(40).optional(),
+    tags: tags.optional(),
+    signedUpAt: z.iso.datetime({ offset: true }).optional(),
+  }),
+  userHash: z.string().trim().regex(/^[0-9a-f]{64}$/i, "userHash must be the hex HMAC-SHA256 of user.id."),
+});
+export const widgetSubscriptionSchema = z.object({ subscribed: z.boolean() });

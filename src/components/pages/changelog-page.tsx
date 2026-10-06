@@ -2,21 +2,21 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Copy, ExternalLink, Globe2, Heart, MessageSquare, Pin, PinOff, Search } from "lucide-react";
+import { Copy, ExternalLink, Heart, MessageSquare, Pin, PinOff } from "lucide-react";
 import { toast } from "sonner";
 import { brandingService, changelogService, releaseService } from "@/lib/services";
 import { useAsyncData } from "@/hooks/use-async-data";
 import { useSession } from "@/components/session/session-provider";
 import { EmptyState, ErrorState, LoadingState, PageHeader, StatusBadge } from "@/components/shared/page-states";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import type { ChangelogSort, ReleaseStatus, WorkspaceBranding } from "@/types";
+import type { ChangelogSort, ReleaseStatus } from "@/types";
 import { format } from "date-fns";
 import { categoryMeta } from "@/components/shared/category-meta";
 import { toneText } from "@/lib/tones";
 import { cn } from "@/lib/utils";
+import { ChangelogPublishingPanel } from "./changelog-publishing";
 
 const statuses: { value: "all" | ReleaseStatus; label: string }[] = [
   { value: "all", label: "All statuses" },
@@ -56,7 +56,7 @@ export function ChangelogManagerPage() {
     () => changelogService.getFilterOptions(),
     []
   );
-  const { state: brandingState, reload: reloadBranding } = useAsyncData(
+  const { state: brandingState } = useAsyncData(
     () => brandingService.get(),
     []
   );
@@ -131,9 +131,7 @@ export function ChangelogManagerPage() {
         {filterOptionsState.status === "error" && <p className="text-xs text-destructive" role="alert">Tags could not load. <button type="button" onClick={() => void reloadFilterOptions()} className="font-medium underline underline-offset-2">Try again</button></p>}
       </section>
 
-      {brandingState.status === "success" && <ChangelogSeoPreview publicPath={publicPath} branding={brandingState.data} />}
-      {(brandingState.status === "loading" || brandingState.status === "idle") && <ChangelogSeoPreviewSkeleton />}
-      {brandingState.status === "error" && <section className="sb-panel flex flex-wrap items-center justify-between gap-3 p-4" aria-live="polite"><div><p className="font-medium">SEO and domain preview is unavailable</p><p className="mt-1 text-sm text-muted-foreground">Your changelog entries are still available while branding reloads.</p></div><Button type="button" variant="outline" size="sm" onClick={() => void reloadBranding()}>Retry preview</Button></section>}
+      <ChangelogPublishingPanel />
 
       {state.status === "loading" && <LoadingState />}
       {state.status === "error" && <ErrorState message={state.error} onRetry={reload} />}
@@ -172,40 +170,4 @@ export function ChangelogManagerPage() {
       )}
     </div>
   );
-}
-
-function ChangelogSeoPreview({ branding, publicPath }: { branding: WorkspaceBranding; publicPath: string }) {
-  const domain = branding.domain.trim();
-  const hasCustomDomain = domain.length > 0;
-  const isConnected = hasCustomDomain && branding.domainStatus === "connected";
-  const titleDomain = hasCustomDomain ? domain : "your workspace";
-  const domainLabel = isConnected ? "Live public URL" : hasCustomDomain ? "Custom domain preview" : "Current public route";
-  const publicUrl = isConnected ? `https://${domain}` : hasCustomDomain ? `https://${domain}` : publicPath;
-
-  return (
-    <section className="sb-panel overflow-hidden" aria-labelledby="changelog-seo-title">
-      <div className="flex flex-col gap-4 p-4 sm:p-5 lg:flex-row lg:items-center lg:justify-between">
-        <div className="flex min-w-0 items-start gap-3">
-          <Search className="mt-1 size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
-          <div className="min-w-0">
-            <div className="flex flex-wrap items-center gap-2"><h2 id="changelog-seo-title" className="sb-title-section">SEO &amp; custom-domain preview</h2><Badge variant="outline">{isConnected ? "Connected" : hasCustomDomain ? "Pending verification" : "ShipBrief route"}</Badge></div>
-            <p className="mt-1 text-sm text-muted-foreground">This is the search listing visitors will associate with your branded changelog.</p>
-          </div>
-        </div>
-        <Link href="/app/branding" className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-lg border border-border px-2.5 text-sm font-medium transition-colors hover:bg-muted"><Globe2 className="size-4" />Manage branding</Link>
-      </div>
-      <div className="grid gap-4 border-t border-border bg-surface-subtle/40 p-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end sm:p-5">
-        <div className="min-w-0" aria-label="Search result preview">
-          <p className="truncate text-xs font-medium" style={{ color: branding.accentColor }}>{publicUrl}</p>
-          <p className="mt-1 truncate text-base font-medium text-primary-strong">What&apos;s New | {titleDomain}</p>
-          <p className="mt-1 max-w-2xl text-sm text-muted-foreground">Product updates, improvements, and launches in one searchable, customer-facing history.</p>
-        </div>
-        <div className="flex items-center gap-2 text-xs text-muted-foreground"><span className="size-2 rounded-full" style={{ backgroundColor: branding.accentColor }} aria-hidden="true" />{domainLabel}</div>
-      </div>
-    </section>
-  );
-}
-
-function ChangelogSeoPreviewSkeleton() {
-  return <section className="sb-panel p-4 sm:p-5" aria-label="Loading SEO and domain preview" aria-busy="true"><div className="h-4 w-48 animate-pulse rounded bg-muted" /><div className="mt-3 h-3 w-full max-w-lg animate-pulse rounded bg-muted" /><div className="mt-5 h-16 animate-pulse rounded-lg bg-muted/70" /></section>;
 }

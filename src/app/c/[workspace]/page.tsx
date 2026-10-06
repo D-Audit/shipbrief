@@ -1,68 +1,37 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { PublicChangelogPage } from "@/components/public/public-changelog";
-import { brandingService, changelogService } from "@/lib/services";
+import { absoluteAssetUrl, changelogBasePath, getPublicReleasePage, getPublicWorkspace } from "@/lib/public-changelog";
 
 type PageProps = {
   params: Promise<{ workspace: string }>;
 };
 
-function workspaceName(workspace: string) {
-  return workspace
-    .split(/[-_]/)
-    .filter(Boolean)
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(" ");
-}
-
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { workspace } = await params;
-  let name = workspaceName(workspace) || "ShipBrief";
+  const data = await getPublicWorkspace(workspace).catch(() => null);
+  if (!data) return { title: { absolute: "Changelog not found" }, robots: { index: false } };
 
-  try {
-    const [publicWorkspace, releases] = await Promise.all([
-      brandingService.getPublic(workspace),
-      changelogService.getPublicList(workspace),
-    ]);
-    const branding = publicWorkspace.branding;
-    name = publicWorkspace.name;
-    const title = `What’s new at ${name}`;
-    const description =
-      releases.length === 1
-        ? `Read the latest product update from ${name}.`
-        : `Read the latest product updates from ${name}.`;
-
-    return {
-      title,
-      description,
-      openGraph: {
-        type: "website",
-        title,
-        description,
-        siteName: name,
-      },
-      twitter: {
-        card: "summary",
-        title,
-        description,
-      },
-      icons: branding.faviconUrl ? { icon: branding.faviconUrl } : undefined,
-    };
-  } catch {
-    const title = `What’s new at ${name}`;
-    const description = `Product updates from ${name}.`;
-
-    return {
-      title,
-      description,
-      openGraph: { type: "website", title, description, siteName: name },
-      twitter: { card: "summary", title, description },
-    };
-  }
+  const title = `What’s new at ${data.name}`;
+  const description = `New features, improvements and fixes in ${data.name}.`;
+  const logo = absoluteAssetUrl(data.branding.logoUrl, data.url);
+  return {
+    title: { absolute: title },
+    description,
+    // The custom domain, once connected, is the address search engines should index.
+    alternates: {
+      canonical: data.url,
+      types: { "application/rss+xml": [{ url: data.rssUrl, title: `${data.name} changelog` }] },
+    },
+    openGraph: { type: "website", title, description, siteName: data.name, url: data.url, images: logo ? [logo] : undefined },
+    twitter: { card: "summary", title, description },
+    icons: data.branding.faviconUrl ? { icon: data.branding.faviconUrl } : undefined,
+  };
 }
 
-export default async function Page({
-  params,
-}: PageProps) {
+export default async function Page({ params }: PageProps) {
   const { workspace } = await params;
-  return <PublicChangelogPage workspace={workspace} />;
+  const [data, firstPage, basePath] = await Promise.all([getPublicWorkspace(workspace), getPublicReleasePage(workspace), changelogBasePath(workspace)]);
+  if (!data || !firstPage) notFound();
+  return <PublicChangelogPage workspace={data} basePath={basePath} initialReleases={firstPage.items} initialHasMore={firstPage.hasMore} />;
 }

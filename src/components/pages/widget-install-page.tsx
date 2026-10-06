@@ -4,13 +4,18 @@ import { useState } from "react";
 import {
   Bell,
   Check,
-  Code2,
   Copy,
+  Eye,
+  EyeOff,
   ExternalLink,
+  KeyRound,
   Loader2,
+  Mail,
   MousePointer2,
   Palette,
+  RefreshCw,
   Settings2,
+  Users,
 } from "lucide-react";
 import { toast } from "sonner";
 import { WhatsNewWidget } from "@/components/channels/whats-new-widget";
@@ -18,6 +23,7 @@ import { ErrorState, LoadingState, PageHeader } from "@/components/shared/page-s
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useSession } from "@/components/session/session-provider";
 import { useAsyncData } from "@/hooks/use-async-data";
 import { brandingService } from "@/lib/services";
 import {
@@ -28,6 +34,7 @@ import {
 import { cn } from "@/lib/utils";
 
 type CodeTab = "script" | "react";
+type ServerTab = "node" | "python" | "php" | "ruby";
 
 export function WidgetInstallPage() {
   const { state: settingsState, reload: reloadSettings } = useAsyncData(() => widgetSettingsService.get(), []);
@@ -117,13 +124,32 @@ function WidgetInstallEditor({
             </div>
           </section>
 
-          <section className="sb-panel overflow-hidden">
-            <div className="flex flex-col gap-3 border-b border-border p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5"><div><h2 className="sb-title-section">Install your project snippet</h2><p className="mt-1 text-sm text-muted-foreground">Project ID <span className="font-mono text-foreground">{settings.projectId}</span></p></div><div className="flex gap-1 rounded-lg bg-surface-subtle p-1"><button type="button" onClick={() => setCodeTab("script")} className={cn("rounded-md px-2.5 py-1.5 text-xs font-medium", codeTab === "script" ? "bg-card text-foreground " : "text-muted-foreground hover:text-foreground")}>HTML</button><button type="button" onClick={() => setCodeTab("react")} className={cn("rounded-md px-2.5 py-1.5 text-xs font-medium", codeTab === "react" ? "bg-card text-foreground " : "text-muted-foreground hover:text-foreground")}>React</button></div></div>
-            {codeTab === "script" ? <CodePanel name="HTML snippet" code={scriptSnippet} copied={copied === "HTML snippet"} onCopy={() => void copy("HTML snippet", scriptSnippet)} /> : <CodePanel name="React snippet" code={reactSnippet} copied={copied === "React snippet"} onCopy={() => void copy("React snippet", reactSnippet)} />}
-            {settings.launcherMode === "manual" && <div className="border-t border-border bg-accent/40 px-4 py-4 sm:px-5"><p className="text-sm font-medium">Manual trigger API</p><p className="mt-1 text-xs leading-relaxed text-muted-foreground">Call <code className="rounded bg-accent px-1 py-0.5 text-primary-strong">open()</code>, <code className="rounded bg-accent px-1 py-0.5 text-primary-strong">close()</code>, or <code className="rounded bg-accent px-1 py-0.5 text-primary-strong">toggle()</code> from your own product control.</p><div className="mt-3 flex flex-wrap gap-2"><CodePill value="window.ShipBrief.open()" onCopy={() => void copy("Open command", "window.ShipBrief.open()")}>Open</CodePill><CodePill value="window.ShipBrief.close()" onCopy={() => void copy("Close command", "window.ShipBrief.close()")}>Close</CodePill><CodePill value="window.ShipBrief.toggle()" onCopy={() => void copy("Toggle command", "window.ShipBrief.toggle()")}>Toggle</CodePill></div></div>}
+          <section className="sb-panel p-4 sm:p-5">
+            <div className="flex items-start gap-3"><Mail className="mt-0.5 size-4 shrink-0 text-muted-foreground" aria-hidden="true" /><div><h2 className="sb-title-section">Email updates</h2><p className="mt-1 text-sm leading-relaxed text-muted-foreground">Signed-in users you identify are added to Contacts automatically and get a switch to turn release emails off. Visitors who aren&apos;t signed in can subscribe with their email.</p></div></div>
+            <label className="mt-5 flex cursor-pointer items-start gap-3 rounded-lg border border-border bg-surface-subtle/45 px-3 py-2.5 text-sm"><input type="checkbox" checked={settings.emailSubscribe} onChange={(event) => update("emailSubscribe", event.target.checked)} className="mt-0.5 size-4 accent-primary" /><span><span className="block font-medium">Show email updates in the widget</span><span className="block text-xs text-muted-foreground">The &quot;Email me new updates&quot; switch for signed-in users, and &quot;Get updates by email&quot; with a confirmation email for everyone else.</span></span></label>
           </section>
 
-          <section className="flex items-start gap-3 border border-dashed border-border bg-surface-subtle/35 p-4 text-sm text-muted-foreground"><Code2 className="mt-0.5 size-4 shrink-0 text-muted-foreground" /><p>The widget tracks read state per visitor and reports views and clicks to Analytics.</p></section>
+          <section className="sb-panel overflow-hidden">
+            <div className="flex flex-col gap-3 border-b border-border p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5"><div><h2 className="sb-title-section">1. Add the snippet to your product</h2><p className="mt-1 text-sm text-muted-foreground">Paste it once, on every page where signed-in users should see updates. Project ID <span className="font-mono text-foreground">{settings.projectId}</span></p></div><div className="flex gap-1 rounded-lg bg-surface-subtle p-1"><TabButton active={codeTab === "script"} onClick={() => setCodeTab("script")}>HTML</TabButton><TabButton active={codeTab === "react"} onClick={() => setCodeTab("react")}>React</TabButton></div></div>
+            {codeTab === "script" ? <CodePanel name="HTML snippet" code={scriptSnippet} copied={copied === "HTML snippet"} onCopy={() => void copy("HTML snippet", scriptSnippet)} /> : <CodePanel name="React snippet" code={reactSnippet} copied={copied === "React snippet"} onCopy={() => void copy("React snippet", reactSnippet)} />}
+            <div className="border-t border-border bg-accent/40 px-4 py-4 sm:px-5">
+              <p className="text-sm font-medium">{settings.launcherMode === "manual" ? "Open the feed from your own control" : "Optional: open the feed from your own control"}</p>
+              <p className="mt-1 text-xs leading-relaxed text-muted-foreground">Add <code className="rounded bg-accent px-1 py-0.5 text-primary-strong">data-shipbrief-toggle</code> to any button, and <code className="rounded bg-accent px-1 py-0.5 text-primary-strong">data-shipbrief-badge</code> to an element that should show the unread count. Or call the commands below.</p>
+              <div className="mt-3 flex flex-wrap gap-2"><CodePill value="ShipBrief.open()" onCopy={() => void copy("Open command", "ShipBrief.open()")}>Open</CodePill><CodePill value="ShipBrief.close()" onCopy={() => void copy("Close command", "ShipBrief.close()")}>Close</CodePill><CodePill value="ShipBrief.toggle()" onCopy={() => void copy("Toggle command", "ShipBrief.toggle()")}>Toggle</CodePill><CodePill value="ShipBrief.logout()" onCopy={() => void copy("Logout command", "ShipBrief.logout()")}>Log out</CodePill><CodePill value={'ShipBrief.on("unread", (count) => {})'} onCopy={() => void copy("Unread listener", 'ShipBrief.on("unread", (count) => {})')}>Unread count</CodePill></div>
+            </div>
+          </section>
+
+          <IdentitySection copy={copy} copied={copied} />
+
+          <section className="sb-panel p-4 sm:p-5">
+            <div className="flex items-start gap-3"><Users className="mt-0.5 size-4 shrink-0 text-muted-foreground" aria-hidden="true" /><div><h2 className="sb-title-section">Where release emails go</h2><p className="mt-1 text-sm leading-relaxed text-muted-foreground">When you publish a release with the Email channel, ShipBrief sends it to everyone in <a href="/app/contacts" className="font-medium text-primary-strong hover:underline">Contacts</a> who has an email, hasn&apos;t unsubscribed, and matches the release&apos;s audience. People get into Contacts like this:</p></div></div>
+            <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
+              <li className="flex gap-2"><span className="mt-2 size-1.5 shrink-0 rounded-full bg-primary-strong" /><span><span className="font-medium text-foreground">Widget sign-in</span>: every identified user, automatically, with their plan and tags kept up to date.</span></li>
+              <li className="flex gap-2"><span className="mt-2 size-1.5 shrink-0 rounded-full bg-primary-strong" /><span><span className="font-medium text-foreground">Widget and changelog subscribe forms</span>: after they confirm their email.</span></li>
+              <li className="flex gap-2"><span className="mt-2 size-1.5 shrink-0 rounded-full bg-primary-strong" /><span><span className="font-medium text-foreground">Your server</span>: <code className="text-xs">POST /api/v1/contacts</code> with an API key. Also CSV import and adding people by hand.</span></li>
+            </ul>
+            <p className="mt-4 text-xs text-muted-foreground">Every email has an unsubscribe link. Someone who unsubscribes is never emailed again, even if your app identifies them later.</p>
+          </section>
         </main>
 
         <aside className="space-y-5 xl:sticky xl:top-20 xl:self-start">
@@ -135,7 +161,7 @@ function WidgetInstallEditor({
               <div className="absolute inset-x-4 top-20 flex justify-center"><WhatsNewWidget key={previewRevision} theme={settings.theme} accentColor={accentColor} /></div>
             </div>
           </section>
-          <section className="sb-panel p-4"><p className="text-sm font-semibold">After you install</p><ol className="mt-4 space-y-3 text-xs leading-relaxed text-muted-foreground"><li className="flex gap-2"><span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-muted text-[10px] font-semibold text-foreground/70">1</span><span>Publish an in-app release from the workspace.</span></li><li className="flex gap-2"><span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-muted text-[10px] font-semibold text-foreground/70">2</span><span>Preview the feed in your product before you share it.</span></li><li className="flex gap-2"><span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-muted text-[10px] font-semibold text-foreground/70">3</span><span>Use analytics and feedback to understand what customers did next.</span></li></ol><a href={`/embed/whats-new?key=${encodeURIComponent(settings.projectId)}`} className="mt-4 inline-flex items-center gap-1 text-xs font-medium text-primary-strong hover:underline">Open standalone preview <ExternalLink className="size-3" /></a></section>
+          <section className="sb-panel p-4"><p className="text-sm font-semibold">After you install</p><ol className="mt-4 space-y-3 text-xs leading-relaxed text-muted-foreground"><li className="flex gap-2"><span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-muted text-[10px] font-semibold text-foreground/70">1</span><span>Sign in to your product: you appear in Contacts with source &quot;Widget&quot;.</span></li><li className="flex gap-2"><span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-muted text-[10px] font-semibold text-foreground/70">2</span><span>Publish a release with the In-app channel. It shows in the feed with an unread badge.</span></li><li className="flex gap-2"><span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-muted text-[10px] font-semibold text-foreground/70">3</span><span>Add the Email channel too, and identified users get it in their inbox.</span></li></ol><a href={`/embed/whats-new?key=${encodeURIComponent(settings.projectId)}`} className="mt-4 inline-flex items-center gap-1 text-xs font-medium text-primary-strong hover:underline">Open standalone preview <ExternalLink className="size-3" /></a></section>
         </aside>
       </div>
     </div>
@@ -154,35 +180,156 @@ function CodePill({ value, children, onCopy }: { value: string; children: string
   return <button type="button" onClick={onCopy} title={value} className="border border-border-strong bg-card px-2.5 py-1.5 text-[11px] font-medium text-primary-strong transition-colors hover:bg-surface-subtle">{children}</button>;
 }
 
-function embedUrl(settings: WidgetInstallSettings) {
-  const origin = typeof window === "undefined" ? "" : window.location.origin;
-  return `${origin}/embed/whats-new?key=${encodeURIComponent(settings.projectId)}`;
+function TabButton({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
+  return <button type="button" onClick={onClick} className={cn("rounded-md px-2.5 py-1.5 text-xs font-medium", active ? "bg-card text-foreground " : "text-muted-foreground hover:text-foreground")}>{children}</button>;
 }
 
 /**
- * The widget is served as an embeddable page, so installing it is one iframe.
- * Placement and theme come from the saved settings above.
+ * The identity secret lets the customer's server vouch for who is signed in.
+ * Shown only to roles that manage developer settings; the API enforces the same.
  */
+function IdentitySection({ copy, copied }: { copy: (name: string, value: string) => Promise<void>; copied: string | null }) {
+  const { can } = useSession();
+  const allowed = can("developer:manage");
+  const [secret, setSecret] = useState<string | null>(null);
+  const [visible, setVisible] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [serverTab, setServerTab] = useState<ServerTab>("node");
+
+  const reveal = async () => {
+    if (secret) return setVisible((current) => !current);
+    setBusy(true);
+    try {
+      setSecret((await widgetSettingsService.identitySecret()).secret);
+      setVisible(true);
+    } catch {
+      toast.error("We couldn't load the identity secret.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const rotate = async () => {
+    if (!window.confirm("Rotate the identity secret? Signed-in users stop being identified until your server uses the new secret.")) return;
+    setBusy(true);
+    try {
+      setSecret((await widgetSettingsService.rotateIdentitySecret()).secret);
+      setVisible(true);
+      toast.success("New identity secret created. Update it on your server.");
+    } catch {
+      toast.error("We couldn't rotate the identity secret.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const serverCode = getServerSnippet(serverTab);
+  const masked = secret && visible ? secret : "sbis_" + "•".repeat(28);
+
+  return (
+    <section className="sb-panel overflow-hidden">
+      <div className="p-4 sm:p-5">
+        <div className="flex items-start gap-3"><KeyRound className="mt-0.5 size-4 shrink-0 text-muted-foreground" aria-hidden="true" /><div><h2 className="sb-title-section">2. Identify signed-in users</h2><p className="mt-1 text-sm leading-relaxed text-muted-foreground">Your server signs the user&apos;s id with this secret and passes the result as <code className="text-xs">userHash</code>. ShipBrief only accepts users with a valid signature, so nobody can add someone else&apos;s email from the browser. Keep the secret on your server, never in front-end code.</p></div></div>
+        {allowed ? (
+          <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center">
+            <code className="min-w-0 flex-1 truncate rounded-md border border-border bg-surface-subtle/60 px-3 py-2 font-mono text-xs">{masked}</code>
+            <div className="flex gap-2">
+              <Button type="button" variant="outline" size="sm" onClick={() => void reveal()} disabled={busy}>{busy ? <Loader2 className="animate-spin" /> : visible ? <EyeOff /> : <Eye />}{visible ? "Hide" : "Reveal"}</Button>
+              <Button type="button" variant="outline" size="sm" disabled={!secret || !visible} onClick={() => secret && void copy("Identity secret", secret)}>{copied === "Identity secret" ? <Check /> : <Copy />}Copy</Button>
+              <Button type="button" variant="ghost" size="sm" onClick={() => void rotate()} disabled={busy}><RefreshCw />Rotate</Button>
+            </div>
+          </div>
+        ) : (
+          <p className="mt-4 rounded-md border border-dashed border-border px-3 py-2 text-xs text-muted-foreground">Ask a developer or an admin of this workspace for the identity secret.</p>
+        )}
+      </div>
+      <div className="flex items-center justify-between border-t border-border px-4 py-2 sm:px-5"><p className="text-xs font-medium text-muted-foreground">Compute userHash on your server</p><div className="flex gap-1 rounded-lg bg-surface-subtle p-1">{(["node", "python", "php", "ruby"] as const).map((tab) => <TabButton key={tab} active={serverTab === tab} onClick={() => setServerTab(tab)}>{SERVER_LABELS[tab]}</TabButton>)}</div></div>
+      <CodePanel name="Server code" code={serverCode} copied={copied === "Server code"} onCopy={() => void copy("Server code", serverCode)} />
+    </section>
+  );
+}
+
+const SERVER_LABELS: Record<ServerTab, string> = { node: "Node.js", python: "Python", php: "PHP", ruby: "Ruby" };
+
+function getServerSnippet(tab: ServerTab) {
+  switch (tab) {
+    case "node":
+      return `import crypto from "node:crypto";
+
+// SHIPBRIEF_IDENTITY_SECRET is the secret above, stored as a server environment variable.
+const userHash = crypto
+  .createHmac("sha256", process.env.SHIPBRIEF_IDENTITY_SECRET)
+  .update(String(user.id))
+  .digest("hex");`;
+    case "python":
+      return `import hashlib, hmac, os
+
+user_hash = hmac.new(
+    os.environ["SHIPBRIEF_IDENTITY_SECRET"].encode(),
+    str(user.id).encode(),
+    hashlib.sha256,
+).hexdigest()`;
+    case "php":
+      return `$userHash = hash_hmac('sha256', (string) $user->id, getenv('SHIPBRIEF_IDENTITY_SECRET'));`;
+    case "ruby":
+      return `user_hash = OpenSSL::HMAC.hexdigest("SHA256", ENV.fetch("SHIPBRIEF_IDENTITY_SECRET"), user.id.to_s)`;
+  }
+}
+
+function appOrigin() {
+  return typeof window === "undefined" ? "" : window.location.origin;
+}
+
+/** The loader script: a queue stub so commands work before it finishes loading, then the async script. */
 function getScriptSnippet(settings: WidgetInstallSettings) {
-  const side = settings.placement === "bottom-left" ? "left" : "right";
-  return `<iframe
-  src="${embedUrl(settings)}"
-  title="What's new"
-  style="position:fixed;bottom:16px;${side}:16px;width:400px;height:560px;border:0;z-index:2147483000;background:transparent"
-  loading="lazy"
-></iframe>`;
+  return `<script>
+  (function (w) { w.ShipBrief = w.ShipBrief || function () { (w.ShipBrief.q = w.ShipBrief.q || []).push(arguments); }; })(window);
+  ShipBrief("init", {
+    key: "${settings.projectId}",
+    // The signed-in user, rendered by your server. Leave "user" out for visitors who aren't signed in.
+    user: {
+      id: "{{ user.id }}",
+      email: "{{ user.email }}",
+      name: "{{ user.name }}",
+      plan: "{{ user.plan }}",      // optional, used by audiences
+      tags: ["{{ user.tag }}"],     // optional, used by audiences
+    },
+    userHash: "{{ userHash }}",     // HMAC-SHA256(identity secret, user.id), see step 2
+  });
+</script>
+<script async src="${appOrigin()}/widget.js"></script>`;
 }
 
 function getReactSnippet(settings: WidgetInstallSettings) {
-  const side = settings.placement === "bottom-left" ? "left" : "right";
-  return `export function WhatsNew() {
-  return (
-    <iframe
-      src="${embedUrl(settings)}"
-      title="What's new"
-      loading="lazy"
-      style={{ position: "fixed", bottom: 16, ${side}: 16, width: 400, height: 560, border: 0, zIndex: 2147483000, background: "transparent" }}
-    />
-  );
+  return `"use client";
+import { useEffect } from "react";
+
+type ShipBriefUser = { id: string; email?: string; name?: string; plan?: string; tags?: string[] };
+
+declare global {
+  interface Window { ShipBrief?: ((...args: unknown[]) => void) & { q?: unknown[][] } }
+}
+
+/** Render once in your signed-in layout. userHash comes from your server (see step 2). */
+export function ShipBriefWidget({ user, userHash }: { user?: ShipBriefUser; userHash?: string }) {
+  useEffect(() => {
+    if (!window.ShipBrief) {
+      const queue: unknown[][] = [];
+      const shipBrief = Object.assign((...args: unknown[]) => { queue.push(args); }, { q: queue });
+      window.ShipBrief = shipBrief;
+      shipBrief("init", { key: "${settings.projectId}" });
+      const script = document.createElement("script");
+      script.async = true;
+      script.src = "${appOrigin()}/widget.js";
+      document.head.appendChild(script);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (user && userHash) window.ShipBrief?.("identify", user, userHash);
+    else window.ShipBrief?.("logout");
+  }, [user, userHash]);
+
+  return null;
 }`;
 }

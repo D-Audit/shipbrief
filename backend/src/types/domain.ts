@@ -85,6 +85,9 @@ export type AudienceRules = {
   accountAgeDays?: number;
 };
 
+/** How a contact first reached the workspace: added in the app, a CSV import, the public API, the changelog subscribe form or the in-app widget. */
+export type ContactSource = "manual" | "import" | "api" | "changelog" | "widget";
+
 export type WorkspaceNotificationSettings = {
   emailDigest: boolean;
   releaseApproved: boolean;

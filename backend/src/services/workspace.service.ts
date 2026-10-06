@@ -1,5 +1,6 @@
 import crypto from "node:crypto";
 import { and, eq, isNull, ne } from "drizzle-orm";
+import { config } from "../config/env.js";
 import { db, type DbExecutor } from "../database/client.js";
 import { audiences, memberships, subscriptions, workspaces } from "../database/schema.js";
 import type { Channel, WorkspaceNotificationSettings } from "../types/domain.js";
@@ -66,7 +67,7 @@ export async function createWorkspace(
   return workspace;
 }
 
-async function getWorkspaceRow(workspaceId: string) {
+export async function getWorkspaceRow(workspaceId: string) {
   const [workspace] = await db
     .select()
     .from(workspaces)
@@ -191,6 +192,49 @@ export async function updateBranding(
 }
 
 // ---------------------------------------------------------------------------
+// Public changelog: where it lives and what it shows
+// ---------------------------------------------------------------------------
+
+/** Canonical public addresses of a workspace's changelog: the ShipBrief-hosted /c/[slug] route and its feed. */
+export function publicChangelogUrls(workspace: Pick<typeof workspaces.$inferSelect, "slug">) {
+  const url = `${config.APP_URL.replace(/\/$/, "")}/c/${workspace.slug}`;
+  return { url, rssUrl: `${url}/rss.xml`, releaseUrl: (releaseSlug: string) => `${url}/${releaseSlug}` };
+}
+
+export function toChangelogSettings(workspace: typeof workspaces.$inferSelect) {
+  const { url, rssUrl } = publicChangelogUrls(workspace);
+  return {
+    enabled: workspace.changelogEnabled,
+    allowSubscriptions: workspace.changelogSubscribe,
+    showAuthor: workspace.changelogShowAuthor,
+    url,
+    rssUrl,
+  };
+}
+
+export async function getChangelogSettings(actor: Actor) {
+  return toChangelogSettings(await getWorkspaceRow(actor.workspaceId));
+}
+
+export async function updateChangelogSettings(actor: Actor, input: { enabled?: boolean; allowSubscriptions?: boolean; showAuthor?: boolean }) {
+  const [updated] = await db
+    .update(workspaces)
+    .set({
+      updatedAt: new Date(),
+      changelogEnabled: input.enabled,
+      changelogSubscribe: input.allowSubscriptions,
+      changelogShowAuthor: input.showAuthor,
+    })
+    .where(and(eq(workspaces.id, actor.workspaceId), isNull(workspaces.deletedAt)))
+    .returning();
+  if (!updated) throw notFound("WORKSPACE_NOT_FOUND", "Workspace not found.");
+  if (input.enabled !== undefined) {
+    await audit({ action: input.enabled ? "changelog.enabled" : "changelog.disabled", workspaceId: updated.id, userId: actor.userId });
+  }
+  return toChangelogSettings(updated);
+}
+
+// ---------------------------------------------------------------------------
 // Widget install settings
 // ---------------------------------------------------------------------------
 
@@ -201,6 +245,9 @@ export function toWidgetSettings(workspace: typeof workspaces.$inferSelect) {
     placement: workspace.widgetPlacement,
     showUnreadBadge: workspace.widgetShowUnreadBadge,
     theme: workspace.widgetTheme,
+    emailSubscribe: workspace.widgetEmailSubscribe,
+    /** Whether an identity secret exists (the secret itself has its own endpoint). */
+    identityVerification: Boolean(workspace.widgetIdentitySecret),
   };
 }
 
@@ -210,7 +257,13 @@ export async function getWidgetSettings(actor: Actor) {
 
 export async function updateWidgetSettings(
   actor: Actor,
-  input: { launcherMode?: "default" | "manual"; placement?: "bottom-right" | "bottom-left"; showUnreadBadge?: boolean; theme?: "inherit" | "light" | "dark" },
+  input: {
+    launcherMode?: "default" | "manual";
+    placement?: "bottom-right" | "bottom-left";
+    showUnreadBadge?: boolean;
+    theme?: "inherit" | "light" | "dark";
+    emailSubscribe?: boolean;
+  },
 ) {
   const [updated] = await db
     .update(workspaces)
@@ -220,6 +273,7 @@ export async function updateWidgetSettings(
       widgetPlacement: input.placement,
       widgetShowUnreadBadge: input.showUnreadBadge,
       widgetTheme: input.theme,
+      widgetEmailSubscribe: input.emailSubscribe,
     })
     .where(and(eq(workspaces.id, actor.workspaceId), isNull(workspaces.deletedAt)))
     .returning();
@@ -247,6 +301,13 @@ export async function getPublicWorkspaceBySlug(slug: string) {
     .where(and(eq(workspaces.slug, slug.trim().toLowerCase()), isNull(workspaces.deletedAt)))
     .limit(1);
   if (!workspace) throw notFound("WORKSPACE_NOT_FOUND", "Workspace not found.");
+  return workspace;
+}
+
+/** Like getPublicWorkspaceBySlug, for the changelog itself: a workspace that turned its changelog off has none. */
+export async function getPublicChangelogWorkspace(slug: string) {
+  const workspace = await getPublicWorkspaceBySlug(slug);
+  if (!workspace.changelogEnabled) throw notFound("CHANGELOG_NOT_FOUND", "This changelog isn't public.");
   return workspace;
 }
 

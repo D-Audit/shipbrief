@@ -10,6 +10,10 @@ export type WidgetInstallSettings = {
   placement: WidgetPlacement;
   showUnreadBadge: boolean;
   theme: "inherit" | "light" | "dark";
+  /** Show "Get updates by email" in the widget. */
+  emailSubscribe: boolean;
+  /** Whether an identity secret exists, so signed-in users can be identified. */
+  identityVerification: boolean;
 };
 
 export type WidgetUpdate = {
@@ -33,13 +37,27 @@ export type WidgetConfig = {
   placement: WidgetPlacement;
   launcherMode: WidgetLauncherMode;
   showUnreadBadge: boolean;
+  emailSubscribe: boolean;
+  /** The public changelog ("View all updates"); null when the workspace turned it off. Absent from older APIs. */
+  changelogUrl?: string | null;
 };
+
+/** A signed-in user of the customer's product, as passed to the widget. */
+export type WidgetIdentity = {
+  user: { id: string; email?: string; name?: string; plan?: string; tags?: string[]; signedUpAt?: string };
+  userHash: string;
+};
+
+export type WidgetUser = { email: string | null; name: string | null; subscribed: boolean };
 
 export const widgetSettingsService = {
   get: () => api.get<WidgetInstallSettings>("/widget"),
   /** The project id is read-only; only placement and presentation are sent. */
-  update: ({ launcherMode, placement, showUnreadBadge, theme }: Partial<WidgetInstallSettings>) =>
-    api.patch<WidgetInstallSettings>("/widget", { launcherMode, placement, showUnreadBadge, theme }),
+  update: ({ launcherMode, placement, showUnreadBadge, theme, emailSubscribe }: Partial<WidgetInstallSettings>) =>
+    api.patch<WidgetInstallSettings>("/widget", { launcherMode, placement, showUnreadBadge, theme, emailSubscribe }),
+  /** The secret the customer's server signs user ids with. Developers and admins only. */
+  identitySecret: () => api.get<{ secret: string }>("/widget/identity-secret"),
+  rotateIdentitySecret: () => api.post<{ secret: string }>("/widget/identity-secret/rotate", {}),
 };
 
 const VISITOR_KEY = "sb_widget_visitor";
@@ -58,9 +76,12 @@ function visitorId() {
   }
 }
 
+/** Set once the host page identifies its signed-in user; kept in memory only, so it never outlives the page. */
+let widgetSession: string | null = null;
+
 function visitorHeaders(): Record<string, string> {
   const id = visitorId();
-  return id ? { "X-Visitor-Id": id } : {};
+  return { ...(id ? { "X-Visitor-Id": id } : {}), ...(widgetSession ? { "X-Widget-Session": widgetSession } : {}) };
 }
 
 const options = () => ({ allowUnauthenticated: true, headers: visitorHeaders() });
@@ -72,4 +93,18 @@ export const widgetService = {
   markRead: (key: string, releaseId: string) => api.post<{ id: string; read: boolean }>(`/public/widget/${encodeURIComponent(key)}/updates/${releaseId}/read`, {}, options()),
   markAllRead: (key: string) => api.post<{ ok: boolean }>(`/public/widget/${encodeURIComponent(key)}/updates/read-all`, {}, options()),
   recordClick: (key: string, releaseId: string) => api.post<{ ok: boolean }>(`/public/widget/${encodeURIComponent(key)}/updates/${releaseId}/click`, {}, options()),
+  /** Verifies the signed-in user with the server; later requests carry their session. */
+  identify: async (key: string, identity: WidgetIdentity) => {
+    const result = await api.post<{ session: string; user: WidgetUser }>(`/public/widget/${encodeURIComponent(key)}/identify`, identity, options());
+    widgetSession = result.session;
+    return result.user;
+  },
+  forget: () => {
+    widgetSession = null;
+  },
+  setSubscribed: (key: string, subscribed: boolean) =>
+    api.post<WidgetUser>(`/public/widget/${encodeURIComponent(key)}/subscription`, { subscribed }, options()),
+  /** Anonymous visitors: emails a confirmation link; they become a contact once they click it. */
+  subscribe: (workspaceSlug: string, email: string) =>
+    api.post<{ sent: boolean }>(`/public/workspaces/${encodeURIComponent(workspaceSlug)}/subscribe`, { email, source: "widget" }, options()),
 };

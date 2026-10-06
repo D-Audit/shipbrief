@@ -20,6 +20,8 @@ workspaceRoutes.get("/audit-logs", p("audit:read"), ws.listAudit);
 
 workspaceRoutes.get("/changelog", p("release:read"), ws.listChangelog);
 workspaceRoutes.get("/changelog/filters", p("release:read"), ws.changelogFilters);
+workspaceRoutes.get("/changelog/settings", p("workspace:read"), ws.getChangelogSettings);
+workspaceRoutes.patch("/changelog/settings", p("branding:update"), ws.updateChangelogSettings);
 workspaceRoutes.post("/releases/:id/comments/:commentId/hide", p("release:write"), ws.hideComment);
 
 workspaceRoutes.get("/feedback", p("feedback:read"), ws.listFeedback);
@@ -70,6 +72,8 @@ workspaceRoutes.get("/branding", p("workspace:read"), ws.getBranding);
 workspaceRoutes.patch("/branding", p("branding:update"), ws.updateBranding);
 workspaceRoutes.get("/widget", p("workspace:read"), ws.getWidget);
 workspaceRoutes.patch("/widget", p("branding:update"), ws.updateWidget);
+workspaceRoutes.get("/widget/identity-secret", p("developer:manage"), ws.getWidgetIdentitySecret);
+workspaceRoutes.post("/widget/identity-secret/rotate", p("developer:manage"), ws.rotateWidgetIdentitySecret);
 
 workspaceRoutes.get("/billing", p("billing:read"), ws.getBilling);
 workspaceRoutes.post("/billing/checkout", p("billing:manage"), ws.checkout);

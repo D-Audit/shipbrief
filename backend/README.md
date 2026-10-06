@@ -231,6 +231,15 @@ These are fully implemented but need credentials to operate for real:
 | Custom changelog domain | DNS + TLS routing at your edge | The domain is saved as `pending`; the changelog is served at `/c/{slug}` |
 | Email open tracking | Provider webhooks (not wired) | Analytics counts deliveries, not opens |
 
+## Public changelog and RSS
+
+Every workspace has a hosted changelog at `{APP_URL}/c/{slug}` as soon as it publishes a release to
+the Changelog channel — no widget needed — and an RSS 2.0 feed at `{APP_URL}/c/{slug}/rss.xml`.
+Both read the published releases through one visibility rule (`publicReleaseWhere` in
+`changelog.service.ts`): published, not deleted, and published to the Changelog channel. Drafts,
+scheduled releases and email/in-app-only releases never appear. **Changelog → Public changelog**
+turns the page (and feed) off, and toggles email subscriptions and author names.
+
 ## Production deployment
 
 Run at least one API process (`WORKER_MODE=off`) and one worker process (`npm run start:worker`).

@@ -1,7 +1,7 @@
 import { and, asc, eq, isNull, sql, type SQL } from "drizzle-orm";
 import { db, type DbExecutor } from "../database/client.js";
 import { audiences, contacts } from "../database/schema.js";
-import type { AudienceRules } from "../types/domain.js";
+import type { AudienceRules, ContactSource } from "../types/domain.js";
 import { conflict, isUniqueViolation, notFound } from "../utils/errors.js";
 import type { Actor } from "../utils/http.js";
 
@@ -76,38 +76,56 @@ export async function createAudience(actor: Actor, input: { name: string; rules:
 export async function upsertContact(
   workspaceId: string,
   input: { externalId?: string; email?: string; name?: string; plan?: string; tags?: string[]; signedUpAt?: string },
+  options: { source?: ContactSource; seen?: boolean } = {},
 ) {
-  const values = {
-    workspaceId,
-    externalId: input.externalId ?? null,
-    email: input.email?.toLowerCase() ?? null,
-    name: input.name ?? null,
-    plan: input.plan ?? null,
-    tags: input.tags ?? [],
-    signedUpAt: input.signedUpAt ? new Date(input.signedUpAt) : null,
-  };
-  const existing = input.externalId
-    ? await db.select({ id: contacts.id }).from(contacts).where(and(eq(contacts.workspaceId, workspaceId), eq(contacts.externalId, input.externalId))).limit(1)
-    : input.email
-      ? await db.select({ id: contacts.id }).from(contacts).where(and(eq(contacts.workspaceId, workspaceId), sql`lower(${contacts.email}) = ${input.email.toLowerCase()}`)).limit(1)
-      : [];
-  if (existing[0]) {
-    const [updated] = await db
-      .update(contacts)
-      .set({
-        email: input.email !== undefined ? values.email : undefined,
-        name: input.name,
-        plan: input.plan,
-        tags: input.tags,
-        signedUpAt: input.signedUpAt ? values.signedUpAt : undefined,
-        externalId: input.externalId,
-      })
-      .where(eq(contacts.id, existing[0].id))
-      .returning();
-    return updated!;
+  const email = input.email?.toLowerCase();
+  const byExternalId = input.externalId
+    ? (await db.select().from(contacts).where(and(eq(contacts.workspaceId, workspaceId), eq(contacts.externalId, input.externalId))).limit(1))[0]
+    : undefined;
+  // Someone imported or subscribed by email and later identified by your user id is the same person: link them.
+  const byEmail =
+    !byExternalId && email
+      ? (await db.select().from(contacts).where(and(eq(contacts.workspaceId, workspaceId), sql`lower(${contacts.email}) = ${email}`)).limit(1))[0]
+      : undefined;
+  const existing = byExternalId ?? (byEmail && (!byEmail.externalId || byEmail.externalId === input.externalId) ? byEmail : undefined);
+  if (byEmail && !existing) throw conflict("CONTACT_EXISTS", "A contact with that email or external id already exists.");
+
+  if (existing) {
+    try {
+      const [updated] = await db
+        .update(contacts)
+        .set({
+          email: input.email !== undefined ? (email ?? null) : undefined,
+          name: input.name,
+          plan: input.plan,
+          tags: input.tags,
+          signedUpAt: input.signedUpAt ? new Date(input.signedUpAt) : undefined,
+          externalId: input.externalId,
+          lastSeenAt: options.seen ? new Date() : undefined,
+        })
+        .where(eq(contacts.id, existing.id))
+        .returning();
+      return updated!;
+    } catch (error) {
+      if (isUniqueViolation(error)) throw conflict("CONTACT_EXISTS", "A contact with that email or external id already exists.");
+      throw error;
+    }
   }
   try {
-    const [created] = await db.insert(contacts).values(values).returning();
+    const [created] = await db
+      .insert(contacts)
+      .values({
+        workspaceId,
+        externalId: input.externalId ?? null,
+        email: email ?? null,
+        name: input.name ?? null,
+        plan: input.plan ?? null,
+        tags: input.tags ?? [],
+        signedUpAt: input.signedUpAt ? new Date(input.signedUpAt) : null,
+        source: options.source ?? "api",
+        lastSeenAt: options.seen ? new Date() : null,
+      })
+      .returning();
     return created!;
   } catch (error) {
     if (isUniqueViolation(error)) throw conflict("CONTACT_EXISTS", "A contact with that email or external id already exists.");

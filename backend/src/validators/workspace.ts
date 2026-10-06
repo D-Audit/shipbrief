@@ -140,11 +140,18 @@ export const brandingSchema = z.object({
   widgetTheme: z.enum(["inherit", "light", "dark"]).optional(),
 });
 
+export const changelogSettingsSchema = z.object({
+  enabled: z.boolean().optional(),
+  allowSubscriptions: z.boolean().optional(),
+  showAuthor: z.boolean().optional(),
+});
+
 export const widgetSettingsSchema = z.object({
   launcherMode: z.enum(["default", "manual"]).optional(),
   placement: z.enum(["bottom-right", "bottom-left"]).optional(),
   showUnreadBadge: z.boolean().optional(),
   theme: z.enum(["inherit", "light", "dark"]).optional(),
+  emailSubscribe: z.boolean().optional(),
 });
 
 // Developer --------------------------------------------------------------------

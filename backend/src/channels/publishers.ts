@@ -1,16 +1,20 @@
 import { and, desc, eq, inArray } from "drizzle-orm";
-import { config } from "../config/env.js";
 import { audiences, campaigns, workspaces } from "../database/schema.js";
 import { enqueue } from "../jobs/queue.js";
 import type { Channel } from "../types/domain.js";
+import { publicChangelogUrls } from "../services/workspace.service.js";
 import type { ChannelPublisher } from "./types.js";
 
 /** Changelog: publication makes the release visible on the public changelog immediately. */
 const changelogPublisher: ChannelPublisher = {
   channel: "changelog",
   async publish({ tx, release }) {
-    const [workspace] = await tx.select({ slug: workspaces.slug }).from(workspaces).where(eq(workspaces.id, release.workspaceId)).limit(1);
-    return { status: "published", meta: { url: `${config.APP_URL}/c/${workspace?.slug}/${release.slug}` } };
+    const [workspace] = await tx
+      .select({ slug: workspaces.slug })
+      .from(workspaces)
+      .where(eq(workspaces.id, release.workspaceId))
+      .limit(1);
+    return { status: "published", meta: { url: workspace ? publicChangelogUrls(workspace).releaseUrl(release.slug) : null } };
   },
 };
 

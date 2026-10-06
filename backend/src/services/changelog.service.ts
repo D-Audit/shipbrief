@@ -1,12 +1,12 @@
 import { and, asc, desc, eq, isNull, ne, sql, type SQL } from "drizzle-orm";
 import { db } from "../database/client.js";
-import { analyticsEvents, feedback, feedbackVotes, publicComments, releasePublications, releaseReactions, releases, roadmapItems } from "../database/schema.js";
+import { analyticsEvents, feedback, feedbackVotes, publicComments, releasePublications, releaseReactions, releases, roadmapItems, users } from "../database/schema.js";
 import type { ReleaseStatus } from "../types/domain.js";
 import { badRequest, notFound } from "../utils/errors.js";
 import type { Actor } from "../utils/http.js";
 import { prefixTsQuery } from "./release.service.js";
 import { emitEvent, track } from "./events.service.js";
-import { getPublicWorkspaceBySlug, toBranding } from "./workspace.service.js";
+import { getPublicChangelogWorkspace, getPublicWorkspaceBySlug, publicChangelogUrls, toBranding } from "./workspace.service.js";
 
 type ReleaseRow = typeof releases.$inferSelect;
 
@@ -87,8 +87,13 @@ export async function hideComment(actor: Actor, releaseId: string, commentId: st
 // Public changelog (/c/[workspace]) — exposes only published, changelog content.
 // ---------------------------------------------------------------------------
 
-/** Public shape: no author names, ids of internal users, counters beyond engagement, or drafts. */
-function toPublicRelease(row: ReleaseRow) {
+type PublicWorkspaceRow = Awaited<ReturnType<typeof getPublicChangelogWorkspace>>;
+
+/**
+ * Public shape: no ids of internal users, counters beyond engagement, or drafts.
+ * The author's display name is included only when the workspace opted in.
+ */
+export function toPublicRelease(row: ReleaseRow, author?: string | null) {
   const variant = row.channelVariants.changelog;
   return {
     id: row.id,
@@ -105,10 +110,16 @@ function toPublicRelease(row: ReleaseRow) {
     seo: row.seo ?? undefined,
     reactions: row.reactions,
     comments: row.comments,
+    author: author ? { name: author } : undefined,
   };
 }
 
-function publicReleaseWhere(workspaceId: string): SQL {
+/**
+ * The one visibility rule for every public surface of the changelog (pages, RSS,
+ * engagement): published, not deleted, and actually published to the Changelog
+ * channel. Drafts, scheduled updates and in-app/email-only updates never match.
+ */
+export function publicReleaseWhere(workspaceId: string): SQL {
   return and(
     eq(releases.workspaceId, workspaceId),
     eq(releases.status, "published"),
@@ -118,12 +129,38 @@ function publicReleaseWhere(workspaceId: string): SQL {
 }
 
 export async function getPublicWorkspace(slug: string) {
-  const workspace = await getPublicWorkspaceBySlug(slug);
-  return { name: workspace.name, slug: workspace.slug, branding: toBranding(workspace) };
+  const workspace = await getPublicChangelogWorkspace(slug);
+  const { url, rssUrl } = publicChangelogUrls(workspace);
+  return {
+    name: workspace.name,
+    slug: workspace.slug,
+    branding: toBranding(workspace),
+    url,
+    rssUrl,
+    settings: { allowSubscriptions: workspace.changelogSubscribe, showAuthor: workspace.changelogShowAuthor },
+  };
+}
+
+/** Rows with their author's display name (who published, else who wrote it) when the workspace shows authors. */
+async function selectPublicReleases(workspace: PublicWorkspaceRow, where: SQL | undefined, page: { limit: number; offset?: number }) {
+  const rows = await db
+    .select({ release: releases, author: users.name })
+    .from(releases)
+    .leftJoin(users, workspace.changelogShowAuthor ? sql`${users.id} = coalesce(${releases.publishedBy}, ${releases.createdBy})` : sql`false`)
+    .where(where)
+    .orderBy(desc(releases.publishedAt), desc(releases.id))
+    .limit(page.limit)
+    .offset(page.offset ?? 0);
+  return rows.map((row) => ({ release: row.release, author: workspace.changelogShowAuthor ? row.author : null }));
+}
+
+/** Newest public releases of an enabled changelog, for feeds. */
+export async function latestPublicReleases(workspace: PublicWorkspaceRow, limit: number) {
+  return selectPublicReleases(workspace, publicReleaseWhere(workspace.id), { limit });
 }
 
 export async function listPublicReleases(slug: string, filters: { search?: string; tag?: string; category?: string; page: number; pageSize: number }) {
-  const workspace = await getPublicWorkspaceBySlug(slug);
+  const workspace = await getPublicChangelogWorkspace(slug);
   const tsQuery = filters.search ? prefixTsQuery(filters.search) : null;
   const where = and(
     publicReleaseWhere(workspace.id),
@@ -132,26 +169,27 @@ export async function listPublicReleases(slug: string, filters: { search?: strin
     tsQuery ? sql`${releases.searchVector} @@ to_tsquery('simple', ${tsQuery})` : undefined,
   );
   const [rows, [{ total } = { total: 0 }]] = await Promise.all([
-    db.select().from(releases).where(where).orderBy(desc(releases.publishedAt)).limit(filters.pageSize).offset((filters.page - 1) * filters.pageSize),
+    selectPublicReleases(workspace, where, { limit: filters.pageSize, offset: (filters.page - 1) * filters.pageSize }),
     db.select({ total: sql<number>`count(*)::int` }).from(releases).where(where),
   ]);
-  return { items: rows.map(toPublicRelease), total, workspaceId: workspace.id };
+  return { items: rows.map((row) => toPublicRelease(row.release, row.author)), total, workspaceId: workspace.id };
 }
 
 async function findPublicRelease(workspaceSlug: string, releaseSlug: string) {
-  const workspace = await getPublicWorkspaceBySlug(workspaceSlug);
-  const [row] = await db.select().from(releases).where(and(publicReleaseWhere(workspace.id), eq(releases.slug, releaseSlug))).limit(1);
+  const workspace = await getPublicChangelogWorkspace(workspaceSlug);
+  const [row] = await selectPublicReleases(workspace, and(publicReleaseWhere(workspace.id), eq(releases.slug, releaseSlug)), { limit: 1 });
   if (!row) throw notFound("UPDATE_NOT_FOUND", "Update not found.");
-  return { workspace, release: row };
+  return { workspace, release: row.release, author: row.author };
 }
 
 export async function getPublicRelease(workspaceSlug: string, releaseSlug: string) {
-  return toPublicRelease((await findPublicRelease(workspaceSlug, releaseSlug)).release);
+  const { release, author } = await findPublicRelease(workspaceSlug, releaseSlug);
+  return toPublicRelease(release, author);
 }
 
 /** Counts a view once per visitor per 30 minutes, so refreshes don't inflate numbers. */
 export async function recordPublicView(workspaceSlug: string, releaseSlug: string | null, visitorId: string, channel: "changelog" | "widget" = "changelog") {
-  const workspace = await getPublicWorkspaceBySlug(workspaceSlug);
+  const workspace = await getPublicChangelogWorkspace(workspaceSlug);
   if (!releaseSlug) {
     await track(db, { workspaceId: workspace.id, type: "changelog.viewed", channel, visitorId });
     return;

@@ -4,6 +4,7 @@ import { config } from "../config/env.js";
 import * as campaigns from "../services/campaign.service.js";
 import * as changelog from "../services/changelog.service.js";
 import * as contactsService from "../services/contact.service.js";
+import * as rss from "../services/rss.service.js";
 import * as inApp from "../services/in-app.service.js";
 import { parse, sendData } from "../utils/http.js";
 import {
@@ -15,9 +16,11 @@ import {
   subscribeSchema,
   unsubscribeQuery,
   viewSchema,
+  widgetIdentifySchema,
   widgetListQuery,
   widgetParam,
   widgetReleaseParam,
+  widgetSubscriptionSchema,
   workspaceParam,
 } from "../validators/public.js";
 
@@ -60,6 +63,14 @@ export async function listReleases(req: Request, res: Response) {
   const { items, total } = await changelog.listPublicReleases(workspace, query);
   res.setHeader("Cache-Control", "public, max-age=30");
   sendData(res, items, 200, { page: query.page, pageSize: query.pageSize, total, hasMore: query.page * query.pageSize < total });
+}
+
+/** RSS 2.0 feed of the public changelog (same releases, same visibility rule). Express adds an ETag for conditional GETs. */
+export async function feed(req: Request, res: Response) {
+  const { workspace } = parse(req, "params", workspaceParam);
+  const xml = await rss.buildChangelogFeed(workspace);
+  res.setHeader("Cache-Control", "public, max-age=300");
+  res.type("application/rss+xml; charset=utf-8").send(xml);
 }
 
 export async function getRelease(req: Request, res: Response) {
@@ -116,6 +127,30 @@ export async function roadmap(req: Request, res: Response) {
 
 // In-app widget ----------------------------------------------------------------
 
+const WIDGET_SESSION_HEADER = "x-widget-session";
+
+/** Identified users (signed widget session) keep one read state everywhere; everyone else is an anonymous visitor. */
+function widgetVisitor(req: Request, res: Response, key: string) {
+  return inApp.readWidgetSession(key, req.get(WIDGET_SESSION_HEADER))?.visitorId ?? visitorId(req, res);
+}
+
+function existingWidgetVisitor(req: Request, key: string) {
+  return inApp.readWidgetSession(key, req.get(WIDGET_SESSION_HEADER))?.visitorId ?? existingVisitor(req);
+}
+
+export async function widgetIdentify(req: Request, res: Response) {
+  const { key } = parse(req, "params", widgetParam);
+  const body = parse(req, "body", widgetIdentifySchema);
+  res.setHeader("Cache-Control", "no-store");
+  sendData(res, await inApp.identifyWidgetUser(key, body, existingVisitor(req)));
+}
+
+export async function widgetSubscription(req: Request, res: Response) {
+  const { key } = parse(req, "params", widgetParam);
+  const { subscribed } = parse(req, "body", widgetSubscriptionSchema);
+  sendData(res, await inApp.setWidgetSubscription(key, req.get(WIDGET_SESSION_HEADER), subscribed));
+}
+
 export async function widgetConfig(req: Request, res: Response) {
   const { key } = parse(req, "params", widgetParam);
   res.setHeader("Cache-Control", "public, max-age=60");
@@ -125,42 +160,42 @@ export async function widgetConfig(req: Request, res: Response) {
 export async function widgetUpdates(req: Request, res: Response) {
   const { key } = parse(req, "params", widgetParam);
   const { limit } = parse(req, "query", widgetListQuery);
-  sendData(res, await inApp.listWidgetUpdates(key, existingVisitor(req), limit));
+  sendData(res, await inApp.listWidgetUpdates(key, existingWidgetVisitor(req, key), limit));
 }
 
 export async function widgetRead(req: Request, res: Response) {
   const { key, releaseId } = parse(req, "params", widgetReleaseParam);
-  sendData(res, await inApp.markWidgetUpdateRead(key, releaseId, visitorId(req, res)));
+  sendData(res, await inApp.markWidgetUpdateRead(key, releaseId, widgetVisitor(req, res, key)));
 }
 
 export async function widgetReadAll(req: Request, res: Response) {
   const { key } = parse(req, "params", widgetParam);
-  sendData(res, await inApp.markAllWidgetUpdatesRead(key, visitorId(req, res)));
+  sendData(res, await inApp.markAllWidgetUpdatesRead(key, widgetVisitor(req, res, key)));
 }
 
 export async function widgetDismiss(req: Request, res: Response) {
   const { key, releaseId } = parse(req, "params", widgetReleaseParam);
-  sendData(res, await inApp.dismissWidgetUpdate(key, releaseId, visitorId(req, res)));
+  sendData(res, await inApp.dismissWidgetUpdate(key, releaseId, widgetVisitor(req, res, key)));
 }
 
 export async function widgetClick(req: Request, res: Response) {
   const { key, releaseId } = parse(req, "params", widgetReleaseParam);
-  sendData(res, await inApp.recordWidgetClick(key, releaseId, visitorId(req, res)));
+  sendData(res, await inApp.recordWidgetClick(key, releaseId, widgetVisitor(req, res, key)));
 }
 
 // Subscribe to updates (double opt-in) -------------------------------------------
 
 export async function subscribe(req: Request, res: Response) {
   const { workspace } = parse(req, "params", workspaceParam);
-  const { email } = parse(req, "body", subscribeSchema);
-  sendData(res, await contactsService.requestSubscription(workspace, email), 202);
+  const { email, source } = parse(req, "body", subscribeSchema);
+  sendData(res, await contactsService.requestSubscription(workspace, email, source), 202);
 }
 
 /** The link in the confirmation email: subscribes, then returns the person to the changelog with a thank-you. */
 export async function confirmSubscribe(req: Request, res: Response) {
   const { token } = parse(req, "query", subscribeConfirmQuery);
   const confirmed = await contactsService.confirmSubscription(token);
-  if (confirmed) return res.redirect(303, `${config.APP_URL}/c/${confirmed.workspaceSlug}?subscribed=1`);
+  if (confirmed) return res.redirect(303, `${confirmed.changelogUrl}?subscribed=1`);
   res
     .status(400)
     .type("html")

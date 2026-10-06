@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
 import * as activity from "../services/activity.service.js";
 import * as analytics from "../services/analytics.service.js";
-import { listAuditLogs } from "../services/audit.service.js";
+import { audit, listAuditLogs } from "../services/audit.service.js";
 import * as audiences from "../services/audience.service.js";
 import * as billing from "../services/billing.service.js";
 import * as campaigns from "../services/campaign.service.js";
@@ -9,6 +9,7 @@ import * as changelog from "../services/changelog.service.js";
 import * as contactsService from "../services/contact.service.js";
 import { exportWorkspace } from "../services/export.service.js";
 import * as feedback from "../services/feedback.service.js";
+import * as inApp from "../services/in-app.service.js";
 import * as overview from "../services/overview.service.js";
 import * as roadmap from "../services/roadmap.service.js";
 import * as team from "../services/team.service.js";
@@ -22,6 +23,7 @@ import {
   importContactsSchema,
   listContactsQuery,
   brandingSchema,
+  changelogSettingsSchema,
   byReleaseQuery,
   checkoutSchema,
   commentParams,
@@ -268,8 +270,23 @@ export const getSettings = async (req: Request, res: Response) => sendData(res, 
 export const updateSettings = async (req: Request, res: Response) => sendData(res, await workspace.updateSettings(actorOf(req), parse(req, "body", settingsSchema)));
 export const getBranding = async (req: Request, res: Response) => sendData(res, await workspace.getBranding(actorOf(req)));
 export const updateBranding = async (req: Request, res: Response) => sendData(res, await workspace.updateBranding(actorOf(req), parse(req, "body", brandingSchema)));
+export const getChangelogSettings = async (req: Request, res: Response) => sendData(res, await workspace.getChangelogSettings(actorOf(req)));
+export const updateChangelogSettings = async (req: Request, res: Response) =>
+  sendData(res, await workspace.updateChangelogSettings(actorOf(req), parse(req, "body", changelogSettingsSchema)));
+
 export const getWidget = async (req: Request, res: Response) => sendData(res, await workspace.getWidgetSettings(actorOf(req)));
 export const updateWidget = async (req: Request, res: Response) => sendData(res, await workspace.updateWidgetSettings(actorOf(req), parse(req, "body", widgetSettingsSchema)));
+export const getWidgetIdentitySecret = async (req: Request, res: Response) => {
+  res.setHeader("Cache-Control", "no-store");
+  sendData(res, await inApp.getWidgetIdentitySecret(actorOf(req)));
+};
+export const rotateWidgetIdentitySecret = async (req: Request, res: Response) => {
+  const actor = actorOf(req);
+  const result = await inApp.rotateWidgetIdentitySecret(actor);
+  await audit({ action: "widget.identity_secret_rotated", workspaceId: actor.workspaceId, userId: actor.userId });
+  res.setHeader("Cache-Control", "no-store");
+  sendData(res, result);
+};
 
 export async function deleteWorkspace(req: Request, res: Response) {
   const { confirmation } = parse(req, "body", deleteWorkspaceSchema);

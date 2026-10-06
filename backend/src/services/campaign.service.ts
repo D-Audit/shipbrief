@@ -15,6 +15,7 @@ import type { Actor } from "../utils/http.js";
 import { recordActivity } from "./activity.service.js";
 import { audienceFilter, reachable } from "./audience.service.js";
 import { emitEvent, track } from "./events.service.js";
+import { publicChangelogUrls } from "./workspace.service.js";
 
 type CampaignRow = typeof campaigns.$inferSelect;
 
@@ -181,9 +182,8 @@ export async function sendTestEmail(actor: Actor, campaignId: string) {
     cta: campaign.cta ?? release.cta,
     accent: workspace.accentColor,
     // Real recipients get their own unsubscribe link; the test points at the changelog instead.
-    unsubscribeUrl: `${config.APP_URL}/c/${workspace.slug}`,
-    changelogUrl: `${config.APP_URL}/c/${workspace.slug}`,
-    releaseUrl: release.channels.includes("changelog") ? `${config.APP_URL}/c/${workspace.slug}/${release.slug}` : null,
+    unsubscribeUrl: publicChangelogUrls(workspace).url,
+    ...changelogLinks(workspace, release),
   });
   try {
     const result = await emailProvider.send({ to: actor.email, ...rendered, fromName: campaign.fromName, replyTo: campaign.replyTo });
@@ -196,6 +196,14 @@ export async function sendTestEmail(actor: Actor, campaignId: string) {
 
 export function unsubscribeToken(contactId: string) {
   return hmacSha256Hex(config.ENCRYPTION_KEY, `unsubscribe:${contactId}`).slice(0, 32);
+}
+
+/** Links from a release email to the public changelog; none when the workspace's changelog is off. */
+function changelogLinks(workspace: typeof workspaces.$inferSelect, release: typeof releases.$inferSelect) {
+  if (!workspace.changelogEnabled) return { changelogUrl: null, releaseUrl: null };
+  const urls = publicChangelogUrls(workspace);
+  // Only link the release page when it exists: the release was also published to the changelog.
+  return { changelogUrl: urls.url, releaseUrl: release.channels.includes("changelog") ? urls.releaseUrl(release.slug) : null };
 }
 
 export function unsubscribeUrl(contactId: string) {
@@ -262,7 +270,7 @@ export async function sendCampaignJob(payload: Record<string, unknown>) {
     if (batch.length === 0) break;
     let progressed = false;
     for (const delivery of batch) {
-      const unsubscribe = delivery.contactId ? unsubscribeUrl(delivery.contactId) : `${config.APP_URL}/c/${workspace.slug}`;
+      const unsubscribe = delivery.contactId ? unsubscribeUrl(delivery.contactId) : publicChangelogUrls(workspace).url;
       const rendered = releaseEmailTemplate({
         workspaceName: workspace.name,
         subject: campaign.subject,
@@ -271,9 +279,7 @@ export async function sendCampaignJob(payload: Record<string, unknown>) {
         cta: campaign.cta ?? release.cta,
         accent: workspace.accentColor,
         unsubscribeUrl: unsubscribe,
-        changelogUrl: `${config.APP_URL}/c/${workspace.slug}`,
-        // Only link the release page when it exists: the release was also published to the changelog.
-        releaseUrl: release.channels.includes("changelog") ? `${config.APP_URL}/c/${workspace.slug}/${release.slug}` : null,
+        ...changelogLinks(workspace, release),
       });
       try {
         const result = await emailProvider.send({

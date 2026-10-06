@@ -1,16 +1,21 @@
 import { WhatsNewWidget } from "@/components/channels/whats-new-widget";
 import { PageHeader } from "@/components/shared/page-states";
 
-type EmbedPageProps = { searchParams: Promise<{ key?: string | string[] }> };
+type EmbedPageProps = { searchParams: Promise<{ key?: string | string[]; mode?: string | string[]; theme?: string | string[] }> };
 
 export default async function EmbedWhatsNewPage({ searchParams }: EmbedPageProps) {
-  const { key } = await searchParams;
+  const { key, mode, theme } = await searchParams;
   const projectKey = typeof key === "string" ? key : undefined;
+  const themeOverride = theme === "light" || theme === "dark" ? theme : undefined;
+  if (projectKey && mode === "panel") {
+    // Opened by /widget.js inside the customer's product: the panel fills the iframe.
+    return <WhatsNewWidget projectKey={projectKey} theme={themeOverride} mode="panel" />;
+  }
   if (projectKey) {
-    // Embedded in a customer's product via iframe: render only the widget.
+    // Older installs embed this page directly with an iframe: render only the widget.
     return (
       <div className="flex min-h-dvh items-end justify-center p-3">
-        <WhatsNewWidget projectKey={projectKey} />
+        <WhatsNewWidget projectKey={projectKey} theme={themeOverride} />
       </div>
     );
   }

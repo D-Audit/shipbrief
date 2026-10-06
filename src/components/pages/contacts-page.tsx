@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { format } from "date-fns";
-import { FileUp, Loader2, Search, Trash2, UserPlus } from "lucide-react";
+import { FileUp, Loader2, Plug, Search, Trash2, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 import { EmptyState, ErrorState, LoadingState, PageHeader, StatusBadge } from "@/components/shared/page-states";
 import { useSession } from "@/components/session/session-provider";
@@ -24,6 +24,14 @@ const filters: { value: ContactStatusFilter; label: string }[] = [
   { value: "subscribed", label: "Subscribed" },
   { value: "unsubscribed", label: "Unsubscribed" },
 ];
+
+const CONTACT_SOURCE_LABELS: Record<NonNullable<Contact["source"]>, string> = {
+  manual: "added by hand",
+  import: "CSV import",
+  api: "API",
+  changelog: "changelog subscribe",
+  widget: "widget",
+};
 
 /** The people who receive release emails: added by hand, imported from CSV, subscribed on the changelog, or sent through the API. */
 export function ContactsPage() {
@@ -74,6 +82,7 @@ export function ContactsPage() {
         description="The people who get your release emails. Anyone who unsubscribes is never emailed again."
         actions={
           <>
+            <ButtonLink href="/app/api/guide" variant="ghost"><Plug />Connect your app</ButtonLink>
             <Button type="button" variant="outline" onClick={() => setImportOpen(true)}><FileUp />Import CSV</Button>
             <Button type="button" onClick={() => setAddOpen(true)}><UserPlus />Add contact</Button>
           </>
@@ -101,7 +110,7 @@ export function ContactsPage() {
       {data && noContactsAtAll && (
         <EmptyState
           title="No contacts yet"
-          description="Add people by hand, import a CSV from your CRM or spreadsheet, or let customers subscribe themselves from your public changelog."
+          description="Add people by hand, import a CSV from your CRM or spreadsheet, connect your app so new sign-ups are added automatically, or let customers subscribe themselves from your public changelog."
           action={
             <div className="flex flex-wrap justify-center gap-2">
               <Button type="button" onClick={() => setAddOpen(true)}><UserPlus />Add contact</Button>
@@ -147,11 +156,11 @@ export function ContactsPage() {
                   <div className="min-w-0">
                     <p className="truncate text-sm font-medium text-foreground">{contact.email ?? contact.externalId}</p>
                     <p className="truncate text-xs text-muted-foreground">
-                      {[contact.name, contact.plan && `${contact.plan} plan`, contact.tags.length ? contact.tags.join(", ") : null, `added ${format(new Date(contact.createdAt), "MMM d, yyyy")}`].filter(Boolean).join(" · ")}
+                      {[contact.name, contact.plan && `${contact.plan} plan`, contact.tags.length ? contact.tags.join(", ") : null, contact.source && `via ${CONTACT_SOURCE_LABELS[contact.source]}`, contact.lastSeenAt ? `last seen ${format(new Date(contact.lastSeenAt), "MMM d, yyyy")}` : `added ${format(new Date(contact.createdAt), "MMM d, yyyy")}`].filter(Boolean).join(" · ")}
                     </p>
                   </div>
                   <div className="flex shrink-0 items-center gap-2">
-                    <StatusBadge status={contact.subscribed ? "subscribed" : "unsubscribed"} />
+                    {contact.email ? <StatusBadge status={contact.subscribed ? "subscribed" : "unsubscribed"} /> : <span className="text-xs text-muted-foreground" title="Identified in the widget without an email, so release emails can't reach them.">No email</span>}
                     <Button type="button" variant="ghost" size="icon-sm" onClick={() => setRemoveTarget(contact)} aria-label={`Remove ${contact.email ?? "contact"}`}><Trash2 /></Button>
                   </div>
                 </li>

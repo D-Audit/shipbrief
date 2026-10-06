@@ -4,6 +4,7 @@ import { logger } from "../config/logger.js";
 import * as auth from "../services/auth.service.js";
 import { listSessions, resolveSession, revokeOwnSession, SESSION_COOKIE, sessionCookieOptions } from "../services/session.service.js";
 import { listUserWorkspaces } from "../services/workspace.service.js";
+import { productUpdatesIdentity } from "../services/in-app.service.js";
 import { AppError, notFound } from "../utils/errors.js";
 import { parse, requestMeta, sendData, sendNoContent, sessionOf } from "../utils/http.js";
 import {
@@ -151,4 +152,10 @@ export async function oauthCallback(req: Request, res: Response) {
     const notice = error instanceof AppError && error.code === "OAUTH_EMAIL_UNVERIFIED" ? "oauth-email-unverified" : "oauth-failed";
     res.redirect(303, `${config.APP_URL}/login?notice=${notice}&provider=${provider}`);
   }
+}
+
+/** The signed-in user's identity for ShipBrief's own "What's new" panel, or null when it isn't configured. */
+export async function productUpdates(req: Request, res: Response) {
+  res.setHeader("Cache-Control", "no-store");
+  sendData(res, await productUpdatesIdentity(sessionOf(req).user));
 }

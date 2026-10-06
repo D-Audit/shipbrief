@@ -9,6 +9,10 @@ const groups = [
       { href: "/#workflow", label: "Workflow" },
       { href: "/#ai", label: "AI Studio" },
       { href: "/#channels", label: "Channels" },
+      { href: "/#widget", label: "In-app widget" },
+      { href: "/#email", label: "Email and contacts" },
+      { href: "/#loop", label: "Feedback and roadmap" },
+      { href: "/#faq", label: "FAQ" },
       { href: "/pricing", label: "Pricing" },
     ],
   },
@@ -17,7 +21,7 @@ const groups = [
     links: [
       { href: "/app/overview", label: "Demo workspace" },
       { href: "/c/acme", label: "Example changelog" },
-      { href: "/embed/whats-new", label: "In-app widget" },
+      { href: "/embed/whats-new", label: "Widget preview" },
     ],
   },
   {

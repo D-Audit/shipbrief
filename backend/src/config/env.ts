@@ -51,6 +51,12 @@ const schema = z
     SESSION_TTL_DAYS: z.coerce.number().int().positive().default(30),
     REQUIRE_EMAIL_VERIFICATION: bool(true),
 
+    /**
+     * Widget key (Project ID) of the workspace whose in-app releases ShipBrief shows its own
+     * signed-in users in the app's "What's new" panel. Unset hides it.
+     */
+    PRODUCT_UPDATES_WIDGET_KEY: optionalString,
+
     WORKER_MODE: z.enum(["embedded", "off"]).default("embedded"),
     /** How often connected sources (GitHub, GitLab, Linear, Jira) are checked for new work. 0 turns automatic sync off. */
     INTEGRATION_SYNC_MINUTES: z.coerce.number().int().min(0).max(1440).default(15),

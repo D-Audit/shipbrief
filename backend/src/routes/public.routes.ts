@@ -10,6 +10,7 @@ publicRoutes.use(publicCors);
 
 publicRoutes.get("/workspaces/:workspace", limits.publicRead, pub.workspace);
 publicRoutes.get("/workspaces/:workspace/releases", limits.publicRead, pub.listReleases);
+publicRoutes.get("/workspaces/:workspace/rss.xml", limits.publicRead, pub.feed);
 publicRoutes.get("/workspaces/:workspace/releases/:slug", limits.publicRead, pub.getRelease);
 publicRoutes.get("/workspaces/:workspace/releases/:slug/engagement", limits.publicRead, pub.engagement);
 publicRoutes.post("/workspaces/:workspace/releases/:slug/reaction", limits.publicWrite, pub.toggleReaction);
@@ -26,6 +27,8 @@ publicRoutes.post("/widget/:key/updates/read-all", limits.publicRead, pub.widget
 publicRoutes.post("/widget/:key/updates/:releaseId/read", limits.publicRead, pub.widgetRead);
 publicRoutes.post("/widget/:key/updates/:releaseId/dismiss", limits.publicRead, pub.widgetDismiss);
 publicRoutes.post("/widget/:key/updates/:releaseId/click", limits.publicRead, pub.widgetClick);
+publicRoutes.post("/widget/:key/identify", limits.widgetIdentify, pub.widgetIdentify);
+publicRoutes.post("/widget/:key/subscription", limits.publicWrite, pub.widgetSubscription);
 
 publicRoutes.post("/workspaces/:workspace/subscribe", limits.subscribe, pub.subscribe);
 publicRoutes.get("/subscribe/confirm", limits.publicWrite, pub.confirmSubscribe);

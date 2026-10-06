@@ -75,6 +75,8 @@ export type PublicRelease = Pick<Release, "id" | "title" | "summary" | "body" | 
   slug: string;
   publishedAt: string;
   featured: boolean;
+  /** Present only when the workspace shows authors on its changelog. */
+  author?: { name: string };
 };
 
 /**
@@ -279,6 +281,10 @@ export type Contact = {
   externalId: string | null;
   subscribed: boolean;
   unsubscribedAt: string | null;
+  /** How they first arrived; null for contacts added before sources were recorded. */
+  source: "manual" | "import" | "api" | "changelog" | "widget" | null;
+  /** Last time the widget saw them signed in to your product. */
+  lastSeenAt: string | null;
   createdAt: string;
 };
 
@@ -442,6 +448,16 @@ export type WorkspaceBranding = {
   domainStatus: "connected" | "pending" | "none";
   publicTheme: "light" | "dark" | "system";
   widgetTheme: "inherit" | "light" | "dark";
+};
+
+/** Public changelog settings (Changelog page). */
+export type ChangelogSettings = {
+  enabled: boolean;
+  allowSubscriptions: boolean;
+  showAuthor: boolean;
+  /** Public changelog URL and its RSS feed. */
+  url: string;
+  rssUrl: string;
 };
 
 export type WorkspaceSettings = {

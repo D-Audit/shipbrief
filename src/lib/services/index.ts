@@ -19,6 +19,7 @@ import type {
   ChangelogEntry,
   ChangelogFilterOptions,
   ChangelogListFilters,
+  ChangelogSettings,
   CreatedApiKey,
   CreatedWebhook,
   CreatePublicReleaseCommentInput,
@@ -334,7 +335,17 @@ export const changelogService = {
     const { data } = await api.list<PublicRelease>(`/public/workspaces/${encodeURIComponent(workspace)}/releases`, { query: { pageSize: 50, ...filters }, allowUnauthenticated: true });
     return data;
   },
+  /** One page of the public changelog, with whether more pages follow. */
+  async getPublicPage(workspace: string, page: number, pageSize = PUBLIC_PAGE_SIZE) {
+    const { data, meta } = await api.list<PublicRelease>(`/public/workspaces/${encodeURIComponent(workspace)}/releases`, { query: { page, pageSize }, allowUnauthenticated: true });
+    return { items: data, hasMore: meta?.hasMore ?? false, total: meta?.total ?? data.length };
+  },
+  getSettings: () => api.get<ChangelogSettings>("/changelog/settings"),
+  updateSettings: (input: Partial<Pick<ChangelogSettings, "enabled" | "allowSubscriptions" | "showAuthor">>) => api.patch<ChangelogSettings>("/changelog/settings", input),
 };
+
+export const PUBLIC_PAGE_SIZE = 20;
+
 
 const publicBase = (workspace: string, slug: string) => `/public/workspaces/${encodeURIComponent(workspace)}/releases/${encodeURIComponent(slug)}`;
 
@@ -398,7 +409,15 @@ export function uploadFile(file: File, purpose: "logo" | "favicon" | "media" | "
   return api.post<UploadedAsset>("/uploads", form);
 }
 
-export type PublicWorkspace = { name: string; slug: string; branding: WorkspaceBranding };
+export type PublicWorkspace = {
+  name: string;
+  slug: string;
+  branding: WorkspaceBranding;
+  /** Public changelog URL and its RSS feed. */
+  url: string;
+  rssUrl: string;
+  settings: { allowSubscriptions: boolean; showAuthor: boolean };
+};
 
 export const brandingService = {
   get: () => api.get<WorkspaceBranding>("/branding"),

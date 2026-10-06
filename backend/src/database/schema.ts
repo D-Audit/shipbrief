@@ -17,6 +17,7 @@ import {
 } from "drizzle-orm/pg-core";
 import type {
   AudienceRules,
+  ContactSource,
   ChannelVariantMap,
   ReleaseCta,
   ReleaseMedia,
@@ -170,11 +171,21 @@ export const workspaces = pgTable(
     accentColor: text().notNull().default("#C85069"),
     customDomain: text(),
     domainStatus: text().$type<"connected" | "pending" | "none">().notNull().default("none"),
+    /** The hosted changelog at /c/[slug] (and the custom domain). Off hides it and its RSS feed. */
+    changelogEnabled: boolean().notNull().default(true),
+    /** Shows "Get updates by email" on the public changelog. */
+    changelogSubscribe: boolean().notNull().default(true),
+    /** Shows who published each update on the public changelog and in RSS. */
+    changelogShowAuthor: boolean().notNull().default(false),
     publicTheme: text().$type<"light" | "dark" | "system">().notNull().default("dark"),
     widgetTheme: text().$type<"inherit" | "light" | "dark">().notNull().default("inherit"),
     widgetLauncherMode: text().$type<"default" | "manual">().notNull().default("default"),
     widgetPlacement: text().$type<"bottom-right" | "bottom-left">().notNull().default("bottom-right"),
     widgetShowUnreadBadge: boolean().notNull().default(true),
+    /** Shows "Get updates by email" in the widget. */
+    widgetEmailSubscribe: boolean().notNull().default(true),
+    /** Encrypted HMAC secret that signs identified widget users (userHash). Created on first use. */
+    widgetIdentitySecret: text(),
     /** Marks rows created by the development seed so they are never mistaken for customer data. */
     isDevSeed: boolean().notNull().default(false),
     createdBy: uuid().references(() => users.id, { onDelete: "set null" }),
@@ -250,6 +261,10 @@ export const contacts = pgTable(
     tags: text().array().notNull().default(sql`'{}'::text[]`),
     signedUpAt: timestamp({ withTimezone: true }),
     unsubscribedAt: timestamp({ withTimezone: true }),
+    /** How the contact first arrived. Never overwritten afterwards. */
+    source: text().$type<ContactSource>(),
+    /** Last time the widget saw this person signed in to the customer's product. */
+    lastSeenAt: timestamp({ withTimezone: true }),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
   },

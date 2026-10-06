@@ -85,6 +85,7 @@ export const routeTitles: Record<string, string> = {
   branding: "Branding",
   billing: "Billing",
   api: "API & Webhooks",
+  guide: "Connect your app",
   activity: "Activity",
   settings: "Settings",
 };
@@ -99,5 +100,6 @@ export const commandActions = [
   { label: "Install the in-app widget", href: "/app/widget", keywords: ["widget", "install", "embed", "launcher"] },
   { label: "View activity", href: "/app/activity", keywords: ["activity", "notifications", "log"] },
   { label: "Invite teammate", href: "/app/team", keywords: ["team", "invite", "roles"] },
-  { label: "Open public changelog", href: "/c/acme", keywords: ["public", "changelog", "customers"] },
+  // ":workspace" is replaced with the active workspace's slug.
+  { label: "Open public changelog", href: "/c/:workspace", keywords: ["public", "changelog", "customers"] },
 ];

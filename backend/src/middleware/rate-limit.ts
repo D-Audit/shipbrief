@@ -72,6 +72,8 @@ export const limits = {
   subscribe: rateLimit({ name: "subscribe", windowSeconds: 60 * 60, max: 5 }),
   testEmail: rateLimit({ name: "test-email", windowSeconds: 10 * 60, max: 10, key: userOrIp }),
   publicRead: rateLimit({ name: "public-read", windowSeconds: 60, max: 240 }),
+  /** The widget identifies the signed-in user on every page load, and whole offices can share one IP. */
+  widgetIdentify: rateLimit({ name: "widget-identify", windowSeconds: 60, max: 120 }),
   api: rateLimit({ name: "api", windowSeconds: 60, max: 600, key: userOrIp }),
   apiKey: rateLimit({
     name: "api-key",

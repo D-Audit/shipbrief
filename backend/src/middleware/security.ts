@@ -40,7 +40,7 @@ export function requestId(req: Request, res: Response, next: NextFunction) {
 export function publicCors(req: Request, res: Response, next: NextFunction) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET,POST,PATCH,DELETE,OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type,Authorization,X-Visitor-Id");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type,Authorization,X-Visitor-Id,X-Widget-Session");
   res.setHeader("Access-Control-Max-Age", "600");
   if (req.method === "OPTIONS") {
     res.status(204).end();

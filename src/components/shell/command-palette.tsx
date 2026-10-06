@@ -16,6 +16,7 @@ import { accountNav, commandActions, workspaceNav } from "@/lib/navigation";
 import { releaseService } from "@/lib/services";
 import { useAsyncData } from "@/hooks/use-async-data";
 import { StatusBadge } from "@/components/shared/page-states";
+import { useSession } from "@/components/session/session-provider";
 
 interface CommandPaletteProps {
   open: boolean;
@@ -24,15 +25,16 @@ interface CommandPaletteProps {
 
 export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
   const router = useRouter();
+  const workspaceSlug = useSession().session.workspace?.slug ?? "";
   const { state: releasesState } = useAsyncData(() => releaseService.list(), [open]);
   const releases = releasesState.status === "success" ? releasesState.data.slice(0, 5) : [];
 
   const run = useCallback(
     (href: string) => {
       onOpenChange(false);
-      router.push(href);
+      router.push(href.replace(":workspace", workspaceSlug));
     },
-    [router, onOpenChange]
+    [router, onOpenChange, workspaceSlug]
   );
 
   return (

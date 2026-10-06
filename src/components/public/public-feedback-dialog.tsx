@@ -23,7 +23,7 @@ type SubmissionState = "idle" | "submitting" | "success" | "error";
  * visitor can reasonably provide; triage, priority, and tags remain internal
  * workspace concerns.
  */
-export function PublicFeedbackDialog({ workspace }: { workspace: string }) {
+export function PublicFeedbackDialog({ workspace, name = workspace }: { workspace: string; name?: string }) {
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [context, setContext] = useState("");
@@ -81,7 +81,7 @@ export function PublicFeedbackDialog({ workspace }: { workspace: string }) {
         size="sm"
         variant="outline"
         onClick={() => setOpen(true)}
-        aria-label={`Share feedback about ${workspace}`}
+        aria-label={`Share feedback about ${name}`}
       >
         <Send aria-hidden="true" />
         <span className="hidden sm:inline">Share feedback</span>
@@ -108,7 +108,7 @@ export function PublicFeedbackDialog({ workspace }: { workspace: string }) {
             <DialogHeader>
               <DialogTitle>Share feedback</DialogTitle>
               <DialogDescription>
-                Tell {workspace} what would make the product more useful. Your request goes to the product team.
+                Tell {name} what would make the product more useful. Your request goes to the product team.
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-2">

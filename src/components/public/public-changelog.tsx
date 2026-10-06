@@ -1,49 +1,84 @@
 "use client";
 
-import { useCallback, useEffect } from "react";
-import { brandingService, changelogService, publicEngagementService } from "@/lib/services";
-import { EmptyState, ErrorState, LoadingState } from "@/components/shared/page-states";
-import { useAsyncData } from "@/hooks/use-async-data";
+import { useEffect, useState } from "react";
+import { Loader2 } from "lucide-react";
+import { changelogService, publicEngagementService, type PublicWorkspace } from "@/lib/services";
+import { EmptyState } from "@/components/shared/page-states";
+import { Button } from "@/components/ui/button";
+import type { PublicRelease } from "@/types";
 import { PublicHeader } from "./public-header";
 import { PublicSubscribe } from "./public-subscribe";
 import { UpdateCard } from "./update-card";
 
-export function PublicChangelogPage({ workspace }: { workspace: string }) {
-  const fetchChangelog = useCallback(async () => {
-    const [releases, publicWorkspace] = await Promise.all([
-      changelogService.getPublicList(workspace),
-      brandingService.getPublic(workspace),
-    ]);
-    return { releases, branding: publicWorkspace.branding, name: publicWorkspace.name };
-  }, [workspace]);
-  const { state, reload } = useAsyncData(fetchChangelog, [workspace]);
+/**
+ * The public changelog. The first page arrives server-rendered; older updates
+ * load on demand. `basePath` is "/c/[workspace]" on ShipBrief and "" on the
+ * workspace's custom domain.
+ */
+export function PublicChangelogPage({
+  workspace,
+  basePath,
+  initialReleases,
+  initialHasMore,
+}: {
+  workspace: PublicWorkspace;
+  basePath: string;
+  initialReleases: PublicRelease[];
+  initialHasMore: boolean;
+}) {
+  const [releases, setReleases] = useState(initialReleases);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(initialHasMore);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     // Analytics only; a failed beacon must never affect the page.
-    publicEngagementService.recordView(workspace).catch(() => undefined);
-  }, [workspace]);
+    publicEngagementService.recordView(workspace.slug).catch(() => undefined);
+  }, [workspace.slug]);
 
-  if (state.status === "idle" || state.status === "loading") return <div className="mx-auto max-w-2xl p-8"><LoadingState /></div>;
-  if (state.status === "error") return <div className="mx-auto max-w-2xl p-8"><ErrorState message={state.error} onRetry={() => void reload()} /></div>;
-  if (state.status !== "success") return <div className="mx-auto max-w-2xl p-8"><ErrorState message="Unable to load this changelog." onRetry={() => void reload()} /></div>;
+  const loadMore = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const next = await changelogService.getPublicPage(workspace.slug, page + 1);
+      setReleases((current) => [...current, ...next.items.filter((item) => !current.some((existing) => existing.id === item.id))]);
+      setPage(page + 1);
+      setHasMore(next.hasMore);
+    } catch (loadError) {
+      setError(loadError instanceof Error ? loadError.message : "Older updates couldn't load.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  const { releases, branding, name } = state.data;
-
-  const featured = releases.find((release) => release.featured);
+  const featured = initialReleases.find((release) => release.featured);
 
   return (
     <div className="min-h-full bg-background">
-      <PublicHeader workspace={workspace} branding={branding} />
+      <PublicHeader workspace={workspace.slug} name={workspace.name} branding={workspace.branding} basePath={basePath} rssUrl={workspace.rssUrl} />
       <main className="mx-auto max-w-2xl px-4 py-10 sm:px-6 sm:py-14">
-        <PublicSubscribe workspace={workspace} workspaceName={name} className="mb-8" />
-        {featured && <div className="mb-8"><UpdateCard workspace={workspace} release={featured} featured /></div>}
+        <div className="mb-8">
+          <h1 className="sb-title-page">What&apos;s new</h1>
+          <p className="mt-2 text-muted-foreground">New features, improvements and fixes in {workspace.name}.</p>
+        </div>
+        {workspace.settings.allowSubscriptions && <PublicSubscribe workspace={workspace.slug} workspaceName={workspace.name} className="mb-10" />}
+        {featured && <div className="mb-8"><UpdateCard basePath={basePath} release={featured} featured /></div>}
         {releases.length === 0 ? (
           <EmptyState title="No updates yet" description="Published product updates will appear here." />
         ) : (
           <div className="space-y-6">
             {releases.filter((release) => release.id !== featured?.id).map((release) => (
-              <UpdateCard key={release.id} workspace={workspace} release={release} />
+              <UpdateCard key={release.id} basePath={basePath} release={release} />
             ))}
+          </div>
+        )}
+        {hasMore && (
+          <div className="mt-10 flex flex-col items-center gap-2">
+            <Button type="button" variant="outline" onClick={() => void loadMore()} disabled={loading}>
+              {loading && <Loader2 className="animate-spin" />}Load older updates
+            </Button>
+            {error && <p role="alert" className="text-xs text-destructive">{error}</p>}
           </div>
         )}
       </main>

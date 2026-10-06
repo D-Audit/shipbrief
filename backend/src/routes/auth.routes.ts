@@ -23,4 +23,5 @@ authRoutes.post("/workspace", requireAuth, controller.switchWorkspace);
 authRoutes.patch("/profile", requireAuth, controller.updateProfile);
 authRoutes.post("/password", requireAuth, limits.passwordReset, controller.changePassword);
 authRoutes.get("/sessions", requireAuth, controller.sessionsList);
+authRoutes.get("/product-updates", requireAuth, controller.productUpdates);
 authRoutes.delete("/sessions/:id", requireAuth, controller.revokeSession);

@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
+import { ProductUpdatesButton } from "./product-updates-button";
 import { useAsyncData } from "@/hooks/use-async-data";
 import { activityService } from "@/lib/services";
 import { routeTitles } from "@/lib/navigation";
@@ -58,6 +59,7 @@ export function Topbar({ onOpenCommand, onOpenNavigation }: TopbarProps) {
         {/* One-click light/dark on every workspace page; phones use Appearance in the account menu. */}
         <ThemeToggle className="mx-1 hidden sm:inline-flex" />
         <HelpMenu />
+        <ProductUpdatesButton />
         <NotificationsPopover />
         <AccountMenu />
       </div>

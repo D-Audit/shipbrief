@@ -29,6 +29,9 @@ services:
         sync: false
       - key: APP_URL
         sync: false
+      # Widget key of the workspace that publishes ShipBrief's own "What's new" (optional).
+      - key: PRODUCT_UPDATES_WIDGET_KEY
+        sync: false
       # Gmail API sending (HTTPS; the free plan blocks SMTP). See backend/.env.example.
       - key: GMAIL_CLIENT_ID
         sync: false

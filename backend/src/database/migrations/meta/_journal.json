@@ -15,6 +15,20 @@
       "when": 1790831146070,
       "tag": "0001_public_theme_dark_default",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1791283701729,
+      "tag": "0002_widget_identity",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1791309079293,
+      "tag": "0003_changelog_settings",
+      "breakpoints": true
     }
   ]
 }

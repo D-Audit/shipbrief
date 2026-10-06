@@ -1,13 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { Check, Copy, Loader2, Plus, ShieldCheck, Trash2, Webhook as WebhookIcon } from "lucide-react";
+import { BookOpen, Check, Copy, Loader2, Plus, ShieldCheck, Trash2, Webhook as WebhookIcon } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import { ErrorState, LoadingState, PageHeader, SectionHeader, StatusBadge } from "@/components/shared/page-states";
 import { IconTile } from "@/components/shared/icon-tile";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { ButtonLink } from "@/components/ui/button-link";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -63,7 +64,7 @@ export function ApiPage() {
 
   return (
     <div className="space-y-8">
-      <PageHeader title="API & Webhooks" description="Build on ShipBrief with scoped keys and real-time event webhooks." />
+      <PageHeader title="API & Webhooks" description="Build on ShipBrief with scoped keys and real-time event webhooks." actions={<ButtonLink href="/app/api/guide" variant="outline"><BookOpen />Connect your app</ButtonLink>} />
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_26rem]">
         <section className="sb-panel min-w-0 p-5" aria-labelledby="keys-heading">
           <SectionHeader id="keys-heading" title="API keys" description="Scoped, server-side keys for trusted integrations." action={<Button type="button" size="sm" onClick={() => setKeyDialog(true)}><Plus />Create key</Button>} />

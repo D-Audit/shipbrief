@@ -1,56 +1,46 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { PublicUpdatePage } from "@/components/public/public-update";
-import { changelogService } from "@/lib/services";
+import { absoluteAssetUrl, changelogBasePath, getPublicRelease, getPublicWorkspace } from "@/lib/public-changelog";
 
 type PageProps = {
   params: Promise<{ workspace: string; slug: string }>;
 };
 
-function workspaceName(workspace: string) {
-  return workspace
-    .split(/[-_]/)
-    .filter(Boolean)
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(" ");
-}
-
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { workspace, slug } = await params;
-  const name = workspaceName(workspace) || "ShipBrief";
+  const [data, release] = await Promise.all([getPublicWorkspace(workspace).catch(() => null), getPublicRelease(workspace, slug).catch(() => null)]);
+  if (!data || !release) return { title: { absolute: "Update not found" }, robots: { index: false } };
 
-  try {
-    const release = await changelogService.getPublic(workspace, slug);
-    const title = release.seo?.title || release.title;
-    const description = release.seo?.description || release.summary;
-
-    return {
+  const title = release.seo?.title || release.title;
+  const description = release.seo?.description || release.summary;
+  const url = `${data.url}/${release.slug}`;
+  const image = absoluteAssetUrl(release.media?.find((media) => media.type === "image")?.url ?? data.branding.logoUrl, data.url);
+  return {
+    title: { absolute: `${title} · ${data.name}` },
+    description,
+    alternates: {
+      canonical: url,
+      types: { "application/rss+xml": [{ url: data.rssUrl, title: `${data.name} changelog` }] },
+    },
+    openGraph: {
+      type: "article",
       title,
       description,
-      openGraph: {
-        type: "article",
-        title,
-        description,
-        siteName: name,
-        publishedTime: release.publishedAt,
-      },
-      twitter: { card: "summary", title, description },
-    };
-  } catch {
-    const title = `Update from ${name}`;
-    const description = `Read a product update from ${name}.`;
-
-    return {
-      title,
-      description,
-      openGraph: { type: "article", title, description, siteName: name },
-      twitter: { card: "summary", title, description },
-    };
-  }
+      siteName: data.name,
+      url,
+      publishedTime: release.publishedAt,
+      authors: release.author ? [release.author.name] : undefined,
+      images: image ? [image] : undefined,
+    },
+    twitter: { card: "summary", title, description },
+    icons: data.branding.faviconUrl ? { icon: data.branding.faviconUrl } : undefined,
+  };
 }
 
-export default async function Page({
-  params,
-}: PageProps) {
+export default async function Page({ params }: PageProps) {
   const { workspace, slug } = await params;
-  return <PublicUpdatePage workspace={workspace} slug={slug} />;
+  const [data, release, basePath] = await Promise.all([getPublicWorkspace(workspace), getPublicRelease(workspace, slug), changelogBasePath(workspace)]);
+  if (!data || !release) notFound();
+  return <PublicUpdatePage workspace={data} release={release} basePath={basePath} />;
 }

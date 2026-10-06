@@ -6,11 +6,12 @@ import { contacts, workspaces } from "../database/schema.js";
 import { EmailSendError, emailProvider } from "../integrations/email/provider.js";
 import { subscribeConfirmTemplate } from "../integrations/email/templates.js";
 import { hmacSha256Hex, safeEqual } from "../utils/crypto.js";
-import { badRequest, conflict, notConfigured, notFound } from "../utils/errors.js";
+import { badRequest, conflict, forbidden, notConfigured, notFound } from "../utils/errors.js";
 import type { Actor } from "../utils/http.js";
-import { getPublicWorkspaceBySlug } from "./workspace.service.js";
+import { getPublicWorkspaceBySlug, publicChangelogUrls } from "./workspace.service.js";
 
 type ContactRow = typeof contacts.$inferSelect;
+type SubscribeSource = "changelog" | "widget";
 
 /** Tag added to everyone who subscribed themselves from the public changelog, so audiences can target them. */
 export const CHANGELOG_SUBSCRIBER_TAG = "changelog";
@@ -28,6 +29,8 @@ function toContactDto(row: ContactRow) {
     externalId: row.externalId,
     subscribed: !row.unsubscribedAt,
     unsubscribedAt: row.unsubscribedAt?.toISOString() ?? null,
+    source: row.source,
+    lastSeenAt: row.lastSeenAt?.toISOString() ?? null,
     createdAt: row.createdAt.toISOString(),
   };
 }
@@ -64,7 +67,7 @@ export async function addContact(actor: Actor, input: { email: string; name?: st
   if (existing) throw conflict("CONTACT_EXISTS", "That email is already in your contacts.");
   const [created] = await db
     .insert(contacts)
-    .values({ workspaceId: actor.workspaceId, email, name: input.name || null, plan: input.plan || null, tags: input.tags ?? [] })
+    .values({ workspaceId: actor.workspaceId, email, name: input.name || null, plan: input.plan || null, tags: input.tags ?? [], source: "manual" })
     .returning();
   return toContactDto(created!);
 }
@@ -161,7 +164,7 @@ export async function importContacts(actor: Actor, csv: string) {
       }
       result.updated += 1;
     } else {
-      await db.insert(contacts).values({ workspaceId: actor.workspaceId, email, name, plan, tags: tags ?? [] }).onConflictDoNothing();
+      await db.insert(contacts).values({ workspaceId: actor.workspaceId, email, name, plan, tags: tags ?? [], source: "import" }).onConflictDoNothing();
       result.added += 1;
     }
   }
@@ -176,18 +179,18 @@ export async function importContacts(actor: Actor, csv: string) {
  * The confirmation link carries everything needed to subscribe, signed with
  * the server key, so nothing is stored until the person clicks it.
  */
-function signSubscription(workspaceId: string, email: string, expiresAt: number) {
-  const payload = Buffer.from(JSON.stringify({ w: workspaceId, e: email, x: expiresAt })).toString("base64url");
+function signSubscription(workspaceId: string, email: string, expiresAt: number, source: SubscribeSource) {
+  const payload = Buffer.from(JSON.stringify({ w: workspaceId, e: email, x: expiresAt, s: source })).toString("base64url");
   return `${payload}.${hmacSha256Hex(config.ENCRYPTION_KEY, `subscribe:${payload}`).slice(0, 32)}`;
 }
 
-function readSubscription(token: string): { workspaceId: string; email: string } | null {
+function readSubscription(token: string): { workspaceId: string; email: string; source: SubscribeSource } | null {
   const [payload, signature] = token.split(".");
   if (!payload || !signature || !safeEqual(signature, hmacSha256Hex(config.ENCRYPTION_KEY, `subscribe:${payload}`).slice(0, 32))) return null;
   try {
-    const data = JSON.parse(Buffer.from(payload, "base64url").toString()) as { w?: unknown; e?: unknown; x?: unknown };
+    const data = JSON.parse(Buffer.from(payload, "base64url").toString()) as { w?: unknown; e?: unknown; x?: unknown; s?: unknown };
     if (typeof data.w !== "string" || typeof data.e !== "string" || typeof data.x !== "number" || data.x < Date.now()) return null;
-    return { workspaceId: data.w, email: data.e };
+    return { workspaceId: data.w, email: data.e, source: data.s === "widget" ? "widget" : "changelog" };
   } catch {
     return null;
   }
@@ -197,9 +200,13 @@ function readSubscription(token: string): { workspaceId: string; email: string }
  * Emails a confirmation link. The response never says whether the address is
  * already subscribed, so the form can't be used to look people up.
  */
-export async function requestSubscription(workspaceSlug: string, email: string) {
+export async function requestSubscription(workspaceSlug: string, email: string, source: SubscribeSource = "changelog") {
   const workspace = await getPublicWorkspaceBySlug(workspaceSlug);
-  const token = signSubscription(workspace.id, email.toLowerCase(), Date.now() + SUBSCRIBE_LINK_DAYS * 24 * 60 * 60 * 1000);
+  // The changelog's own switch; widget sign-ups keep their existing behaviour.
+  if (source === "changelog" && !(workspace.changelogEnabled && workspace.changelogSubscribe)) {
+    throw forbidden("Email subscriptions are turned off for this changelog.", "SUBSCRIPTIONS_DISABLED");
+  }
+  const token = signSubscription(workspace.id, email.toLowerCase(), Date.now() + SUBSCRIBE_LINK_DAYS * 24 * 60 * 60 * 1000, source);
   const url = `${config.APP_URL}/api/public/subscribe/confirm?token=${encodeURIComponent(token)}`;
   const rendered = subscribeConfirmTemplate({ workspaceName: workspace.name, url, accent: workspace.accentColor });
   try {
@@ -216,7 +223,11 @@ export async function requestSubscription(workspaceSlug: string, email: string) 
 export async function confirmSubscription(token: string) {
   const subscription = readSubscription(token);
   if (!subscription) return null;
-  const [workspace] = await db.select({ slug: workspaces.slug }).from(workspaces).where(and(eq(workspaces.id, subscription.workspaceId), isNull(workspaces.deletedAt))).limit(1);
+  const [workspace] = await db
+    .select({ slug: workspaces.slug })
+    .from(workspaces)
+    .where(and(eq(workspaces.id, subscription.workspaceId), isNull(workspaces.deletedAt)))
+    .limit(1);
   if (!workspace) return null;
 
   const [existing] = await db
@@ -233,8 +244,8 @@ export async function confirmSubscription(token: string) {
   } else {
     await db
       .insert(contacts)
-      .values({ workspaceId: subscription.workspaceId, email: subscription.email, tags: [CHANGELOG_SUBSCRIBER_TAG], signedUpAt: new Date() })
+      .values({ workspaceId: subscription.workspaceId, email: subscription.email, tags: [CHANGELOG_SUBSCRIBER_TAG], signedUpAt: new Date(), source: subscription.source })
       .onConflictDoNothing();
   }
-  return { workspaceSlug: workspace.slug };
+  return { workspaceSlug: workspace.slug, changelogUrl: publicChangelogUrls(workspace).url };
 }

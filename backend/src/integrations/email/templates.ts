@@ -224,7 +224,8 @@ export function releaseEmailTemplate(input: {
   cta?: { label: string; url: string } | null;
   accent: string;
   unsubscribeUrl: string;
-  changelogUrl: string;
+  /** Null when the workspace has no public changelog. */
+  changelogUrl: string | null;
   /** This update's own changelog page, when it was published there. */
   releaseUrl?: string | null;
 }): Rendered {
@@ -239,9 +240,9 @@ export function releaseEmailTemplate(input: {
       preheader: input.previewText,
       accent: input.accent,
       header,
-      bodyHtml: `${input.bodyHtml}${cta}${readMore}<p style="margin:${readMore ? 8 : 24}px 0 0;font-size:13px"><a href="${escapeHtml(input.changelogUrl)}" style="color:${MUTED}">See all updates from ${escapeHtml(input.workspaceName)}</a></p>`,
+      bodyHtml: `${input.bodyHtml}${cta}${readMore}${input.changelogUrl ? `<p style="margin:${readMore ? 8 : 24}px 0 0;font-size:13px"><a href="${escapeHtml(input.changelogUrl)}" style="color:${MUTED}">See all updates from ${escapeHtml(input.workspaceName)}</a></p>` : ""}`,
       footerHtml: `You're receiving product updates from ${escapeHtml(input.workspaceName)}. <a href="${escapeHtml(input.unsubscribeUrl)}" style="color:${MUTED}">Unsubscribe</a>.`,
     }),
-    text: `${htmlToPlainText(input.bodyHtml)}\n\n${input.cta?.label && input.cta.url ? `${input.cta.label}: ${input.cta.url}\n\n` : ""}${input.releaseUrl ? `Read this update: ${input.releaseUrl}\n` : ""}All updates: ${input.changelogUrl}\nUnsubscribe: ${input.unsubscribeUrl}`,
+    text: `${htmlToPlainText(input.bodyHtml)}\n\n${input.cta?.label && input.cta.url ? `${input.cta.label}: ${input.cta.url}\n\n` : ""}${input.releaseUrl ? `Read this update: ${input.releaseUrl}\n` : ""}${input.changelogUrl ? `All updates: ${input.changelogUrl}\n` : ""}Unsubscribe: ${input.unsubscribeUrl}`,
   };
 }

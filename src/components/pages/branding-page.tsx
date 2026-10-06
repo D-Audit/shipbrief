@@ -3,13 +3,12 @@
 import { useSession } from "@/components/session/session-provider";
 import { useMemo, useState } from "react";
 import { createPortal } from "react-dom";
-import { Check, Copy, ImageUp, Loader2, Monitor, Moon, Sun } from "lucide-react";
+import { Check, ImageUp, Loader2, Monitor, Moon, Sun } from "lucide-react";
 import { toast } from "sonner";
 import { ShipBriefIcon, ShipBriefLogo } from "@/components/brand";
 import { WhatsNewWidget } from "@/components/channels/whats-new-widget";
 import { ErrorState, LoadingState, PageHeader, SectionHeader } from "@/components/shared/page-states";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { useAsyncData } from "@/hooks/use-async-data";
 import { brandingService } from "@/lib/services";
 import { cn } from "@/lib/utils";
@@ -49,12 +48,12 @@ export function BrandingPage() {
 function BrandingEditor({ branding, onReload }: { branding: WorkspaceBranding; onReload: () => Promise<void> }) {
   const { session } = useSession();
   const workspaceName = session.workspace?.name ?? "Your product";
+  const previewAddress = `/c/${session.workspace?.slug ?? ""}`;
   const [draft, setDraft] = useState(branding);
   const [logoName, setLogoName] = useState(branding.logoUrl ? "Workspace logo" : "");
   const [faviconName, setFaviconName] = useState(branding.faviconUrl ? "Workspace favicon" : "");
   const [preview, setPreview] = useState<PreviewTab>("changelog");
   const [saving, setSaving] = useState(false);
-  const [verifying, setVerifying] = useState(false);
 
   const uploadAsset = async (file: File, purpose: "logo" | "favicon") => {
     try {
@@ -80,7 +79,7 @@ function BrandingEditor({ branding, onReload }: { branding: WorkspaceBranding; o
     }
     setSaving(true);
     try {
-      await brandingService.update({ accentColor: draft.accentColor, domain: draft.domain, publicTheme: draft.publicTheme, widgetTheme: draft.widgetTheme });
+      await brandingService.update({ accentColor: draft.accentColor, publicTheme: draft.publicTheme, widgetTheme: draft.widgetTheme });
       await onReload();
       toast.success("Brand settings saved.");
     } catch {
@@ -89,34 +88,6 @@ function BrandingEditor({ branding, onReload }: { branding: WorkspaceBranding; o
       setSaving(false);
     }
   };
-
-  const verifyDomain = async () => {
-    if (!draft.domain.trim()) {
-      toast.error("Enter a domain first, like updates.acme.com.");
-      return;
-    }
-    setVerifying(true);
-    try {
-      await brandingService.update({ domain: draft.domain });
-      await onReload();
-      toast.success("Domain saved. It stays pending until its DNS record is verified.");
-    } catch {
-      toast.error("We couldn't start domain verification.");
-    } finally {
-      setVerifying(false);
-    }
-  };
-
-  const copy = async (value: string) => {
-    try {
-      await navigator.clipboard.writeText(value);
-      toast.success("Copied.");
-    } catch {
-      toast.error("Copy isn't available in this browser.");
-    }
-  };
-
-  const status = branding.domainStatus;
 
   return (
     <div className="space-y-8 pb-20">
@@ -222,37 +193,7 @@ function BrandingEditor({ branding, onReload }: { branding: WorkspaceBranding; o
             </div>
           </section>
 
-          <section aria-labelledby="domain-heading" className="sb-panel p-5">
-            <SectionHeader
-              id="domain-heading"
-              title="Custom domain"
-              description="Serve your changelog from your own address."
-              action={
-                <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface px-2.5 py-1 text-xs font-medium text-foreground/80">
-                  <span className={cn("size-1.5 rounded-full", status === "connected" ? "bg-success" : status === "pending" ? "bg-warning" : "bg-border-strong")} />
-                  {status === "connected" ? "Connected" : status === "pending" ? "Verifying" : "Not connected"}
-                </span>
-              }
-            />
-            <div className="mt-5 flex flex-col gap-2 sm:flex-row">
-              <Input value={draft.domain} onChange={(event) => patch({ domain: event.target.value.trim().toLowerCase() })} placeholder="updates.acme.com" aria-label="Custom domain" className="h-9" />
-              <Button type="button" variant="outline" className="h-9" onClick={() => void verifyDomain()} disabled={verifying}>
-                {verifying && <Loader2 className="animate-spin" />}
-                {status === "none" ? "Connect domain" : "Check again"}
-              </Button>
-            </div>
-            <div className="mt-4 overflow-hidden rounded-lg sb-feature">
-              <p className="border-b border-ink-foreground/10 px-4 py-2.5 text-xs text-ink-foreground/60">Add this record at your DNS provider</p>
-              <div className="grid grid-cols-[4.5rem_minmax(0,1fr)_minmax(0,1.3fr)_auto] items-center gap-3 px-4 py-3 font-mono text-[12.5px]">
-                <span className="text-ink-foreground/50">CNAME</span>
-                <span className="truncate">{draft.domain.split(".")[0] || "updates"}</span>
-                <span className="truncate text-primary-strong">cname.shipbrief.app</span>
-                <button type="button" onClick={() => void copy("cname.shipbrief.app")} aria-label="Copy CNAME target" className="rounded-md p-1 text-ink-foreground/60 transition-colors hover:bg-ink-foreground/10 hover:text-ink-foreground">
-                  <Copy className="size-3.5" />
-                </button>
-              </div>
-            </div>
-          </section>
+
         </div>
 
         <aside className="min-w-0 xl:sticky xl:top-6 xl:self-start" aria-label="Live preview">
@@ -274,13 +215,13 @@ function BrandingEditor({ branding, onReload }: { branding: WorkspaceBranding; o
             </div>
           </div>
           <div className="mt-3 rounded-[var(--radius-xl)] bg-surface-subtle p-3">
-            {preview === "changelog" && <ChangelogMock name={workspaceName} accent={contrast.valid ? draft.accentColor : "#c7f238"} dark={draft.publicTheme === "dark"} domain={draft.domain} />}
+            {preview === "changelog" && <ChangelogMock name={workspaceName} accent={contrast.valid ? draft.accentColor : "#c7f238"} dark={draft.publicTheme === "dark"} domain={previewAddress} />}
             {preview === "widget" && (
               <div className="overflow-hidden rounded-xl">
                 <WhatsNewWidget theme={draft.widgetTheme} accentColor={contrast.valid ? draft.accentColor : undefined} />
               </div>
             )}
-            {preview === "social" && <SocialMock name={workspaceName} accent={contrast.valid ? draft.accentColor : "#c7f238"} onAccent={contrast.onAccent} domain={draft.domain} />}
+            {preview === "social" && <SocialMock name={workspaceName} accent={contrast.valid ? draft.accentColor : "#c7f238"} onAccent={contrast.onAccent} domain={previewAddress} />}
           </div>
           <p className="mt-3 text-xs text-muted-foreground">Previews update as you edit. Customers see changes after you save.</p>
         </aside>
@@ -385,7 +326,7 @@ function ChangelogMock({ name, accent, dark, domain }: { name: string; accent: s
           </span>
           {name}
         </span>
-        <span className={cn("truncate text-[11px]", dark ? "text-white/50" : "text-[#6c6d6e]")}>{domain || "acme.shipbrief.app"}</span>
+        <span className={cn("truncate text-[11px]", dark ? "text-white/50" : "text-[#6c6d6e]")}>{domain}</span>
       </div>
       <div className="px-4 py-4">
         <p className="text-lg font-semibold tracking-tight">What&apos;s new</p>
@@ -420,7 +361,7 @@ function SocialMock({ name, accent, onAccent, domain }: { name: string; accent: 
         </span>
       </div>
       <div className="px-4 py-3 text-[#171717]">
-        <p className="text-[11px] text-[#6c6d6e] uppercase">{domain || "acme.shipbrief.app"}</p>
+        <p className="text-[11px] text-[#6c6d6e] uppercase">{domain}</p>
         <p className="mt-0.5 text-sm font-medium">Dark mode is here · {name}</p>
       </div>
     </div>
